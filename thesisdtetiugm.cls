@@ -265,7 +265,7 @@
 				\vfill
 				\textbf{
 					\iftoggle{lang}
-					{\MakeUppercase{Program Studi \@program}}
+					{\MakeUppercase{Program Sarjana Program Studi \@program}}
 					{\MakeUppercase{\@program \vspace{1em} Program}}\\
 					\iftoggle{lang}{\scalebox{1.0}[1.0]{\MakeUppercase{\@departmentIna}}}{\MakeUppercase{\@departmentEng}} \\
 					\iftoggle{lang}{\MakeUppercase{\@facultyIna}}{\MakeUppercase{\@facultyEng}}
