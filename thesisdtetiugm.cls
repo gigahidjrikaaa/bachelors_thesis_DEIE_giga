@@ -259,6 +259,14 @@
 				\vfill
 				\includegraphics[width=0.5\textwidth]{#1}
 				\vfill
+				\textit{\textbf{\MakeUppercase{The Sustainable Development Goals}}}
+				
+				\textit{\textbf{Industry, Innovation and Infrastructure}}
+				
+				\textit{\textbf{Affordable and Clean Energy}}
+				
+				\textit{\textbf{Climate Action}}
+				\vfill
 				\iftoggle{lang}{\textbf{Disusun oleh:}}{Written by:}\\
 				\vspace{0.4em}
 				\textbf{\underline{\@authorName} \\ \@authorID \\}
