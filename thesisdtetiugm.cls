@@ -88,7 +88,6 @@
 \usetikzlibrary{positioning}
 \usetikzlibrary{arrows}
 \usetikzlibrary{shapes}
-\bibliographystyle{IEEEtran}
 
 % Page break for equation
 \allowdisplaybreaks
