@@ -2,16 +2,15 @@
 
 ## Info
 
-- This template is originally written by [Canggih Puspo Wibowo](https://github.com/canggihpw/thesisdtetiugm). 
+- This template is originally written by [Canggih Puspo Wibowo](https://github.com/canggihpw/thesisdtetiugm). Now, this template is developed by Yohan Fajar Sidik (DTETI FT UGM)
 - The template is intended for a bachelor thesis. Other templates (master and doctoral) are availables, but they need adjustment.
 
 
 ## What's new
 
-
 - [2023-02-17] Initial release.
 - [2023-05-30] [v1.1](https://github.com/Dr-Sidik/template_thesis_latex_dteti/releases/tag/v1.1)
-
+- [2025-04-09] [v1.2](https://github.com/Dr-Sidik/template_thesis_latex_dteti/releases/tag/v1.2)
 
 ## How-to-use 
 
