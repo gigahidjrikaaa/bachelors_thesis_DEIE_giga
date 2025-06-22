@@ -1,12 +1,16 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%  Filename: thesisdtetiugm.cls
-%%%  Class File  for Master Thesis at DTETI UGM
-%%%  --- 
-%%%  Written by Canggih Puspo Wibowo
-%%%  [canggihpw@gmail.com]
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%  Filename: main.tex
 %%%  ---
-%%%  This class file can be freely modified
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%  Template for Bachelor Thesis at DTETI UGM   		
+%%%  Created using thesisdtetiugm.cls
+%%%  --- 
+%%%  Original Written by Canggih Puspo Wibowo
+%%%  [canggihpw@gmail.com]
+%%%
+%%% Developed by Dr.-Ing. Yohan Fajar Sidik [DTETI FT UGM]
+%%% [yohanfajarsidik@ugm.ac.id]
+%%% Github repo: https://github.com/Dr-Sidik/template_thesis_latex_dteti
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %======================================
 %% Identification
@@ -27,9 +31,6 @@
 \RequirePackage{calc}%Simple arithmetic lib
 \RequirePackage{pdfpages} %include pdf file in latex
 %\RequirePackage{titlesec}
-
-
-
 
 %======================================
 %% Option Declaration
@@ -893,6 +894,16 @@
 	\fontsize{12}{2}\selectfont
 	\onehalfspacing
 	\input{#1}
+}
+
+\newcommand{\appendixtables}{
+  \renewcommand{\thetable}{L.\arabic{table}}%
+  \setcounter{table}{0}%
+}
+
+\newcommand{\appendixfigures}{
+  \renewcommand{\thefigure}{L.\arabic{figure}} 
+  \setcounter{figure}{0} 
 }
 
 %----------------
