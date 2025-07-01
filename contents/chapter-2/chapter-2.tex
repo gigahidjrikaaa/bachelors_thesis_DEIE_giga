@@ -2,17 +2,55 @@
 
 % Bab ini mengulas fondasi konseptual dan empiris yang melandasi penelitian mengenai platform terintegrasi berbasis AI, gamifikasi, dan blockchain untuk keterlibatan dan kesejahteraan mahasiswa. Bagian pertama menyajikan tinjauan pustaka terhadap karya-karya terdahulu yang relevan, mengidentifikasi kontribusi serta keterbatasan mereka, dan memposisikan penelitian ini dalam lanskap keilmuan saat ini. Bagian kedua memaparkan dasar-dasar teori mengenai teknologi inti yang digunakan (AI Konversasional Hibrida, Gamifikasi, Blockchain) serta konsep keterlibatan pengguna dan kesejahteraan mahasiswa dalam konteks digital. Terakhir, bab ini menganalisis secara komparatif pendekatan-pendekatan yang ada dan justifikasi pemilihan metode untuk penelitian ini.
 
+This chapter provides the theoretical foundations and academic context for the research. The first section, Theoretical Background, explains the core concepts and technologies that constitute the proposed framework. The second section, Literature Review, surveys existing work in related fields to identify the research gap that this thesis aims to address.
+
 \section{Theoretical Background}
 \label{sec:theoretical_background}
 
-Penelitian mengenai pemanfaatan teknologi untuk mendukung mahasiswa bukanlah hal baru. Berbagai solusi digital telah diusulkan dan dievaluasi untuk meningkatkan aspek-aspek tertentu dari pengalaman belajar dan kehidupan mahasiswa. Namun, integrasi spesifik antara AI konversasional dengan kapabilitas empatik, mekanisme gamifikasi yang memotivasi, dan infrastruktur blockchain yang menjamin keamanan dan transparansi, khususnya untuk meningkatkan keterlibatan (\textit{engagement}) dan kesejahteraan (\textit{well-being}) mahasiswa secara simultan, masih merupakan area yang relatif baru dan terus berkembang, menyisakan banyak ruang untuk eksplorasi dan kontribusi ilmiah. Tinjauan ini akan mengulas beberapa area kunci penelitian terdahulu secara sistematis untuk memetakan lanskap riset saat ini dan mengidentifikasi celah yang relevan.
+This section describes the foundational principles and technologies upon which the agentic AI framework is built, including Agentic AI, Large Language Models (LLMs), LLM orchestration, and workflow automation platforms.
 
-\subsection{AI Konversasional untuk Dukungan Kesejahteraan dan Keterlibatan Mahasiswa} 
-\label{subsec:ai_konversasional_tinjauan_revised}
+\subsection{Agentic AI and Multi-Agent Systems (MAS)}
+\label{subsec:agentic_ai}
 
-Pemanfaatan AI konversasional, dalam bentuk \textit{chatbot} atau agen virtual, telah menunjukkan potensi signifikan dalam menyediakan dukungan kepada mahasiswa. Penelitian awal cenderung berfokus pada implementasi \textit{chatbot} untuk tugas-tugas administratif dan penyediaan informasi umum \cite{ai_chatbots_education_advances_2024}. Seiring dengan kemajuan \textit{Natural Language Processing} (NLP) dan \textit{Large Language Models} (LLMs), fokus penelitian bergeser ke arah pengembangan agen konversasional yang lebih canggih. Tinjauan sistematis mengenai desain agen konversasional empatik, khususnya dalam konteks dukungan kesehatan mental, mengidentifikasi bahwa arsitektur hibrida seringkali lebih unggul dalam mencapai akurasi dan nuansa respons \cite{empathetic_conversational_agents_mental_health_2024}. Studi kasus di Indonesia juga mengonfirmasi penerimaan positif mahasiswa terhadap \textit{chatbot} untuk dukungan kesehatan mental awal, dengan catatan penting mengenai kebutuhan personalisasi dan penanganan privasi \cite{chatbot_student_mental_health_unuja}.
+Artificial Intelligence (AI) has evolved beyond systems that perform simple classification or prediction tasks. A key advancement in this evolution is the concept of an \textbf{intelligent agent}. An agent is defined as an autonomous entity that perceives its environment through sensors and acts upon that environment through actuators to achieve specific goals \cite{FIND_CITATION_PLEASE}. The core characteristic of an agent is its autonomy; it can operate independently to make decisions and take actions without direct human intervention.
 
-Dalam domain keterlibatan akademik, sistem tutor cerdas (\textit{Intelligent Tutoring Systems} - ITS) dan agen konversasional telah dieksplorasi untuk menyediakan pendampingan belajar personal. Tinjauan oleh Rizvi dkk. (2023) membahas bagaimana ITS berbasis AI dapat meningkatkan pengalaman belajar dan keterlibatan mahasiswa melalui jalur pembelajaran yang adaptif dan umpan balik instan \cite{rizvi_ai_tutoring_review_2023}. Kontribusi utama dari studi-studi ini adalah demonstrasi efektivitas AI dalam personalisasi pembelajaran. Namun, banyak dari sistem ini belum secara eksplisit mengintegrasikan dukungan kesejahteraan emosional atau aspek sosial dari keterlibatan. Selain itu, potensi dampak negatif seperti kelelahan digital akibat interaksi berkepanjangan dengan sistem AI, serta isu etika terkait pengumpulan dan penggunaan data mahasiswa, tetap menjadi perhatian yang memerlukan mitigasi cermat dalam desain platform \cite{ai_effects_student_wellbeing_2025}.
+When multiple agents operate within the same environment and interact with one another, they form a \textbf{Multi-Agent System (MAS)} \cite{FIND_CITATION_PLEASE}. In an MAS, each agent typically has a specialized role and a set of goals. The overall system's intelligent behavior emerges from the collaboration, coordination, and negotiation among these individual agents. This thesis leverages the MAS paradigm by designing a framework composed of three specialized agents (Analytics, Intervention, and Triage), each with a distinct goal, that work collaboratively to achieve the overarching objective of proactive institutional support.
+
+\subsection{Large Language Models (LLMs)}
+\label{subsec:llms}
+
+Large Language Models (LLMs) are a class of deep learning models, most commonly based on the transformer architecture, that are trained on vast amounts of text data \cite{FIND_CITATION_PLEASE}. Their primary capability is to understand, generate, summarize, and translate human language with remarkable fluency. These models function by predicting the next word in a sequence, allowing them to perform a wide range of natural language processing (NLP) tasks.
+
+This research utilizes a \textbf{hybrid LLM strategy} to balance performance, privacy, and capability:
+\begin{itemize}
+    \item \textbf{Locally-Hosted Open Models (e.g., Gemma):} These are models with open weights that can be deployed on institutional hardware. The primary advantage is data privacy and control, as sensitive data does not need to be sent to third-party vendors. They also offer low latency, which is crucial for real-time applications like the Triage Agent \cite{FIND_CITATION_PLEASE}.
+    \item \textbf{Cloud-Based API Models (e.g., Gemini):} These are state-of-the-art, proprietary models accessed via an API. They often provide superior performance on highly complex tasks. In this framework, such a model is used as a robust fallback mechanism to ensure service continuity if the local model fails, thereby enhancing system reliability \cite{FIND_CITATION_PLEASE}.
+\end{itemize}
+
+\subsection{LLM Orchestration Frameworks (LangChain)}
+\label{subsec:langchain}
+
+An LLM, in isolation, is a powerful text processor but lacks the ability to perform complex, multi-step tasks or interact with external systems. This limitation is addressed by LLM orchestration frameworks like \textbf{LangChain} \cite{FIND_CITATION_PLEASE}. LangChain is a software development framework that provides modular components for building applications powered by LLMs.
+
+Key components of LangChain utilized in this research include:
+\begin{itemize}
+    \item \textbf{Chains:} Sequences of calls, either to an LLM or another utility, that allow for complex, multi-step logic.
+    \item \textbf{Agents and Tools:} LangChain allows the creation of agents that use an LLM as a reasoning engine to decide which "tools" to use. A tool can be any function, such as a database query, a calculation, or an API call.
+    \item \textbf{Retrieval-Augmented Generation (RAG):} This technique allows an LLM to access and incorporate information from external knowledge bases before generating a response, which is crucial for providing context-aware answers.
+\end{itemize}
+In this thesis, LangChain serves as the core of the "Brain" within the FastAPI backend, enabling the development of the sophisticated logic required by the three agents.
+
+\subsection{Workflow Automation Platforms (n8n)}
+\label{subsec:n8n}
+
+Modern software systems rarely exist in isolation. The ability to integrate disparate systems and automate data flows is critical for operational efficiency. \textbf{Workflow Automation Platforms} are designed for this purpose \cite{FIND_CITATION_PLEASE}. These platforms provide a visual interface to connect various applications, databases, and APIs into automated sequences, or "workflows."
+
+This project utilizes \textbf{n8n}, an open-source workflow automation tool. Unlike a general-purpose programming language, n8n excels at tasks involving scheduling, event triggers, and system-to-system communication. In our architecture, n8n functions as the "Nervous System," responsible for:
+\begin{itemize}
+    \item **Scheduled Triggers:** Running tasks at specific times (e.g., triggering the Analytics Agent every Sunday via a Cron job).
+    \item **API Integration:** Calling the API endpoints exposed by our FastAPI backend and communicating with external services (e.g., an email server).
+    \item **Visual Workflow Management:** Providing a clear, visual representation of the automated processes, which simplifies debugging and modification.
+\end{itemize}
 
 % PLACEHOLDER UNTUK GAMBAR/DIAGRAM
 % \begin{figure}[htbp]
@@ -22,15 +60,6 @@ Dalam domain keterlibatan akademik, sistem tutor cerdas (\textit{Intelligent Tut
 %   \caption{Perbandingan Pendekatan dalam Pengembangan AI Konversasional untuk Dukungan Mahasiswa.}
 %   \label{fig:ai_support_models}
 % \end{figure}
-
-\subsection{Gamifikasi untuk Peningkatan Keterlibatan dan Motivasi Mahasiswa}
-\label{subsec:gamifikasi_engagement_tinjauan_revised}
-
-Gamifikasi telah diakui sebagai strategi yang menjanjikan untuk meningkatkan motivasi dan keterlibatan mahasiswa di berbagai aktivitas akademik maupun non-akademik \cite{gamification_motivation_engagement_chemistry_2021, gamification_in_education_boosting_2025}. Tinjauan literatur sistematis oleh Rossi dkk. (2023) mengonfirmasi potensi ini, meskipun menekankan variabilitas implementasi dan tantangan dalam analisis empiris yang seragam \cite{gamification_higher_ed_review_2023}.
-
-Efektivitas gamifikasi sering dikaitkan dengan kemampuannya memenuhi kebutuhan psikologis dasar seperti yang dijelaskan dalam \textit{Self-Determination Theory} (SDT) \cite{sdt_gamification_review_2015, sdt_gamification_duolingo_2025}. Namun, implementasi yang dangkal atau terlalu berfokus pada imbalan ekstrinsik berisiko menciptakan keterlibatan superfisial dan bahkan dapat merusak motivasi intrinsik jangka panjang \cite{challenges_gamification_higher_ed_2022}. Studi oleh Hanus dan Fox (2015), sebuah penelitian longitudinal, memberikan wawasan penting mengenai dampak jangka panjang gamifikasi terhadap motivasi intrinsik, perbandingan sosial, dan performa akademik, menyoroti kompleksitas interaksi ini dari waktu ke waktu \cite{hanus_longitudinal_gamification_2015}.
-
-Lebih lanjut, respons mahasiswa terhadap gamifikasi dapat bervariasi berdasarkan karakteristik individual. Penelitian mengenai tipe pemain (\textit{player types}) menyarankan bahwa personalisasi desain gamifikasi, dengan menyesuaikan elemen permainan dengan preferensi pengguna yang berbeda (misalnya, \textit{achievers, explorers, socializers, philanthropists}), dapat meningkatkan efektivitasnya \cite{taskin_player_types_gamification_2022}. Hal ini menunjukkan bahwa pendekatan "satu ukuran untuk semua" dalam gamifikasi mungkin kurang optimal. Mengintegrasikan pemahaman tentang tipe pengguna ke dalam desain platform gamifikasi menjadi salah satu kontribusi potensial, meskipun tantangan teknis untuk personalisasi adaptif tetap ada.
 
 % PLACEHOLDER UNTUK TABEL
 % \begin{table}[htbp]
@@ -51,42 +80,6 @@ Lebih lanjut, respons mahasiswa terhadap gamifikasi dapat bervariasi berdasarkan
 %     \hline
 %   \end{tabular}
 % \end{table}
-
-\subsection{Aplikasi Teknologi Blockchain dalam Pendidikan dan Sistem Terintegrasi}
-\label{subsec:blockchain_pendidikan_tinjauan_revised}
-
-Teknologi Blockchain menawarkan potensi transformatif untuk sektor pendidikan, terutama dalam hal peningkatan keamanan data, transparansi, dan verifikasi \cite{blockchain_security_privacy_education_2020}. Aplikasi awal banyak berfokus pada penerbitan dan verifikasi kredensial akademik yang aman dan tahan pemalsuan \cite{blockchain_education_transforming_2024}. Namun, potensi blockchain melampaui sekadar ijazah digital.
-
-Dalam konteks platform terintegrasi yang diusulkan, blockchain dapat memainkan peran krusial dalam sistem penghargaan gamifikasi. Penggunaan \textit{smart contract} dapat mengotomatisasi distribusi penghargaan (misalnya, token atau lencana digital) berdasarkan pencapaian yang terverifikasi, menciptakan sistem yang lebih transparan dan akuntabel \cite{integrated_metaverse_blockchain_ai_education_2025}. Meskipun tinjauan spesifik mengenai integrasi blockchain dalam sistem *reward* gamifikasi pendidikan masih terbatas, penelitian mengenai tantangan umum blockchain dalam gamifikasi mulai muncul, menyoroti aspek seperti pengalaman pengguna dan skalabilitas \cite{xi_blockchain_gamification_education_2020}.
-
-Aspek penting lainnya adalah manajemen identitas dan privasi data. Konsep \textit{Self-Sovereign Identity} (SSI) yang didukung oleh blockchain berpotensi memberdayakan mahasiswa dengan kontrol lebih besar atas data pribadi mereka \cite{survey_blockchain_privacy_2024}. Ini sangat relevan mengingat platform yang diusulkan akan mengumpulkan data interaksi AI dan progres gamifikasi. Namun, tantangan implementasi SSI yang user-friendly dan integrasinya dengan sistem universitas yang ada masih signifikan. Selain itu, keseimbangan antara transparansi inheren blockchain (terutama pada blockchain publik) dan kebutuhan privasi pengguna memerlukan desain arsitektur yang hati-hati, mungkin melibatkan solusi \textit{off-chain storage} atau teknik peningkatan privasi lainnya \cite{survey_blockchain_privacy_2024}.
-
-% PLACEHOLDER UNTUK GAMBAR/DIAGRAM
-% \begin{figure}[htbp]
-%   \centering
-%   % \includegraphics[width=0.7\textwidth]{placeholder_diagram_blockchain_applications_education.png} % Ganti dengan file gambar Anda
-%   \fbox{\parbox[c][8cm][c]{0.7\textwidth}{\centering Gambar Placeholder: Diagram Aplikasi Blockchain di Pendidikan (Kredensial, Reward Gamifikasi, SSI, Manajemen Data)}}
-%   \caption{Potensi Aplikasi Teknologi Blockchain dalam Ekosistem Pendidikan.}
-%   \label{fig:blockchain_applications_education_revised}
-% \end{figure}
-
-\subsection{Platform Terintegrasi untuk Keterlibatan dan Kesejahteraan Mahasiswa}
-\label{subsec:platform_terintegrasi_tinjauan}
-
-Upaya untuk meningkatkan keterlibatan dan kesejahteraan mahasiswa seringkali melibatkan berbagai intervensi atau platform digital yang berdiri sendiri. Namun, terdapat argumen kuat yang mendukung pendekatan terintegrasi. Sistem dukungan mahasiswa yang terintegrasi, yang mengkoordinasikan berbagai layanan dan sumber daya, telah terbukti dapat meningkatkan hasil akademik dan non-akademik mahasiswa dengan mengatasi berbagai penghalang secara holistik \cite{child_trends_integrated_student_support_2019}. Dalam konteks digital, platform kesejahteraan digital (\textit{digital well-being platforms}) mulai banyak dikembangkan, meskipun tinjauan sistematis seperti yang dilakukan oleh Borges dkk. (2021) menunjukkan bahwa penelitian di area ini, khususnya di pendidikan tinggi, masih terus berkembang dan memerlukan lebih banyak bukti empiris mengenai efektivitas jangka panjang dan desain yang optimal \cite{borges_digital_wellbeing_higher_ed_2021}. Pengukuran keterlibatan pengguna (\textit{user engagement}) pada platform digital semacam ini juga merupakan aspek penting, di mana tinjauan sistematis oleh Ng dkk. (2022) dapat memberikan panduan mengenai konseptualisasi dan metrik pengukuran yang relevan \cite{ng_user_engagement_systematic_review_2022}.
-
-\subsection{Sintesis dan Celah Penelitian}
-\label{subsec:sintesis_celah_detail_revised}
-
-Dari tinjauan pustaka yang lebih mendalam ini, semakin jelas bahwa meskipun terdapat kemajuan signifikan dalam pemanfaatan AI konversasional untuk dukungan \cite{empathetic_conversational_agents_mental_health_2024, rizvi_ai_tutoring_review_2023}, penerapan gamifikasi untuk motivasi \cite{gamification_higher_ed_review_2023, hanus_longitudinal_gamification_2015}, dan eksplorasi blockchain untuk keamanan dan transparansi di sektor pendidikan \cite{blockchain_education_transforming_2024, xi_blockchain_gamification_education_2020}, beberapa celah penelitian utama tetap ada dan memotivasi urgensi penelitian ini:
-\begin{enumerate}
-    \item \textbf{Integrasi Sinergis Multiteknologi yang Belum Teruji:} Fokus utama tetap pada kurangnya studi yang secara komprehensif merancang, mengimplementasikan, dan mengevaluasi platform yang mengintegrasikan *ketiga* teknologi ini (AI hibrida, gamifikasi yang dipersonalisasi, dan blockchain) secara sinergis untuk tujuan ganda: peningkatan keterlibatan *dan* kesejahteraan mahasiswa. Sebagian besar penelitian masih bersifat parsial atau konseptual \cite{integrated_metaverse_blockchain_ai_education_2025}.
-    \item \textbf{Personalisasi Gamifikasi Berbasis Data dan Tipe Pengguna:} Meskipun pentingnya personalisasi gamifikasi telah diidentifikasi \cite{taskin_player_types_gamification_2022}, implementasi praktis dan evaluasi platform gamifikasi yang secara dinamis beradaptasi dengan tipe pengguna atau data perilaku mahasiswa (yang mungkin difasilitasi oleh AI dan dicatat secara aman oleh blockchain) masih minim.
-    \item \textbf{Studi Longitudinal dan Dampak Jangka Panjang:} Kebutuhan akan studi longitudinal untuk memahami efek jangka panjang dari intervensi teknologi, baik gamifikasi \cite{hanus_longitudinal_gamification_2015} maupun platform kesejahteraan digital \cite{borges_digital_wellbeing_higher_ed_2021}, masih sangat besar. Penelitian ini, meskipun mungkin terbatas dalam durasinya, dapat memberikan dasar untuk investigasi semacam itu.
-    \item \textbf{Validasi dalam Konteks Budaya Spesifik (Indonesia):} Kebutuhan akan penelitian yang memvalidasi efektivitas dan penerimaan platform teknologi canggih ini dalam konteks budaya dan sistem pendidikan tinggi di Indonesia tetap krusial \cite{chatbot_student_mental_health_unuja}.
-    \item \textbf{Desain Etis dan Tata Kelola Platform Terintegrasi:} Mengelola data sensitif dari interaksi AI, memastikan keadilan dalam sistem gamifikasi berbasis blockchain, dan menjaga privasi pengguna dalam ekosistem terintegrasi memunculkan tantangan etika dan tata kelola yang kompleks dan memerlukan eksplorasi lebih lanjut \cite{challenges_gamification_higher_ed_2022, survey_blockchain_privacy_2024}.
-\end{enumerate}
-Penelitian ini diajukan untuk secara langsung menjawab celah-celah ini, dengan fokus pada perancangan artefak inovatif berupa platform terintegrasi dan evaluasi empiris awal terhadap potensi dampaknya.
 
 % ==================================================================================
 % Bagian selanjutnya dari Bab 2 (Dasar Teori, Analisis Perbandingan Metode, dll.)
