@@ -1,45 +1,138 @@
 \chapter{Metode Penelitian}
 
-Bab ini menjelaskan metode atau cara yang digunakan dalam penelitian ini untuk 
-mencapai maksud dan tujuan seperti yang tertulis dalam sub-bab 1.3 [jika diinginkan, kalian dapat menuliskan Kembali tujuan penelitian yang ingin dicapai di sini].
+% Bab ini menjelaskan metode atau cara yang digunakan dalam penelitian ini untuk 
+% mencapai maksud dan tujuan seperti yang tertulis dalam sub-bab 1.3 [jika diinginkan, kalian dapat menuliskan Kembali tujuan penelitian yang ingin dicapai di sini].
 
-\section{Alat dan Bahan Tugas akhir (Opsional)}
+\section{Research Methodology: Design Science Research (DSR)}
 
-\subsection{Alat Tugas akhir}
+% Purpose: To formally establish the academic methodology underpinning your constructive research, directly addressing the need for a research method.
 
-Alat-alat yang digunakan pada tugas akhir ini berupa perangkat keras maupun perangkat lunak sebagai sarana pendukung antara lain. Kemukakan secara detail sesuai dengan kebutuhan tugas akhir dan juga tambahkan spesifikasi minumum sehingga peneliti lain yang hendak melakukan hal yang sama bisa melakukannya :
+% Elaboration Points:
 
-\begin{enumerate}
-	\item \textit{Notebook} dengan spesifikasi minumum sistem operasi Windows 8, \textit{processor} Intel Core i3 2330M CPU @ 2,2 GHz, memori 4GB DDR3, grafis NVIDIA GeForce GT 610 (4GB), hardisk 500GB. Pada tugas akhir ini digunakan Windows 10, Intel Core i7 4570M CPU, Memori 4GB DDR 3, grafis Intel HD4300. 
-	\item \textit{Smartphone} dengan spesifikasi tipe minimum, OS Android OS v4.1.2 (Jelly Bean),CPU Dual-core 800 MHz, GPU Mali-400, Internal 4 GB, 768 MB RAM. Pada tugas akhir ini digunakan ....
-	\item \textit{Game creation platform} versi 3.3.2 untuk Stencyl dan Construct2.
-	\item CORELDRAW X7, Tiled dan GIMP 2
-\end{enumerate}
+% Provide a formal definition of Design Science Research, citing key literature (e.g., Hevner et al., 2004). Explain that DSR's goal is to create innovative artifacts that solve real-world problems.
 
-\subsection{Bahan Tugas akhir}
+% Outline the stages of DSR and map them to your thesis structure:
 
-Bahan tugas akhir adalah segala sesuatu yang bersifat fisik atau digital yang digunakan untuk kebutuhan tugas akhir. Bahan tugas akhir dapat berupa:
+% Problem Identification & Motivation (Addressed in Chapter 1).
 
-\begin{enumerate}
-	\item Bahan habis pakai. Bahan yang digunakan untuk tugas akhir. Sebagai contoh 
-	mungkin dibutuhkan kertas transparansi, baterai, atau yang lain 
-	\item Bahan yang berupa data atau informasi yang menjadi dataset tugas akhir. Dataset tugas akhir dapat berupa:
-\end{enumerate}
-\begin{itemize}
-	\item Dataset pihak lain yang diperoleh dengan izin atau dalam lisensi yang diizinkan untuk digunakan secara langsung 
-	\item Dataset pihak pertama yang disusun sendiri melalui quisioner, observasi, atau interview 
-	\item Dokumen panduan yang mengacu pada standar, hasil tugas akhir, atau artikel yang disitasi dan digunakan.
-\end{itemize}
+% Definition of Objectives for a Solution (Addressed in Chapter 1).
+
+% Design & Development (The focus of this chapter, Chapter 3, and the next, Chapter 4).
+
+% Demonstration (The focus of the testing in Chapter 4).
+
+% Evaluation & Communication (Addressed in Chapter 4 and Chapter 5, and through this thesis itself).
+
+% Include a flowchart diagram illustrating your research process from start to finish.
 
 
-\section{Metode yang Digunakan}
+\section{System Overview and Conceptual Design}
 
-Bagian ini membahas metode atau cara yang akan digunakan dalam penelitian, tahapan 
-penerapan metode, dan desain penelitian (misalnya apakah penelitian akan menggunakan 
-eksperimen di Laboratorium atau di lapangan, misalkan saja penelitian biomedis atau 
-penelitian alat ukur hama yang dapat dilakukan di laboratorium ataupun di lapangan, atau menggunakan metode survei (misalnya untuk teknologi Informasi), studi kasus, atau analisis dengan perangkat lunak (ETAP, LTSpice, dst), atau \textit{prototyping} (pembuatan perangkat keras).
+Purpose: To provide a high-level, 10,000-foot view of the system's purpose and its main components, making it understandable before diving into technical specifics.
 
-Bagian ini juga membahas bagaimana data [akan] dianalisis, apakah dengan membandingkan keluaran beberapa alat ukur, membandingkan dengan standar atau bagaimana.
+Elaboration Points:
+
+Present a concise paragraph describing the conceptual model: "The proposed framework is an ecosystem of three collaborative, intelligent agents that work in concert to transform an institution's mental health support from a reactive to a proactive model..."
+
+Include a high-level Context Diagram showing the main entities (Students, University Staff/Counselors) and systems (UGM-AICare User App, Agentic AI Backend, Admin Dashboard) and how they interact.
+
+\section{Functional Architecture: The Agentic Core}
+Purpose: To detail the "what" of the system. This section explains the specific roles and functions of each agent. This is the heart of your functional design.
+
+Elaboration Points: Create a subsection for each of the three agents. For each, define its:
+
+\subsection{The Analytics Agent}
+
+Goal: To autonomously identify mental health trends from anonymized user data.
+
+Perception (Inputs): Anonymized conversation logs from the PostgreSQL database.
+
+Processing Logic: Describe the NLP tasks it performs: topic modeling, sentiment analysis, and summarization.
+
+Action (Outputs): A structured weekly report (in JSON format) containing key insights (e.g., top 5 trending stress topics, overall sentiment score).
+
+\subsection{The Intervention Agent}
+
+Goal: To automate targeted, proactive outreach campaigns.
+
+Perception (Inputs): The structured report from the Analytics Agent and a set of predefined "campaign rules."
+
+Processing Logic: A rule-based engine that maps insights to actions (e.g., IF 'exam stress' > threshold THEN trigger 'time-management-workshop' campaign).
+
+Action (Outputs): A signal sent to the orchestration layer (n8n) with target audience segment and message content.
+
+\subsection{The Triage Agent}
+
+Goal: To efficiently route a student to the most appropriate level of support in real-time.
+
+Perception (Inputs): A user's live conversation with the chatbot.
+
+Processing Logic: A real-time text classification model to determine the conversation's severity level (e.g., Level 1: Casual, Level 2: Moderate, Level 3: Red Flag).
+
+Action (Outputs): A structured recommendation (e.g., suggest a self-help module, suggest booking a counselor, provide an emergency hotline).
+
+Include a detailed Data Flow Diagram (DFD) showing how data moves between these three agents and the database.
+
+\section{Technical Architecture: The Hybrid System}
+Purpose: To detail the "how" of the system—the engineering blueprint, including justification for key technology choices.
+
+Elaboration Points:
+
+\subsection{Overall System Architecture Diagram}
+A detailed diagram showing the interplay between all technologies: Next.js (Admin Dashboard), FastAPI (Backend), PostgreSQL, LangChain (as a library), and n8n (as a separate, orchestrated service). Show the communication protocols (e.g., REST API, direct DB connection).
+
+\subsection{The "Brain": FastAPI + LangChain Service}
+Justify the choice of FastAPI (for performance, async support) and LangChain (for LLM orchestration). Detail the API design, defining key endpoints (e.g., /api/agents/generate-report) and their request/response schemas.
+
+\subsection{The "Nervous System": n8n Workflows} 
+Justify the choice of n8n for robust workflow automation. Provide screenshots or diagrams of the primary n8n workflows (e.g., the "Weekly Report Generation" workflow triggered by a Cron job).
+
+\section{Database Design}
+Purpose: To define the data persistence layer of the system.
+
+Elaboration Points:
+
+Present a clean Entity-Relationship Diagram (ERD).
+
+% Add table of key columns and data types for the most important table
+\begin{table}[h]
+    \centering
+    \caption{Key Columns and Data Types for \texttt{conversation\_logs} Table}
+    \label{tab:conversation-logs}
+    \begin{tabular}{|l|l|l|}
+        \hline
+        \textbf{Column Name} & \textbf{Data Type} & \textbf{Description} \\
+        \hline
+        id & SERIAL PRIMARY KEY & Unique identifier \\
+        user\_id & UUID & Reference to user (anonymized) \\
+        timestamp & TIMESTAMP WITH TIME ZONE & Time of message \\
+        message & TEXT & User or agent message content \\
+        sender & VARCHAR(16) & 'user' or 'agent' \\
+        sentiment\_score & FLOAT & Sentiment analysis result \\
+        topic & VARCHAR(64) & NLP-inferred topic label \\
+        \hline
+    \end{tabular}
+\end{table}
+
+\section{User Interface (UI) Design}
+Purpose: To show the design of the human interface for the system's administrative users.
+
+Elaboration Points:
+
+Define the primary user persona for the dashboard (e.g., "Dr. Astuti, Head of Counseling Services").
+
+Present wireframes or high-fidelity mockups for the key screens of the Admin Dashboard (e.g., the main analytics view, the report history page).
+
+\section{Security and Privacy by Design}
+Purpose: To demonstrate that critical security and privacy considerations are integral to the architecture.
+
+Elaboration Points:
+
+Detail the Data Anonymization Pipeline: How is Personally Identifiable Information (PII) identified and redacted from chat logs before they are stored for analysis?
+
+Describe the Role-Based Access Control (RBAC) mechanism for the admin dashboard.
+
+Mention standard security practices like data encryption in transit (TLS) and at rest.
 
 \section{Alur Tugas Akhir}
 

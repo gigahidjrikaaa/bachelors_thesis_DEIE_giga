@@ -4,25 +4,26 @@
 \label{sec:background}
 
 
-Discuss the "organizational challenge": HEIs struggle with scalable, proactive, and efficient mental health support.
+Higher Education Institutions (HEIs) are facing a critical and growing challenge in supporting student well-being \cite{FIND_CITATION_PLEASE}. A landmark report highlights the escalating prevalence of mental health and substance use issues among student populations, urging institutions to adopt a more comprehensive support model \cite{FIND_CITATION_PLEASE}. This crisis not only jeopardizes students' academic success and personal development but also places an immense, unsustainable strain on the institutions tasked with supporting them \cite{FIND_CITATION_PLEASE}.
 
-Describe the current model as "reactive," waiting for students to seek help, which leads to overwhelmed human resources.
+The traditional support model, centered around on-campus counseling services, is fundamentally \textbf{reactive}. It relies on students to self-identify their distress and navigate the process of seeking help. This paradigm faces significant operational challenges, including insufficient staffing, long waiting lists, and an inability to provide immediate, 24/7 support, which ultimately limits access for a large portion of the student body \cite{FIND_CITATION_PLEASE}. Consequently, a critical gap persists between the need for mental health services and their actual provision, leaving many students without timely support \cite{FIND_CITATION_PLEASE}.
 
-Introduce "Digital Transformation" in the context of higher education.
+To bridge this gap, a paradigm shift from a reactive to a \textbf{proactive} support model is imperative \cite{FIND_CITATION_PLEASE}. The engine for this evolution is \textbf{Digital Transformation}, a process that leverages technology to fundamentally reshape organizational processes and enhance value delivery within HEIs \cite{FIND_CITATION_PLEASE}. Within this context, Artificial Intelligence (AI) has emerged as a key enabling technology, with systematic reviews confirming its significant potential to analyze complex data, automate processes, and deliver personalized interventions at scale within the higher education landscape \cite{FIND_CITATION_PLEASE}.
 
-Introduce "Agentic AI" as a paradigm shift from passive tools to autonomous systems that act to achieve goals.
+This research moves beyond conventional AI applications by proposing the use of \textbf{Agentic AI}. An intelligent agent is an autonomous system capable of perception, decision-making, and proactive action to achieve specific goals \cite{FIND_CITATION_PLEASE}, representing a new frontier in educational technology \cite{FIND_CITATION_PLEASE}. We propose that a framework built upon a system of collaborative intelligent agents, a Multi-Agent System (MAS), a concept already explored for smart campus management \cite{FIND_CITATION_PLEASE}, can create a truly transformative ecosystem. Such a system would not only serve as a support tool for students but, more importantly, would function as a strategic asset for the institution, enabling data-driven decision-making, automating operational workflows, and facilitating a proactive stance on student well-being. This thesis details the design, development, and evaluation of such a framework, prototyped within the UGM-AICare project.
+
 
 %-------------------------------------------------
 
-\section{Problem Statement}
-\label{sec:problem_statement}
+\section{Problem Formulation}
+\label{sec:problem_formulation}
 
-\noindent Berdasarkan latar belakang yang telah diuraikan, penelitian ini difokuskan untuk menjawab pertanyaan-pertanyaan berikut:
+The inefficiency and reactive nature of current university mental health support systems present a complex problem. This research addresses the following core challenges:
 
 \begin{enumerate}
-    \item How to design an agentic AI framework to automate trend analysis, intervention campaigns, and initial triage for university mental health services?
-    \item How can a robust and modular technical architecture (using FastAPI, LangChain, n8n) implement this framework?
-    \item What is the potential impact of this framework on operational efficiency and institutional decision-making processes?
+    \item The primary challenge is the \textbf{design of an agentic AI framework} capable of automating key institutional processes, specifically in the areas of trend analysis, proactive intervention, and initial user triage.
+    \item A significant technical challenge lies in the \textbf{design and implementation of a robust, modular, and hybrid architecture} to realize this framework, requiring the integration of local Large Language Models (e.g., self-hosted Gemma 3), cloud-based models (e.g., Gemini through AI Studio), and workflow automation platforms (e.g., n8n).
+    \item Finally, there is a need to \textbf{evaluate the potential impact} of such a framework on institutional operational efficiency and data-driven decision-making, which will be validated through a proof-of-concept prototype and scenario-based testing.
 \end{enumerate}
 
 %-------------------------------------------------	
@@ -30,8 +31,7 @@ Introduce "Agentic AI" as a paradigm shift from passive tools to autonomous syst
 \section{Objectives}
 \label{sec:objectives}
 
-\noindent Sejalan dengan rumusan masalah di atas, tujuan dari penelitian ini adalah sebagai berikut:
-
+The primary objectives of this thesis are:
 \begin{enumerate}
     \item To design the conceptual and technical framework for the agentic AI system.
     \item To implement a functional proof-of-concept prototype.
@@ -43,10 +43,13 @@ Introduce "Agentic AI" as a paradigm shift from passive tools to autonomous syst
 \section{Scope and Limitations}
 \label{sec:scope_and_limitations}
 
+To ensure the feasibility and focus of this research, the following boundaries are established:
+
 \begin{enumerate}
-    \item The research is focused on the design, prototype implementation, and scenario-based validation of the framework.
-    \item It is not a full-scale deployment across the university.
-    \item It does not measure the long-term impact on student psychological outcomes, but rather the system's functional capabilities and potential organizational impact.
+    \item This research is focused on the \textbf{design and prototype implementation} of the agentic AI framework, not a full-scale, university-wide deployment.
+    \item The evaluation of the framework is based on \textbf{functional, scenario-based testing} of the prototype's capabilities. It does not measure the long-term psychological impact on students or the real-world operational savings for the institution.
+    \item The data utilized for testing the analytics agent will consist of anonymized, pre-existing chat logs or simulated data to ensure user privacy and controlled testing conditions.
+    \item The research will not address the ethical implications of AI in education, such as bias in AI algorithms or the potential for misuse of student data. These are acknowledged as important issues but are outside the scope of this thesis.
 \end{enumerate}
 
 % \noindent Agar penelitian ini lebih terarah dan mendalam, ruang lingkupnya dibatasi sebagai berikut:
@@ -85,16 +88,16 @@ Introduce "Agentic AI" as a paradigm shift from passive tools to autonomous syst
 \section{Thesis Outline}
 \label{sec:thesis_outline}
 
-Penyusunan laporan skripsi ini akan mengikuti sistematika sebagai berikut:
+The structure of this thesis is outlined as follows:
 
-\textbf{Bab I Pendahuluan,} menguraikan latar belakang masalah, justifikasi pentingnya penelitian, rumusan masalah yang akan dijawab, tujuan yang ingin dicapai, batasan ruang lingkup penelitian, manfaat yang diharapkan, serta sistematika penulisan laporan skripsi.
+\textbf{Chapter I: Introduction.} This chapter elaborates on the background of the study, the justification for the research's significance, the problem formulation to be addressed, and the specific objectives to be achieved. It also defines the scope and limitations of the research, outlines the expected contributions, and presents the overall organizational structure of the thesis report.
 
-\textbf{Bab II Tinjauan Pustaka dan Dasar Teori,} menyajikan kajian literatur terhadap penelitian-penelitian terdahulu yang relevan di bidang \textit{conversational AI}, \textit{gamification} dalam pendidikan/kesejahteraan, aplikasi \textit{blockchain} terkait, serta \textit{user engagement} dan kesejahteraan mahasiswa. Bab ini juga memaparkan landasan teori yang mendasari konsep dan teknologi yang digunakan dalam penelitian.
+\textbf{Chapter II: Literature Review and Theoretical Framework.} This chapter presents a comprehensive review of relevant prior research in the fields of conversational AI, the application of gamification in educational and well-being contexts, related blockchain applications, and studies on user engagement and student welfare. Furthermore, this chapter establishes the theoretical foundation that underpins the core concepts and technologies utilized in this research.
 
-\textbf{Bab III Metodologi Penelitian,} menjelaskan secara rinci pendekatan penelitian yang digunakan (\textit{Design Science Research}), tahapan perancangan arsitektur platform, spesifikasi teknis pengembangan prototipe (termasuk pemilihan teknologi AI, \textit{blockchain}, dan \textit{gamification}), metode pengumpulan data, serta desain dan instrumen evaluasi platform.
+\textbf{Chapter III: System Design and Architecture.} This chapter outlines the methodology and technical blueprint for the system. This chapter explains the adoption of Design Science Research and presents the system's high-level conceptual architecture, including its core functional components. It details the underlying technical architecture, justifying the chosen technology stack, and describes the database structure. The chapter also covers the user interface design for system administration and specifies the integrated security and privacy measures.
 
-\textbf{Bab IV Hasil dan Pembahasan,} menyajikan hasil dari implementasi prototipe platform, data yang terkumpul selama tahap evaluasi (baik kuantitatif maupun kualitatif), serta analisis mendalam terhadap hasil tersebut dikaitkan dengan tujuan penelitian dan pertanyaan penelitian. Pembahasan juga mencakup analisis terhadap tantangan teknis dan usabilitas yang ditemukan.
+\textbf{Chapter IV: Implementation and Evaluation.} This chapter describes the development and testing of the system prototype. This chapter details the technical environment used for implementation and demonstrates the functional prototype that was built. It then explains the testing process used to evaluate the system's performance against its design requirements. The chapter concludes by presenting the results from these tests and providing an analysis of the findings.
 
-\textbf{Bab V Kesimpulan dan Saran,} merangkum temuan-temuan utama penelitian, menyajikan kesimpulan yang menjawab rumusan masalah dan tujuan penelitian, serta memberikan saran praktis bagi pengembangan platform lebih lanjut dan rekomendasi untuk penelitian di masa mendatang.
+\textbf{Chapter V: Conclusion and Future Work.} This chapter summarizes the study's findings and contributions. This chapter revisits the initial research problems and presents the main conclusions drawn from the research. It concludes by offering recommendations for both the future development of the system and for subsequent research in this area.
 
 % Akhir dari Chapter 1
