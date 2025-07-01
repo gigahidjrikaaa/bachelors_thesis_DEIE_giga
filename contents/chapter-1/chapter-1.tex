@@ -1,87 +1,89 @@
-\chapter{Pendahuluan}
+\chapter{Introduction}
 
-\section{Latar Belakang}
-\label{sec:latar_belakang}
+\section{Background}
+\label{sec:background}
 
 
-Kesejahteraan (\textit{well-being}) dan keterlibatan (\textit{engagement}) mahasiswa merupakan dua pilar fundamental bagi keberhasilan proses pendidikan tinggi di era digital ini. Tekanan akademik, adaptasi sosial, serta dinamika kehidupan perkuliahan yang kompleks, terlebih dalam konteks pasca-pandemi, menuntut adanya sistem pendukung yang inovatif dan responsif \cite{wellbeing_digital_learning_2021}. Di Indonesia, khususnya di lingkungan universitas seperti Universitas Gadjah Mada (UGM), tantangan ini semakin nyata, di mana mahasiswa memerlukan akses mudah terhadap informasi, dukungan sebaya (\textit{peer support}), serta motivasi untuk terlibat aktif dalam kegiatan positif yang menunjang perkembangan holistik mereka \cite{kesejahteraan_mental_mahasiswa_cybersecurity_2025}.
+Discuss the "organizational challenge": HEIs struggle with scalable, proactive, and efficient mental health support.
 
-Di sisi lain, kemajuan pesat dalam teknologi informasi menawarkan potensi solusi yang signifikan. Kecerdasan buatan konversasional (\textit{Conversational AI}), khususnya \textit{chatbot} dan agen virtual, telah menunjukkan kapabilitas dalam menyediakan layanan informasi, pendampingan awal, hingga dukungan emosional skala luas \cite{ai_chatbots_education_advances_2024}. Namun, keterbatasan AI generik seringkali terletak pada pemahaman konteks lokal, nuansa emosi, dan kemampuan membangun hubungan interpersonal yang otentik. Pendekatan \textit{hybrid conversational AI}, yang mengombinasikan kekuatan model bahasa skala besar (\textit{Large Language Models} - LLM) dengan basis pengetahuan terkurasi atau bahkan intervensi manusia, dipandang sebagai jalur prometif untuk meningkatkan empati dan relevansi interaksi \cite{empathetic_conversational_agents_mental_health_2024}.
+Describe the current model as "reactive," waiting for students to seek help, which leads to overwhelmed human resources.
 
-Selanjutnya, konsep \textit{gamification} atau gamifikasi, yakni penerapan elemen dan mekanisme desain permainan dalam konteks non-permainan, telah terbukti efektif dalam mendorong motivasi dan keterlibatan pengguna (\textit{user engagement}) di berbagai domain, termasuk pendidikan dan kesehatan \cite{gamification_motivation_engagement_chemistry_2021, gamification_engagement_moderating_concentration_2024}. Penerapan gamifikasi dalam platform dukungan mahasiswa berpotensi meningkatkan partisipasi dalam aktivitas pengembangan diri, penggunaan sumber daya kampus, dan interaksi sosial yang positif.
+Introduce "Digital Transformation" in the context of higher education.
 
-Namun, implementasi sistem AI dan gamifikasi terpusat seringkali menimbulkan kekhawatiran terkait privasi data pengguna, transparansi algoritma, dan keamanan sistem penghargaan \cite{integrated_metaverse_blockchain_ai_education_2025}. Teknologi \textit{blockchain} menawarkan solusi potensial untuk mengatasi isu ini melalui sifatnya yang terdesentralisasi, transparan, dan \textit{immutable} (tidak dapat diubah). Pemanfaatan \textit{blockchain} dapat menjamin integritas data interaksi, memberikan kontrol lebih besar kepada mahasiswa atas data pribadi mereka, serta menciptakan sistem penghargaan (\textit{reward system}) gamifikasi yang akuntabel dan terverifikasi \cite{blockchain_education_transforming_2024, blockchain_security_education_rizky_2021}.
-
-Meskipun potensi masing-masing teknologi ini signifikan, sinergi dari integrasi ketiganya---*hybrid conversational AI*, *gamification*, dan *blockchain*---dalam sebuah platform terpadu untuk mendukung mahasiswa belum banyak dieksplorasi secara komprehensif \cite{integrated_metaverse_blockchain_ai_education_2025}. Terdapat celah penelitian (\textit{research gap}) dalam merancang dan mengevaluasi sebuah ekosistem digital yang tidak hanya responsif dan empatik melalui AI, memotivasi melalui gamifikasi, tetapi juga aman dan transparan melalui \textit{blockchain}, guna meningkatkan keterlibatan dan kesejahteraan mahasiswa secara simultan. Penelitian ini bertujuan untuk mengisi celah tersebut dengan merancang, mengembangkan, dan mengevaluasi platform terintegrasi yang mengombinasikan ketiga teknologi mutakhir ini dalam konteks spesifik kehidupan mahasiswa di Indonesia.
+Introduce "Agentic AI" as a paradigm shift from passive tools to autonomous systems that act to achieve goals.
 
 %-------------------------------------------------
 
-\section{Rumusan Masalah}
-\label{sec:rumusan_masalah}
+\section{Problem Statement}
+\label{sec:problem_statement}
 
 \noindent Berdasarkan latar belakang yang telah diuraikan, penelitian ini difokuskan untuk menjawab pertanyaan-pertanyaan berikut:
 
 \begin{enumerate}
-    \item Bagaimana merancang arsitektur platform terintegrasi yang efektif menggabungkan \textit{hybrid conversational AI}, mekanisme \textit{gamification}, dan teknologi \textit{blockchain} untuk mendukung keterlibatan dan kesejahteraan mahasiswa?
-    \item Bagaimana implementasi \textit{hybrid conversational AI} dapat memberikan interaksi yang lebih empatik, relevan secara kontekstual, dan bermanfaat bagi mahasiswa dibandingkan pendekatan AI konvensional \cite{empathetic_conversational_agents_mental_health_2024}?
-    \item Sejauh mana mekanisme \textit{gamification} berbasis \textit{blockchain} yang dirancang dapat meningkatkan motivasi dan keterlibatan (\textit{user engagement}) mahasiswa dalam menggunakan platform dan berpartisipasi dalam aktivitas pendukung kesejahteraan \cite{gamification_engagement_moderating_concentration_2024}?
-    \item Bagaimana dampak penggunaan platform terintegrasi ini terhadap indikator-indikator kesejahteraan subjektif mahasiswa (misalnya, tingkat stres yang dirasakan, rasa keterhubungan sosial, kemudahan akses informasi dukungan)?
-    \item Bagaimana teknologi \textit{blockchain} dapat diimplementasikan secara efektif untuk menjamin keamanan data pengguna, transparansi sistem penghargaan gamifikasi, dan memberikan kontrol data kepada mahasiswa dalam konteks platform ini \cite{blockchain_education_transforming_2024}?
-    \item Apa saja tantangan teknis, usabilitas, dan skalabilitas yang dihadapi dalam pengembangan dan implementasi platform terintegrasi semacam ini di lingkungan universitas \cite{integrated_metaverse_blockchain_ai_education_2025}?
+    \item How to design an agentic AI framework to automate trend analysis, intervention campaigns, and initial triage for university mental health services?
+    \item How can a robust and modular technical architecture (using FastAPI, LangChain, n8n) implement this framework?
+    \item What is the potential impact of this framework on operational efficiency and institutional decision-making processes?
 \end{enumerate}
 
 %-------------------------------------------------	
 
-\section{Tujuan Penelitian}
-\label{sec:tujuan_penelitian}
+\section{Objectives}
+\label{sec:objectives}
 
 \noindent Sejalan dengan rumusan masalah di atas, tujuan dari penelitian ini adalah sebagai berikut:
 
 \begin{enumerate}
-    \item Merancang arsitektur sistem untuk platform terintegrasi yang menyinergikan fungsi \textit{hybrid conversational AI}, elemen \textit{gamification}, dan infrastruktur \textit{blockchain}.
-    \item Mengembangkan prototipe fungsional dari platform terintegrasi tersebut.
-    \item Mengimplementasikan modul \textit{hybrid conversational AI} yang mampu merespons kebutuhan informasi dan memberikan dukungan percakapan awal yang empatik kepada mahasiswa.
-    \item Mengintegrasikan sistem \textit{gamification} yang memanfaatkan \textit{blockchain} untuk pencatatan poin/prestasi dan pengelolaan sistem penghargaan yang transparan dan aman.
-    \item Mengevaluasi tingkat keterlibatan pengguna (\textit{user engagement}) pada platform melalui metrik kuantitatif (misalnya, frekuensi interaksi, penyelesaian tugas gamifikasi) dan kualitatif (misalnya, wawancara, survei).
-    \item Menganalisis dampak platform terhadap persepsi kesejahteraan mahasiswa menggunakan instrumen pengukuran yang relevan (misalnya, kuesioner skala kesejahteraan, analisis sentimen percakapan).
-    \item Menganalisis aspek keamanan, privasi data, dan kelayakan teknis dari implementasi \textit{blockchain} dalam platform.
+    \item To design the conceptual and technical framework for the agentic AI system.
+    \item To implement a functional proof-of-concept prototype.
+    \item To evaluate the prototype's capabilities against predefined functional scenarios.
 \end{enumerate}
 
 %-------------------------------------------------	
 
-\section{Batasan Penelitian}
-\label{sec:batasan_penelitian}
-
-\noindent Agar penelitian ini lebih terarah dan mendalam, ruang lingkupnya dibatasi sebagai berikut:
+\section{Scope and Limitations}
+\label{sec:scope_and_limitations}
 
 \begin{enumerate}
-    \item \textbf{Objek Penelitian:} Fokus pada desain, pengembangan prototipe, dan evaluasi platform terintegrasi yang menggabungkan \textit{hybrid conversational AI}, \textit{gamification}, dan \textit{blockchain} untuk mahasiswa. Studi kasus dapat difokuskan pada mahasiswa UGM atau lingkungan universitas serupa di Indonesia.
-    \item \textbf{Teknologi:} Implementasi \textit{hybrid conversational AI} akan menggunakan kombinasi \textit{Pre-trained LLM} Gemini dengan RAG berbasis dokumen kesehatan mental UGM. Implementasi \textit{blockchain} akan menggunakan EDUChain (L2 Ethereum) untuk fitur \textit{achievement badges minting}. Mekanisme \textit{gamification} akan mencakup \textit{badges}, \textit{points}, dan sistem \textit{levelling}.
-    \item \textbf{Metode Penelitian:} Menggunakan pendekatan \textit{Design Science Research} (DSR) yang meliputi tahap desain artifak (platform), pengembangan prototipe, dan evaluasi. Evaluasi akan menggunakan metode campuran (\textit{mixed methods}), menggabungkan analisis data log penggunaan platform, survei, dan/atau wawancara dengan kelompok pengguna terbatas.
-    \item \textbf{Waktu dan Tempat Penelitian:} Penelitian dilaksanakan dalam periode [Sebutkan periode, misal: Semester Gasal 2024/2025 hingga Semester Genap 2024/2025] di lingkungan [Sebutkan, misal: Laboratorium Departemen Teknik Elektro dan Teknologi Informasi UGM dan melibatkan partisipan mahasiswa UGM secara daring].
-    \item \textbf{Populasi dan Sampel:} Populasi adalah mahasiswa aktif [Sebutkan jenjang, misal: S1] di [Sebutkan Fakultas/Universitas]. Sampel untuk evaluasi adalah sejumlah [Sebutkan jumlah, misal: 30-50] mahasiswa yang dipilih melalui [Sebutkan metode sampling, misal: purposive sampling atau voluntary sampling].
-    \item \textbf{Variabel dan Indikator:} Variabel independen adalah penggunaan platform dan fitur-fiturnya. Variabel dependen meliputi metrik \textit{user engagement} (misal: frekuensi login, durasi sesi, jumlah interaksi AI, progres gamifikasi) dan indikator kesejahteraan (misal: skor skala PSS - Perceived Stress Scale, skor skala koneksi sosial, feedback kualitatif).
-    \item \textbf{Keterbatasan Penelitian:} Penelitian ini tidak mencakup implementasi skala penuh di seluruh universitas. Evaluasi aspek kesejahteraan bersifat subjektif berdasarkan persepsi pengguna. Aspek keamanan \textit{blockchain} dievaluasi pada level prototipe dan tidak mencakup audit keamanan ekstensif. Model AI mungkin memiliki keterbatasan dalam menangani semua topik atau kondisi kesehatan mental yang kompleks dan tidak menggantikan konseling profesional.
+    \item The research is focused on the design, prototype implementation, and scenario-based validation of the framework.
+    \item It is not a full-scale deployment across the university.
+    \item It does not measure the long-term impact on student psychological outcomes, but rather the system's functional capabilities and potential organizational impact.
 \end{enumerate}
 
-%-------------------------------------------------
+% \noindent Agar penelitian ini lebih terarah dan mendalam, ruang lingkupnya dibatasi sebagai berikut:
 
-\section{Manfaat Penelitian}
-\label{sec:manfaat_penelitian}
-
-Penelitian ini diharapkan dapat memberikan manfaat signifikan bagi berbagai pihak:
-
-\begin{itemize}
-    \item \textbf{Bagi Mahasiswa:} Menyediakan akses terhadap platform digital inovatif yang dapat mendukung kebutuhan informasi, interaksi sosial, motivasi, dan akses ke sumber daya kesejahteraan secara terintegrasi, aman, dan menarik.
-    \item \textbf{Bagi Institusi Pendidikan (UGM dan lainnya):} Memberikan model dan bukti konsep (\textit{proof-of-concept}) mengenai pemanfaatan teknologi AI, \textit{gamification}, dan \textit{blockchain} untuk meningkatkan layanan dukungan mahasiswa, engagement, dan strategi peningkatan kesejahteraan di era digital.
-    \item \textbf{Bagi Komunitas Akademik dan Riset:} Menambah khazanah ilmu pengetahuan di bidang Teknik Informasi, khususnya terkait interaksi manusia-komputer (HCI), AI dalam pendidikan (\textit{AI in Education}), aplikasi \textit{blockchain} non-finansial, dan desain sistem terintegrasi untuk kesejahteraan digital (\textit{digital well-being}). Menjadi dasar bagi penelitian selanjutnya di area ini.
-    \item \textbf{Bagi Pengembang Teknologi:} Memberikan wawasan praktis mengenai tantangan dan strategi dalam mengintegrasikan tiga teknologi kompleks (\textit{conversational AI, gamification, blockchain}) dalam satu platform yang berfokus pada pengguna akhir.
-\end{itemize}
+% \begin{enumerate}
+%     \item \textbf{Objek Penelitian:} Fokus pada desain, pengembangan prototipe, dan evaluasi platform terintegrasi yang menggabungkan \textit{hybrid conversational AI}, \textit{gamification}, dan \textit{blockchain} untuk mahasiswa. Studi kasus dapat difokuskan pada mahasiswa UGM atau lingkungan universitas serupa di Indonesia.
+%     \item \textbf{Teknologi:} Implementasi \textit{hybrid conversational AI} akan menggunakan kombinasi \textit{Pre-trained LLM} Gemini dengan RAG berbasis dokumen kesehatan mental UGM. Implementasi \textit{blockchain} akan menggunakan EDUChain (L2 Ethereum) untuk fitur \textit{achievement badges minting}. Mekanisme \textit{gamification} akan mencakup \textit{badges}, \textit{points}, dan sistem \textit{levelling}.
+%     \item \textbf{Metode Penelitian:} Menggunakan pendekatan \textit{Design Science Research} (DSR) yang meliputi tahap desain artifak (platform), pengembangan prototipe, dan evaluasi. Evaluasi akan menggunakan metode campuran (\textit{mixed methods}), menggabungkan analisis data log penggunaan platform, survei, dan/atau wawancara dengan kelompok pengguna terbatas.
+%     \item \textbf{Waktu dan Tempat Penelitian:} Penelitian dilaksanakan dalam periode [Sebutkan periode, misal: Semester Gasal 2024/2025 hingga Semester Genap 2024/2025] di lingkungan [Sebutkan, misal: Laboratorium Departemen Teknik Elektro dan Teknologi Informasi UGM dan melibatkan partisipan mahasiswa UGM secara daring].
+%     \item \textbf{Populasi dan Sampel:} Populasi adalah mahasiswa aktif [Sebutkan jenjang, misal: S1] di [Sebutkan Fakultas/Universitas]. Sampel untuk evaluasi adalah sejumlah [Sebutkan jumlah, misal: 30-50] mahasiswa yang dipilih melalui [Sebutkan metode sampling, misal: purposive sampling atau voluntary sampling].
+%     \item \textbf{Variabel dan Indikator:} Variabel independen adalah penggunaan platform dan fitur-fiturnya. Variabel dependen meliputi metrik \textit{user engagement} (misal: frekuensi login, durasi sesi, jumlah interaksi AI, progres gamifikasi) dan indikator kesejahteraan (misal: skor skala PSS - Perceived Stress Scale, skor skala koneksi sosial, feedback kualitatif).
+%     \item \textbf{Keterbatasan Penelitian:} Penelitian ini tidak mencakup implementasi skala penuh di seluruh universitas. Evaluasi aspek kesejahteraan bersifat subjektif berdasarkan persepsi pengguna. Aspek keamanan \textit{blockchain} dievaluasi pada level prototipe dan tidak mencakup audit keamanan ekstensif. Model AI mungkin memiliki keterbatasan dalam menangani semua topik atau kondisi kesehatan mental yang kompleks dan tidak menggantikan konseling profesional.
+% \end{enumerate}
 
 %-------------------------------------------------
 
-\section{Sistematika Penulisan}
-\label{sec:sistematika_penulisan}
+\section{Contributions}
+\label{sec:contributions}
+
+\begin{enumerate}
+    \item Academic: A novel framework for applying agentic AI in an institutional (higher education) context.
+    \item Practical: A blueprint for UGM to develop a more proactive, data-driven, and efficient mental health support system.
+\end{enumerate}
+
+% Penelitian ini diharapkan dapat memberikan manfaat signifikan bagi berbagai pihak:
+
+% \begin{itemize}
+%     \item \textbf{Bagi Mahasiswa:} Menyediakan akses terhadap platform digital inovatif yang dapat mendukung kebutuhan informasi, interaksi sosial, motivasi, dan akses ke sumber daya kesejahteraan secara terintegrasi, aman, dan menarik.
+%     \item \textbf{Bagi Institusi Pendidikan (UGM dan lainnya):} Memberikan model dan bukti konsep (\textit{proof-of-concept}) mengenai pemanfaatan teknologi AI, \textit{gamification}, dan \textit{blockchain} untuk meningkatkan layanan dukungan mahasiswa, engagement, dan strategi peningkatan kesejahteraan di era digital.
+%     \item \textbf{Bagi Komunitas Akademik dan Riset:} Menambah khazanah ilmu pengetahuan di bidang Teknik Informasi, khususnya terkait interaksi manusia-komputer (HCI), AI dalam pendidikan (\textit{AI in Education}), aplikasi \textit{blockchain} non-finansial, dan desain sistem terintegrasi untuk kesejahteraan digital (\textit{digital well-being}). Menjadi dasar bagi penelitian selanjutnya di area ini.
+%     \item \textbf{Bagi Pengembang Teknologi:} Memberikan wawasan praktis mengenai tantangan dan strategi dalam mengintegrasikan tiga teknologi kompleks (\textit{conversational AI, gamification, blockchain}) dalam satu platform yang berfokus pada pengguna akhir.
+% \end{itemize}
+
+%-------------------------------------------------
+
+\section{Thesis Outline}
+\label{sec:thesis_outline}
 
 Penyusunan laporan skripsi ini akan mengikuti sistematika sebagai berikut:
 
