@@ -257,7 +257,7 @@
 				\MakeUppercase{\fontsize{14pt}{16pt}\selectfont\textbf{\@title}}\\
 				\vspace{1.5cm}
 				%\textbf{#2}\\
-				\fontsize{14pt}{16pt}SKRIPSI\\
+				\fontsize{14pt}{16pt}BACHELOR'S THESIS\\
 				\vfill
 				\includegraphics[width=0.5\textwidth]{#1}
 				\vfill
