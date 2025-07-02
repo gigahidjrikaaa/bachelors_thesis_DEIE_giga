@@ -41,16 +41,35 @@ When multiple agents, each with its own goals and capabilities, co-exist and int
 \end{itemize}
 Therefore, this thesis leverages the MAS paradigm by designing a framework composed of three specialized, collaborative agents. Their individual, goal-directed behaviors, orchestrated within a hybrid architecture, work in concert to achieve the overarching systemic objective: transforming institutional mental health support from a reactive model to a proactive, data-driven ecosystem.
 
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SubSection: Large Language Models (LLMs)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Large Language Models (LLMs)}
 \label{subsec:llms}
 
-Large Language Models (LLMs) are a class of deep learning models, most commonly based on the transformer architecture, that are trained on vast amounts of text data \cite{FIND_CITATION_PLEASE}. Their primary capability is to understand, generate, summarize, and translate human language with remarkable fluency. These models function by predicting the next word in a sequence, allowing them to perform a wide range of natural language processing (NLP) tasks.
+Large Language Models (LLMs) are a class of deep learning models that have demonstrated remarkable capabilities in understanding and generating human-like text. The architectural foundation for virtually all modern LLMs, including the Gemma and Gemini models used in this research, is the \textbf{Transformer architecture}, first introduced by Vaswani et al. \cite{FIND_CITATION_PLEASE}. The Transformer's key innovation is the \textbf{self-attention mechanism}, which allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors, such as Recurrent Neural Networks (RNNs) \cite{FIND_CITATION_PLEASE}.
 
-This research utilizes a \textbf{hybrid LLM strategy} to balance performance, privacy, and capability:
+The core operation of a Transformer-based model involves processing input text through a series of encoding and/or decoding layers. In a generative, decoder-only model like Gemma, the process can be conceptualized as follows:
+\begin{enumerate}
+    \item \textbf{Tokenization and Embedding:} Input text is first broken down into smaller units called tokens. Each token is then mapped to a high-dimensional vector, or an "embedding," that represents its semantic meaning.
+    \item \textbf{Positional Encoding:} Since the self-attention mechanism does not inherently process sequential order, a positional encoding vector is added to each token embedding to provide the model with information about the word's position in the sequence.
+    \item \textbf{Self-Attention Layers:} The sequence of embeddings passes through multiple self-attention layers. In each layer, the model calculates attention scores for every token relative to all other tokens in the sequence, effectively learning which parts of the input are most relevant for understanding the context of each specific token.
+    \item \textbf{Feed-Forward Networks:} Each attention layer is followed by a feed-forward neural network that applies further transformations to each token's representation.
+    \item \textbf{Output Generation:} The model's final output is a probability distribution over its entire vocabulary for the next token in the sequence. The model then typically selects the most likely token (or samples from the distribution) and appends it to the input, repeating the process autoregressively to generate coherent text \cite{FIND_CITATION_PLEASE}.
+\end{enumerate}
+
+\begin{figure}[htbp]
+  \centering
+  % \includegraphics[width=\textwidth]{placeholder_diagram_transformer.png} % Ganti dengan file gambar Anda
+  \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Simplified Transformer Architecture for Generative LLMs} \\ \vspace{1cm} This diagram should illustrate the flow of information: \\ 1. Input Text -> Tokenizer \\ 2. Tokens -> Embedding Layer + Positional Encoding \\ 3. Embedded Tokens -> A stack of 'N' Decoder Blocks \\ 4. Inside a Decoder Block: Multi-Head Self-Attention -> Feed-Forward Network \\ 5. Final Output -> Linear Layer -> Softmax -> Probability of Next Token}}
+  \caption{A simplified view of the decoder-only Transformer architecture used in generative LLMs like Gemma. The model processes input embeddings through multiple layers of self-attention and feed-forward networks to predict the next token in a sequence.}
+  \label{fig:transformer_architecture}
+\end{figure}
+
+This research utilizes a \textbf{hybrid LLM strategy} that leverages two distinct families of models based on this architecture to balance performance, privacy, and capability:
 \begin{itemize}
-    \item \textbf{Locally-Hosted Open Models (e.g., Gemma):} These are models with open weights that can be deployed on institutional hardware. The primary advantage is data privacy and control, as sensitive data does not need to be sent to third-party vendors. They also offer low latency, which is crucial for real-time applications like the Triage Agent \cite{FIND_CITATION_PLEASE}.
-    \item \textbf{Cloud-Based API Models (e.g., Gemini):} These are state-of-the-art, proprietary models accessed via an API. They often provide superior performance on highly complex tasks. In this framework, such a model is used as a robust fallback mechanism to ensure service continuity if the local model fails, thereby enhancing system reliability \cite{FIND_CITATION_PLEASE}.
+    \item \textbf{Locally-Hosted Open Models (Gemma):} The Gemma models are a family of lightweight, open-weight models developed by Google, built from the same research and technology used to create the Gemini models \cite{FIND_CITATION_PLEASE}. As decoder-only Transformers, they are optimized for generative text tasks. Being "open-weight" means their parameters are publicly available, allowing them to be deployed on institutional hardware. This approach is critical for this project as it guarantees data privacy and security—sensitive student conversations processed by the Triage Agent never leave the university's secure servers. Furthermore, local hosting provides low latency and eliminates per-token API costs, making it a sustainable choice for real-time, high-volume interactions.
+    \item \textbf{Cloud-Based API Models (Gemini):} The Gemini models represent Google's state-of-the-art, natively multimodal foundation models, available in various sizes (e.g., Gemini Pro). Unlike models trained solely on text, Gemini was pre-trained from the ground up on multiple data modalities, giving it more sophisticated reasoning capabilities \cite{FIND_CITATION_PLEASE}. In this framework, a powerful model like Gemini Pro is accessed via a secure API for complex, non-sensitive tasks, such as the weekly trend analysis performed by the Analytics Agent. It also serves as a robust fallback mechanism, ensuring service continuity and reliability should the local model encounter issues.
 \end{itemize}
 
 \subsection{LLM Orchestration Frameworks (LangChain)}
