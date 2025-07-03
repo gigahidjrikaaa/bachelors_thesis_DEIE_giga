@@ -42,6 +42,24 @@ When multiple agents, each with its own goals and capabilities, co-exist and int
 Therefore, this thesis leverages the MAS paradigm by designing a framework composed of three specialized, collaborative agents. Their individual, goal-directed behaviors, orchestrated within a hybrid architecture, work in concert to achieve the overarching systemic objective: transforming institutional mental health support from a reactive model to a proactive, data-driven ecosystem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SubSection: Foundational Principles of the Framework
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Foundational Principles of the Framework}
+\label{subsec:foundational_principles}
+
+Beyond the technical architecture, the proposed framework is grounded in several key strategic and ethical principles that justify its design and purpose. These concepts from service design, management science, and data ethics provide the theoretical motivation for shifting how institutional support is delivered.
+
+\subsubsection{Proactive vs. Reactive Support Models}
+The traditional approach to institutional support, particularly in mental health, is predominantly \textbf{reactive}. This model, common in service design, operates on a "break-fix" basis, where the service delivery is initiated only after a user (in this case, a student) self-identifies a problem and actively seeks a solution \cite{FIND_CITATION_PLEASE}. This places the onus of initiation entirely on the individual, creating significant barriers to access such as stigma, lack of awareness, or the inability to act during a crisis. In contrast, a \textbf{proactive support model} aims to anticipate needs and intervene before a problem escalates. Drawing from principles in preventative healthcare and proactive customer relationship management, this model uses data to identify patterns and risk factors, enabling the institution to offer timely, relevant support to at-risk cohorts \cite{FIND_CITATION_PLEASE}. This thesis is an explicit attempt to architect a system that facilitates this strategic shift from a reactive to a proactive support paradigm.
+
+\subsubsection{Data-Driven Decision-Making in Higher Education}
+The concept of \textbf{Data-Driven Decision-Making (DDDM)} posits that strategic decisions should be based on objective data analysis and interpretation rather than solely on intuition or tradition \cite{FIND_CITATION_PLEASE}. In higher education, this has manifested as the field of learning analytics, where student data is used to improve learning outcomes and retention. This framework extends that principle to student well-being. The \textbf{Analytics Agent} is the core enabler of DDDM for the university's support services. By autonomously processing anonymized interaction data to identify trends, sentiment shifts, and emerging topics of concern, it provides administrators with actionable, empirical evidence. This allows the institution to move beyond anecdotal evidence and allocate resources—such as workshops, counselors, or targeted information campaigns—to where they are most needed, thereby optimizing the efficiency and impact of its support ecosystem.
+
+\subsubsection{Privacy by Design (PbD)}
+Given the highly sensitive nature of mental health data, the framework's architecture is guided by the principles of \textbf{Privacy by Design (PbD)}. PbD is an internationally recognized framework, formalized in ISO 31700, which dictates that privacy should be the default, embedded into the design and architecture of systems from the outset rather than being an add-on feature \cite{FIND_CITATION_PLEASE}. Key principles include being proactive not reactive, making privacy the default setting, and providing end-to-end security. The architectural decision to include a dedicated \textbf{Safeguard LLM} is a direct implementation of PbD. Its sole purpose is to proactively identify and redact Personally Identifiable Information (PII) before data is used for analysis, ensuring that privacy is protected by default at the earliest possible stage of the data lifecycle. This demonstrates a commitment to building a system that is not only effective but also fundamentally ethical and secure.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Large Language Models (LLMs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Large Language Models (LLMs)}
@@ -72,39 +90,35 @@ This research utilizes a \textbf{hybrid LLM strategy} that leverages two distinc
     \item \textbf{Cloud-Based API Models (Gemini):} The Gemini models represent Google's state-of-the-art, natively multimodal foundation models, available in various sizes (e.g., Gemini Pro). Unlike models trained solely on text, Gemini was pre-trained from the ground up on multiple data modalities, giving it more sophisticated reasoning capabilities \cite{FIND_CITATION_PLEASE}. In this framework, a powerful model like Gemini Pro is accessed via a secure API for complex, non-sensitive tasks, such as the weekly trend analysis performed by the Analytics Agent. It also serves as a robust fallback mechanism, ensuring service continuity and reliability should the local model encounter issues.
 \end{itemize}
 
-\subsubsection{A Closer Look: Gemma 3 Architecture and Capabilities}
+\subsubsection{Locally-Hosted Open Models: The Gemma 3 Family}
 
 The selection of Gemma 3 as the locally-hosted model for this framework is predicated on its state-of-the-art capabilities, efficiency, and suitability for advanced, multimodal tasks. Released in March 2025, Gemma 3 represents a significant evolution in Google's open model family, introducing several key advancements over its predecessors. It is available in multiple sizes (1B, 4B, 12B, and 27B), allowing for a flexible trade-off between performance and resource requirements. For this research, the 4B or 12B models are particularly relevant, offering powerful capabilities that can be reasonably deployed on institutional-grade hardware.
 
-The architecture of Gemma 3 incorporates several major innovations:
+The architecture of Gemma 3 is based on the decoder-only Transformer. The foundational mechanism of the Transformer is scaled dot-product attention, calculated as:
+$$ \text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V $$
+where $Q$ (Queries), $K$ (Keys), and $V$ (Values) are matrices representing the input sequence, and $d_k$ is the dimension of the keys. To capture different relational aspects of the context, this is extended to \textbf{Multi-Head Attention (MHA)}, where multiple attention "heads" operate in parallel. For each head $i$ out of $h$ total heads, separate linear projections are learned: $W_i^Q, W_i^K, W_i^V$. The output of each head is:
+$$ \text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V) $$
+The final output is the concatenation of all head outputs, passed through a final linear projection $W^O$:
+$$ \text{MHA}(Q, K, V) = \text{Concat}(\text{head}_1, ..., \text{head}_h)W^O $$
+While powerful, MHA is memory-intensive during inference because it requires caching the Key and Value matrices for each of the $h$ heads.
 
+Gemma 3's architecture incorporates several major innovations to enhance performance and efficiency:
 \begin{itemize}
-    \item \textbf{Multimodal Input (Image and Text):} Unlike previous text-only versions, Gemma 3 models (with the exception of the 1B variant) are inherently multimodal. They integrate a 400M parameter variant of the SigLIP vision encoder, which allows the model to process and understand images as part of its input context. This enables a new class of applications, such as analyzing images for contextual cues or answering questions about visual data, which could be leveraged in future expansions of this framework.
-
-    \item \textbf{Extended Context Window and Architectural Efficiency:} Gemma 3 supports a significantly larger context window of up to 128,000 tokens (32K for the 1B model), a 16-fold increase over Gemma 2. To manage the immense memory requirements of the Key-Value (KV) cache that typically accompany such long contexts, the architecture was re-designed. It now employs an interleaving pattern of local and global attention layers, with five local sliding-window attention layers for every one global attention layer. This hybrid attention mechanism drastically reduces the memory footprint during inference while maintaining the model's ability to reason over long-range dependencies.
-
-    \item \textbf{Advanced Attention and Normalization:} The models continue to use Grouped-Query Attention (GQA) for efficient inference, and the architecture is built on a standard decoder-only Transformer foundation with post-attention normalization, ensuring stable training and robust performance.
-
+    \item \textbf{Efficient Attention Mechanisms:} Gemma 3 utilizes \textbf{Grouped-Query Attention (GQA)}, a more efficient variant of MHA \cite{FIND_CITATION_PLEASE}. In GQA, instead of having $h$ independent key and value heads, the query heads are divided into $g$ groups, where all heads within a group share the same key and value projection. This significantly reduces the size of the KV cache from being proportional to $h$ to being proportional to $g$ (where $g < h$), lowering memory requirements and enabling faster inference.
+    \item \textbf{Extended Context Window:} Gemma 3 supports a significantly larger context window of up to 128,000 tokens. This is made computationally feasible by architectural efficiencies like GQA and the use of local, sliding-window attention layers, which restrict the attention calculation to a smaller, fixed-size window of tokens for most layers \cite{FIND_CITATION_PLEASE}.
+    \item \textbf{Multimodal Input (Image and Text):} Unlike previous text-only versions, Gemma 3 models (with the exception of the 1B variant) are inherently multimodal. They integrate a 400M parameter variant of the SigLIP vision encoder, which allows the model to process and understand images as part of its input context \cite{FIND_CITATION_PLEASE}.
+    \item \textbf{Advanced Agentic Capabilities:} Gemma 3 has built-in function calling capabilities, allowing it to interact with external tools and APIs in a structured manner. This is essential for the Intervention and Triage agents to execute tasks beyond simple text generation \cite{FIND_CITATION_PLEASE}.
 \end{itemize}
+This combination of multimodal understanding, long-context efficiency, and agentic capabilities makes Gemma 3 a powerful and highly suitable choice for the locally-hosted component of this thesis's hybrid AI strategy.
 
 % --- DESCRIPTION FOR A DIAGRAM ---
 % You could add a diagram here with the following description:
 % \begin{figure}[htbp]
 %   \centering
 %   % \includegraphics[width=\textwidth]{path/to/your/diagram.png}
-%   \caption{Gemma 3 Long Context Architecture. The diagram visually represents a sequence of Transformer blocks. It shows a repeating pattern of five blocks labeled "Local Attention (Sliding Window)" followed by one block labeled "Global Attention (Full Context)". An arrow indicates the data flow through the sequence, illustrating how the model processes information efficiently while retaining the ability to access the full context at specific intervals.}
-%   \label{fig:gemma3_long_context}
+%   \caption{Comparison of Attention Mechanisms. The diagram visually contrasts two architectures. Part (a) titled "Multi-Head Attention (MHA)" shows an input sequence leading to multiple, independent sets of Query, Key, and Value projection layers (e.g., 8 sets). Part (b) titled "Grouped-Query Attention (GQA) in Gemma 3" shows the same input leading to the same number of Query projection layers, but these are visually grouped (e.g., in sets of 4) and point to a smaller number of shared Key and Value projection layers (e.g., 2 sets). This illustrates the reduction in KV heads, which is the source of GQA's efficiency.}
+%   \label{fig:gemma3_attention_arch}
 % \end{figure}
-
-Beyond its core architecture, Gemma 3's capabilities have been significantly enhanced through a novel post-training recipe. This process, which includes advanced distillation techniques, has markedly improved the model's performance in key areas:
-
-\begin{itemize}
-    \item \textbf{Enhanced Reasoning and Multilinguality:} The post-training process specifically targeted mathematics, coding, instruction-following, and chat abilities. As a result, Gemma 3 is proficient in over 140 languages, making it a truly multilingual model suitable for diverse user bases.
-    \item \textbf{Function Calling:} A critical feature for agentic systems, Gemma 3 has built-in function calling capabilities. This allows the model to interact with external tools and APIs in a structured manner, which is essential for the Intervention and Triage agents in this framework to execute tasks beyond text generation.
-    \item \textbf{Competitive Performance:} On standard academic benchmarks, the instruction-tuned Gemma 3 models demonstrate class-leading performance. The Gemma3-4B-IT model is competitive with the much larger Gemma2-27B-IT, and the Gemma3-27B-IT model is comparable to frontier models like Gemini 1.5 Pro.
-\end{itemize}
-
-This combination of multimodal understanding, long-context efficiency, and advanced agentic capabilities makes Gemma 3 a powerful and highly suitable choice for the locally-hosted component of this thesis's hybrid AI strategy. It provides the necessary computational intelligence for the framework's agents while aligning with the practical requirements of privacy, control, and responsible resource management.
 
 \subsubsection{Cloud-Based API Models: The Gemini 2.5 Family}
 
@@ -196,15 +210,31 @@ This iterative loop is what transforms a passive LLM into a proactive, problem-s
 \subsection{Workflow Automation Platforms (n8n)}
 \label{subsec:n8n}
 
-Modern software systems rarely exist in isolation. The ability to integrate disparate systems and automate data flows is critical for operational efficiency. \textbf{Workflow Automation Platforms} are designed for this purpose \cite{FIND_CITATION_PLEASE}. These platforms provide a visual interface to connect various applications, databases, and APIs into automated sequences, or "workflows."
+If an LLM orchestration framework like LangChain provides the "brain" for an individual agent, a workflow automation platform provides the "nervous system" for the entire multi-agent framework. While LangChain excels at creating complex, stateful logic within a single application, workflow automation platforms are designed to connect disparate systems and orchestrate processes across them. This research utilizes \textbf{n8n}, an open-source, node-based workflow automation tool, to manage the high-level scheduling and system-to-system communication required by the agentic framework \cite{FIND_CITATION_PLEASE}.
 
-This project utilizes \textbf{n8n}, an open-source workflow automation tool. Unlike a general-purpose programming language, n8n excels at tasks involving scheduling, event triggers, and system-to-system communication. In our architecture, n8n functions as the "Nervous System," responsible for:
+The theoretical foundation for such platforms can be understood through the concept of a \textbf{Directed Acyclic Graph (DAG)}. A workflow in n8n is a DAG where each node represents a specific task or operation, and the directed edges represent the flow of data and execution from one node to the next. A workflow, $W$, can be formally defined as a graph $W = (N, E)$, where:
 \begin{itemize}
-    \item **Scheduled Triggers:** Running tasks at specific times (e.g., triggering the Analytics Agent every Sunday via a Cron job).
-    \item **API Integration:** Calling the API endpoints exposed by our FastAPI backend and communicating with external services (e.g., an email server).
-    \item **Visual Workflow Management:** Providing a clear, visual representation of the automated processes, which simplifies debugging and modification.
+    \item $N$ is a set of nodes, where each node $n \in N$ represents a discrete unit of work (e.g., an API call, a database query, an email function).
+    \item $E$ is a set of directed edges $(n_i, n_j)$, where an edge represents that the output of node $n_i$ becomes the input for node $n_j$.
 \end{itemize}
+The acyclic nature of the graph ensures that workflows have a clear start and end and do not enter into infinite loops.
 
+The key components of n8n that are leveraged in this thesis are:
+\begin{enumerate}
+    \item \textbf{Trigger Nodes:} These are the starting points of a workflow and are activated by specific events. For this research, the most critical trigger is the \textbf{Cron node}, which allows for time-based scheduling. This is used to activate the \textbf{Analytics Agent} at regular intervals (e.g., every Sunday at midnight) to ensure consistent, automated trend analysis without manual intervention.
+    \item \textbf{Regular Nodes:} These nodes perform the actual work. Each node is an abstraction for a specific service or function. For instance, an \textbf{HTTP Request node} is used to call the API endpoints exposed by the FastAPI backend, thereby invoking the LangChain agents. Other nodes, like the \textbf{Gmail node}, can be used to send notifications or reports generated by the agents.
+    \item \textbf{Visual Workflow Management:} Unlike writing complex scripts, n8n provides a visual interface for building, debugging, and modifying these workflows. This visual representation of the DAG makes the high-level logic of the system transparent and easy to manage, which is crucial for maintaining a complex multi-agent system.
+\end{enumerate}
+In this architecture, n8n does not concern itself with the internal reasoning of the agents (which is handled by LangChain), but rather with the high-level orchestration: when to wake an agent up, how to pass data between agent calls, and how to connect the agentic framework to external services like email. This separation of concerns creates a robust and modular system.
+
+% --- DESCRIPTION FOR A DIAGRAM ---
+% You could add a diagram here with the following description:
+% \begin{figure}[htbp]
+%   \centering
+%   % \includegraphics[width=\textwidth]{path/to/your/diagram.png}
+%   \caption{Example n8n Workflow for the Analytics Agent. The diagram shows a sequence of connected nodes. The first node is a "Cron" trigger labeled "Every Sunday at 00:00". An arrow connects it to an "HTTP Request" node labeled "POST /api/agents/generate-report". An arrow from this node connects to an "IF" node that checks if the request was successful. The "True" branch leads to a "Gmail" node labeled "Send Report to Admin", while the "False" branch leads to another "Gmail" node labeled "Send Error Alert". This visualizes the automated, scheduled execution of an agent.}
+%   \label{fig:n8n_workflow}
+% \end{figure}
 % PLACEHOLDER UNTUK GAMBAR/DIAGRAM
 % \begin{figure}[htbp]
 %   \centering
