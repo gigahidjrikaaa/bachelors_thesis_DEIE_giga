@@ -72,18 +72,126 @@ This research utilizes a \textbf{hybrid LLM strategy} that leverages two distinc
     \item \textbf{Cloud-Based API Models (Gemini):} The Gemini models represent Google's state-of-the-art, natively multimodal foundation models, available in various sizes (e.g., Gemini Pro). Unlike models trained solely on text, Gemini was pre-trained from the ground up on multiple data modalities, giving it more sophisticated reasoning capabilities \cite{FIND_CITATION_PLEASE}. In this framework, a powerful model like Gemini Pro is accessed via a secure API for complex, non-sensitive tasks, such as the weekly trend analysis performed by the Analytics Agent. It also serves as a robust fallback mechanism, ensuring service continuity and reliability should the local model encounter issues.
 \end{itemize}
 
+\subsubsection{A Closer Look: Gemma 3 Architecture and Capabilities}
+
+The selection of Gemma 3 as the locally-hosted model for this framework is predicated on its state-of-the-art capabilities, efficiency, and suitability for advanced, multimodal tasks. Released in March 2025, Gemma 3 represents a significant evolution in Google's open model family, introducing several key advancements over its predecessors. It is available in multiple sizes (1B, 4B, 12B, and 27B), allowing for a flexible trade-off between performance and resource requirements. For this research, the 4B or 12B models are particularly relevant, offering powerful capabilities that can be reasonably deployed on institutional-grade hardware.
+
+The architecture of Gemma 3 incorporates several major innovations:
+
+\begin{itemize}
+    \item \textbf{Multimodal Input (Image and Text):} Unlike previous text-only versions, Gemma 3 models (with the exception of the 1B variant) are inherently multimodal. They integrate a 400M parameter variant of the SigLIP vision encoder, which allows the model to process and understand images as part of its input context. This enables a new class of applications, such as analyzing images for contextual cues or answering questions about visual data, which could be leveraged in future expansions of this framework.
+
+    \item \textbf{Extended Context Window and Architectural Efficiency:} Gemma 3 supports a significantly larger context window of up to 128,000 tokens (32K for the 1B model), a 16-fold increase over Gemma 2. To manage the immense memory requirements of the Key-Value (KV) cache that typically accompany such long contexts, the architecture was re-designed. It now employs an interleaving pattern of local and global attention layers, with five local sliding-window attention layers for every one global attention layer. This hybrid attention mechanism drastically reduces the memory footprint during inference while maintaining the model's ability to reason over long-range dependencies.
+
+    \item \textbf{Advanced Attention and Normalization:} The models continue to use Grouped-Query Attention (GQA) for efficient inference, and the architecture is built on a standard decoder-only Transformer foundation with post-attention normalization, ensuring stable training and robust performance.
+
+\end{itemize}
+
+% --- DESCRIPTION FOR A DIAGRAM ---
+% You could add a diagram here with the following description:
+% \begin{figure}[htbp]
+%   \centering
+%   % \includegraphics[width=\textwidth]{path/to/your/diagram.png}
+%   \caption{Gemma 3 Long Context Architecture. The diagram visually represents a sequence of Transformer blocks. It shows a repeating pattern of five blocks labeled "Local Attention (Sliding Window)" followed by one block labeled "Global Attention (Full Context)". An arrow indicates the data flow through the sequence, illustrating how the model processes information efficiently while retaining the ability to access the full context at specific intervals.}
+%   \label{fig:gemma3_long_context}
+% \end{figure}
+
+Beyond its core architecture, Gemma 3's capabilities have been significantly enhanced through a novel post-training recipe. This process, which includes advanced distillation techniques, has markedly improved the model's performance in key areas:
+
+\begin{itemize}
+    \item \textbf{Enhanced Reasoning and Multilinguality:} The post-training process specifically targeted mathematics, coding, instruction-following, and chat abilities. As a result, Gemma 3 is proficient in over 140 languages, making it a truly multilingual model suitable for diverse user bases.
+    \item \textbf{Function Calling:} A critical feature for agentic systems, Gemma 3 has built-in function calling capabilities. This allows the model to interact with external tools and APIs in a structured manner, which is essential for the Intervention and Triage agents in this framework to execute tasks beyond text generation.
+    \item \textbf{Competitive Performance:} On standard academic benchmarks, the instruction-tuned Gemma 3 models demonstrate class-leading performance. The Gemma3-4B-IT model is competitive with the much larger Gemma2-27B-IT, and the Gemma3-27B-IT model is comparable to frontier models like Gemini 1.5 Pro.
+\end{itemize}
+
+This combination of multimodal understanding, long-context efficiency, and advanced agentic capabilities makes Gemma 3 a powerful and highly suitable choice for the locally-hosted component of this thesis's hybrid AI strategy. It provides the necessary computational intelligence for the framework's agents while aligning with the practical requirements of privacy, control, and responsible resource management.
+
+\subsubsection{Cloud-Based API Models: The Gemini 2.5 Family}
+
+To complement the locally-hosted model, the framework integrates a state-of-the-art, proprietary model accessed via a cloud API. The Gemini family, specifically the flagship \textbf{Gemini 2.5 Pro} model, serves this role, providing a level of reasoning and multimodal understanding that is critical for handling the most complex tasks and ensuring system robustness. While a detailed architectural schematic is not public, in line with the proprietary nature of frontier AI models, its capabilities have been extensively documented by Google through official developer guides and announcements \cite{FIND_CITATION_PLEASE}.
+
+Gemini 2.5 Pro builds upon the efficient \textbf{Mixture-of-Experts (MoE) Transformer} architecture of its predecessors. In an MoE architecture, the model is composed of numerous smaller "expert" neural networks. For any given input, a routing mechanism activates only a sparse subset of these experts. This allows the model to have a very large total parameter count—enabling vast knowledge and capability—while keeping the computational cost for any single inference relatively low.
+
+The strategic role of Gemini 2.5 Pro in this framework is defined by its next-generation capabilities:
+\begin{itemize}
+    \item \textbf{Native Multimodality with Expressive Audio:} A significant architectural leap in Gemini 2.5 is its native handling of audio. Unlike models that first transcribe audio to text, Gemini 2.5 processes audio streams directly. This allows it to understand not just the words, but also the nuances of human speech such as tone, pitch, and prosody, which is invaluable for a mental health application where user sentiment is key \cite{FIND_CITATION_PLEASE}.
+    \item \textbf{Controllable Reasoning and "Thinking Time":} Gemini 2.5 introduces a "thinking budget," a mechanism that allows developers to control the trade-off between response latency and reasoning depth. For high-frequency tasks performed by the Triage Agent, a lower budget can ensure speed. For complex analytical tasks required by the Analytics Agent, a higher budget can be allocated to allow for more thorough reasoning, providing granular control over both cost and quality.
+    \item \textbf{Advanced Agentic Capabilities and Tool Use:} The model is explicitly designed to power advanced agents. It features more reliable and sophisticated function calling, enabling seamless integration with external tools and APIs. This is essential for the Intervention Agent to execute multi-step plans, such as triggering an email campaign based on analytical insights.
+    \item \textbf{High-Fidelity Reasoning and Fallback:} As a frontier model, Gemini 2.5 Pro serves as the high-capability engine for the most demanding requests and as a crucial fallback mechanism. If the local Gemma 3 model fails or returns a low-confidence result, the system can route the query to the Gemini API, ensuring service continuity and the highest quality output.
+\end{itemize}
+By integrating Gemini 2.5 Pro via its API, the agentic framework gains access to state-of-the-art reasoning power on demand, ensuring that it can handle a wide spectrum of tasks with both efficiency and exceptional quality.
+
+
+\subsubsection{Multilingual Understanding: The XLM-RoBERTa Model}
+\label{subsubsec:xlm-roberta}
+
+To address the multilingual nature of the chat logs, which are expected to contain English, Indonesian, and code-mixed language, a specialized model is required for the Safeguard LLM component. \textbf{XLM-RoBERTa (XLM-R)} is an encoder-only Transformer model specifically designed for high-performance cross-lingual understanding \cite{FIND_CITATION_PLEASE}. Its architecture is based on RoBERTa, which itself is a robustly optimized version of BERT, but its key innovation lies in its training methodology.
+
+XLM-R is pre-trained on a massive, curated dataset of over 2.5 terabytes of text from the CommonCrawl corpus, spanning 100 different languages, including Indonesian. Unlike previous cross-lingual models that required parallel data or explicit translation objectives, XLM-R's power comes from being trained at scale using only a \textbf{Masked Language Modeling (MLM)} objective.
+
+The mathematical intuition behind the MLM objective is to predict a randomly masked token in a sequence based on its surrounding context. Given a sequence of tokens $X = \{x_1, x_2, ..., x_n\}$, a corrupted version $\tilde{X}$ is created by replacing a subset of tokens with a special `[MASK]` token. The model is then trained to minimize the cross-entropy loss between its predictions and the original tokens. The objective function can be expressed as:
+
+$$ \mathcal{L}_{MLM}(\theta) = - \sum_{i \in \mathcal{M}} \log p(x_i | \tilde{X}; \theta) $$
+
+where $\mathcal{M}$ is the set of indices of the masked tokens and $\theta$ represents the model's parameters.
+
+By applying this objective to a vast corpus containing 100 languages, the model is forced to develop a shared, high-dimensional embedding space where similar concepts from different languages are mapped to nearby vectors. For example, the model learns that the English word "student" and the Indonesian word "mahasiswa" often appear in similar contexts (e.g., with words like "university," "learn," "exam") and thus assigns them similar vector representations.
+
+% --- DESCRIPTION FOR A DIAGRAM ---
+% You could add a diagram here with the following description:
+% \begin{figure}[htbp]
+%   \centering
+%   % \includegraphics[width=0.8\textwidth]{path/to/your/diagram.png}
+%   \caption{Conceptual Depiction of XLM-RoBERTa's Shared Embedding Space. The diagram shows a 3D vector space. In one region, the English word "student", the Indonesian word "mahasiswa", and the Spanish word "estudiante" are clustered closely together. In another distinct region, the words "university", "universitas", and "universidad" are clustered. This illustrates how the model learns cross-lingual semantic similarities through its training objective.}
+%   \label{fig:xlm_embedding_space}
+% \end{figure}
+
+This learned shared representation enables a powerful capability known as \textbf{zero-shot cross-lingual transfer}. It means that a model fine-tuned for a specific task (like Named Entity Recognition for PII) on a single language (e.g., English) can then perform that same task on other languages it was pre-trained on (e.g., Indonesian) with a high degree of accuracy, often without seeing any task-specific examples in that second language. This makes XLM-RoBERTa an ideal candidate for the generalist component of the Safeguard LLM pipeline, capable of handling mixed-language text where specialized monolingual models might fail.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SubSection: LLM Orchestration Frameworks (LangChain)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{LLM Orchestration Frameworks (LangChain)}
 \label{subsec:langchain}
 
-An LLM, in isolation, is a powerful text processor but lacks the ability to perform complex, multi-step tasks or interact with external systems. This limitation is addressed by LLM orchestration frameworks like \textbf{LangChain} \cite{FIND_CITATION_PLEASE}. LangChain is a software development framework that provides modular components for building applications powered by LLMs.
+While LLMs provide powerful reasoning capabilities, they are inherently stateless and lack direct access to external data or tools. An LLM, in isolation, cannot query a database, call an API, or access a private document. To build sophisticated, stateful applications that overcome these limitations, an orchestration framework is required. \textbf{LangChain} is an open-source framework designed specifically for this purpose, providing the essential "glue" to connect LLMs with external resources and compose them into complex applications \cite{FIND_CITATION_PLEASE}.
 
-Key components of LangChain utilized in this research include:
-\begin{itemize}
-    \item \textbf{Chains:} Sequences of calls, either to an LLM or another utility, that allow for complex, multi-step logic.
-    \item \textbf{Agents and Tools:} LangChain allows the creation of agents that use an LLM as a reasoning engine to decide which "tools" to use. A tool can be any function, such as a database query, a calculation, or an API call.
-    \item \textbf{Retrieval-Augmented Generation (RAG):} This technique allows an LLM to access and incorporate information from external knowledge bases before generating a response, which is crucial for providing context-aware answers.
-\end{itemize}
-In this thesis, LangChain serves as the core of the "Brain" within the FastAPI backend, enabling the development of the sophisticated logic required by the three agents.
+The core philosophy of LangChain is to provide modular components that can be "chained" together to create complex workflows. The most recent and fundamental abstraction in LangChain is the \textbf{LangChain Expression Language (LCEL)}. LCEL provides a declarative, composable syntax for building chains, where the pipe (`|`) operator streams the output of one component into the input of the next. Every component in an LCEL chain is a "Runnable," a standardized interface that supports synchronous, asynchronous, batch, and streaming invocations, making it highly versatile for production environments \cite{FIND_CITATION_PLEASE}.
+
+A simple LCEL chain can be represented as:
+$$ \text{Chain} = \text{PromptTemplate} \ | \ \text{LLM} \ | \ \text{OutputParser} $$
+In this sequence, user input is first formatted by a `PromptTemplate`, the result is passed to the `LLM` for processing, and the LLM's raw output is then transformed into a structured format (e.g., JSON) by an `OutputParser`.
+
+For this thesis, the most critical application of LangChain is its ability to create \textbf{agents}. A LangChain agent uses an LLM not just for text processing, but as a reasoning engine to make decisions. This is often based on a framework known as \textbf{ReAct (Reasoning and Acting)}, which enables the LLM to synergize reasoning and action \cite{FIND_CITATION_PLEASE}. The agent is given access to a set of \textbf{Tools}—which are simply functions that can interact with the outside world (e.g., a database query function, a file reader, a web search API). The agent's operational loop, managed by an \textbf{Agent Executor}, can be formalized as an iterative process.
+
+Let $G$ be the initial goal and $H_t$ be the history of actions and observations up to step $t$. The process at each step $t$ is:
+\begin{enumerate}
+    \item \textbf{Reasoning (Thought Generation):} The agent generates a thought $th_t$ and a subsequent action $a_t$ by sampling from the LLM's conditional probability distribution, given the goal and the history so far.
+    $$ (th_t, a_t) \sim p(th, a | G, H_{t-1}; \theta_{LLM}) $$
+    The prompt to the LLM contains the goal and the trajectory of previous thoughts, actions, and observations, guiding its next decision.
+
+    \item \textbf{Action Execution:} The Agent Executor parses $a_t$ to identify the chosen tool and its input, then executes it to produce an observation, $o_t$.
+    $$ o_t = \text{ExecuteTool}(a_t) $$
+
+    \item \textbf{History Augmentation:} The new observation is appended to the history, forming the context for the next iteration.
+    $$ H_t = H_{t-1} \oplus (a_t, o_t) $$
+    This loop continues until the LLM determines the goal $G$ is met and generates a final answer.
+\end{enumerate}
+This iterative loop is what transforms a passive LLM into a proactive, problem-solving agent. For example, the \textbf{Analytics Agent} in this framework, when tasked with "summarizing student stress trends," would use this loop to formulate a SQL query (Thought and Action), execute it (Observation), and then use the results to generate a final summary. This orchestration is fundamental to enabling the autonomous capabilities central to this thesis.
+
+% --- DESCRIPTION FOR A DIAGRAM ---
+% You could add a diagram here with the following description:
+% \begin{figure}[htbp]
+%   \centering
+%   % \includegraphics[width=\textwidth]{path/to/your/diagram.png}
+%   \caption{Conceptual Diagram of a LangChain Agent based on the ReAct Framework. The diagram shows a central box labeled "Agent (LLM Reasoning Core)". An arrow labeled "Goal/Input" points to this box. From the agent box, several arrows point outwards to a set of boxes labeled "Tools", such as "Database Query", "Web Search", and "Calculator". The agent box has a looping arrow on it labeled "Thought -> Action -> Observation". An arrow labeled "Final Answer" points away from the agent box, showing the result after the loop is complete. This visualizes how the LLM core decides which tool to use to accomplish a goal.}
+%   \label{fig:langchain_agent}
+% \end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SubSection: Workflow Automation Platforms (n8n)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \subsection{Workflow Automation Platforms (n8n)}
 \label{subsec:n8n}
