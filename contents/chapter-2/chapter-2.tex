@@ -100,6 +100,7 @@ To operationalize this concept, this thesis formally introduces a framework buil
     \item The \textbf{Intervention Agent}, responsible for automating proactive outreach.
     \item The \textbf{Triage Agent}, responsible for real-time user support and resource routing.
 \end{itemize}
+
 The theoretical underpinnings of these agents' architecture and behavior are drawn from established models of rational agency and multi-agent systems, as detailed below.
 
 Fundamentally, an agent's operation is defined by a continuous cycle of perception, reasoning (or deliberation), and action. It perceives its environment through virtual \textbf{sensors} (e.g., data feeds, API calls, database queries) and influences that environment through its \textbf{actuators} (e.g., sending emails, generating reports, invoking other services) \cite{FIND_CITATION_PLEASE}. A prominent and highly relevant architecture for designing such goal-oriented agents is the \textbf{Belief-Desire-Intention (BDI)} model \cite{FIND_CITATION_PLEASE}. This model provides a framework for rational agency that mirrors human practical reasoning:
@@ -109,6 +110,73 @@ Fundamentally, an agent's operation is defined by a continuous cycle of percepti
     \item \textbf{Intentions:} This represents the agent's commitment to a specific plan or course of action. An intention is a desire that the agent has chosen to actively pursue. For instance, the \textbf{Triage Agent}, upon identifying a high-severity conversation, forms an intention to immediately route the user to emergency resources.
 \end{itemize}
 The BDI framework allows for the design of agents that are not merely reactive but are proactive and deliberative, capable of reasoning about how to best achieve their goals given their current beliefs about the world \cite{FIND_CITATION_PLEASE}.
+
+To formally ground the proposed framework in this established model, the roles and logic of each of the three agents are mapped to the BDI components in Table \ref{tab:bdi_mapping}. This mapping clarifies how each agent perceives its environment, formulates its objectives, and decides on a concrete course of action, allowing for the design of agents that are not merely reactive but are proactive and deliberative, capable of reasoning about how to best achieve their goals given their current beliefs about the world \cite{FIND_CITATION_PLEASE}.
+
+% This table maps the proposed intelligent agents to the Belief-Desire-Intention (BDI) model of rational agency.
+\begin{table}[H] % Using [H] from the 'float' package to place the table HERE
+    \centering
+    \caption{Mapping of the Agentic Framework to the BDI Model.}
+    \label{tab:bdi_mapping}
+    \small % Reducing font size to make the table more compact
+    \renewcommand{\arraystretch}{1.4} % Adjusting row spacing
+    \begin{tabular}{lp{0.3\textwidth}p{0.25\textwidth}p{0.25\textwidth}}
+        \toprule
+        \textbf{Agent} & 
+        \textbf{Beliefs} \textit{(Informational State)} & 
+        \textbf{Desires} \textit{(Motivational Goals)} & 
+        \textbf{Intentions} \textit{(Committed Plans)} \\
+        \midrule
+
+        \textbf{Analytics Agent} & 
+        \begin{itemize} \itemsep0em
+            \item Access to the anonymized conversation log database.
+            \item The timestamp of the last generated report.
+            \item A model of known topics (e.g., "exams," "relationships").
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item To identify emerging trends in student concerns.
+            \item To quantify shifts in overall student sentiment.
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item Upon its weekly trigger, form an intention to generate a new summary report.
+            \item To formulate and execute a database query for the past week's data.
+        \end{itemize} \\
+        \midrule
+
+        \textbf{Intervention Agent} &
+        \begin{itemize} \itemsep0em
+            \item The latest structured report from the Analytics Agent.
+            \item A library of predefined intervention campaigns (e.g., email templates, workshop links).
+            \item Rules mapping trends to campaigns (e.g., IF "exam stress" > threshold...).
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item To proactively reduce widespread student stress.
+            \item To inform students about relevant and timely resources.
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item When a rule is met, form an intention to trigger the corresponding campaign.
+            \item To construct and send the outreach signal to the orchestration layer (n8n).
+        \end{itemize} \\
+        \midrule
+
+        \textbf{Triage Agent} &
+        \begin{itemize} \itemsep0em
+            \item The user's live conversation history in the current session.
+            \item A classification model for conversation severity (e.g., low, medium, high).
+            \item A directory of available resources (e.g., self-help modules, emergency contacts).
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item To assess a user's immediate risk level accurately.
+            \item To provide the most appropriate support for the user's current state.
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item Upon detecting a high-severity utterance, form an intention to immediately escalate.
+            \item To retrieve and display emergency contact information without delay.
+        \end{itemize} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 When multiple agents, each with its own goals and capabilities, co-exist and interact within a shared environment, they form a \textbf{Multi-Agent System (MAS)}. An MAS is a system in which the overall intelligent behavior and functionality are a product of the collective, emergent dynamics of its constituent agents \cite{FIND_CITATION_PLEASE}. The power of an MAS lies in its ability to solve problems that would be difficult or impossible for a monolithic system or a single agent to handle. This is achieved through social interaction, primarily:
 \begin{itemize}
