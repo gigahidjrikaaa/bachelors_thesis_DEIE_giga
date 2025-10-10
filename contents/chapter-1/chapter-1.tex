@@ -4,7 +4,6 @@
 \section{Background}
 \label{sec:background}
 
-
 Higher Education Institutions (HEIs) are facing a critical and growing challenge in supporting student well-being \cite{hill2024studentwellbeing, duraku2024overcoming}. A landmark report highlights the escalating prevalence of mental health and substance use issues among student populations, urging institutions to adopt a more comprehensive support model \cite{scherer2021mentalhealth}. This crisis not only jeopardizes students' academic success and personal development but also places an immense, unsustainable strain on the institutions tasked with supporting them \cite{baik2019universities}.
 
 The traditional support model, centered around on-campus counseling services, is fundamentally \textbf{reactive}. It relies on students to self-identify their distress and navigate the process of seeking help. This paradigm faces significant operational challenges, including insufficient staffing, long waiting lists, and an inability to provide immediate, 24/7 support, which ultimately limits access for a large portion of the student body \cite{baik2019universities}. Consequently, a critical gap persists between the need for mental health services and their actual provision, leaving many students without timely support \cite{outay2024multiagent}.
@@ -19,14 +18,17 @@ This research moves beyond conventional AI applications by proposing the use of 
 \section{Problem Formulation}
 \label{sec:problem_formulation}
 
-The inefficiency and reactive nature of current university mental health support systems present a complex problem. This research addresses the following core challenges:
+The inefficiency and reactive nature of current university mental health support systems present a complex problem. To move towards a proactive and scalable model, this research addresses the following core challenges:
 
 \begin{enumerate}
-    \item The primary challenge is the \textbf{design of an agentic AI framework} capable of automating key institutional processes, specifically in the areas of trend analysis, proactive intervention, and initial user triage.
-    \item A significant technical challenge lies in the \textbf{design and implementation of a robust, modular, and hybrid architecture} to realize this framework, requiring the integration of local Large Language Models (e.g., self-hosted Gemma 3), cloud-based models (e.g., Gemini through AI Studio), and workflow automation platforms (e.g., n8n).
-    \item Finally, there is a need to \textbf{evaluate the potential impact} of such a framework on institutional operational efficiency and data-driven decision-making, which will be validated through a proof-of-concept prototype and scenario-based testing.
+    \item The primary challenge is the \textbf{design of a cohesive, safety-oriented agentic AI framework} capable of automating key institutional processes. This requires a shift from a monolithic chatbot to a multi-agent system where specialized agents handle distinct tasks, including real-time crisis detection, personalized coaching, clinical case management, and privacy-preserving analytics.
+
+    \item A significant technical challenge lies in the \textbf{implementation of a cloud-native architecture} to realize this framework. This involves orchestrating multiple AI agents using \textbf{LangGraph}, powered by a robust Large Language Model (Google Gemini), and integrating them within a secure FastAPI backend with an internal task scheduler.
+
+    \item Finally, there is a need to \textbf{evaluate the potential impact} of such a framework on institutional operational efficiency and its ability to support data-driven, safety-first decision-making. This will be validated through a proof-of-concept prototype and scenario-based testing focused on the agentic workflows.
 \end{enumerate}
-To address these challenges, this thesis proposes and details a framework comprised of three specialized, collaborative intelligent agents: an \textbf{Analytics Agent}, an \textbf{Intervention Agent}, and a \textbf{Triage Agent}.
+
+To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Support Coach Agent (SCA)}, a \textbf{Service Desk Agent (SDA)}, and an \textbf{Isingts Agent (IA)}.
 
 %-------------------------------------------------	
 
@@ -48,10 +50,13 @@ The primary objectives of this thesis are:
 To ensure the feasibility and focus of this research, the following boundaries are established:
 
 \begin{enumerate}
-    \item This research is focused on the \textbf{design and prototype implementation} of the agentic AI framework, not a full-scale, university-wide deployment.
-    \item The evaluation of the framework is based on \textbf{functional, scenario-based testing} of the prototype's capabilities. It does not measure the long-term psychological impact on students or the real-world operational savings for the institution.
-    \item The data utilized for testing the analytics agent will consist of anonymized, pre-existing chat logs or simulated data to ensure user privacy and controlled testing conditions.
-    \item The research will not address the ethical implications of AI in education, such as bias in AI algorithms or the potential for misuse of student data. These are acknowledged as important issues but are outside the scope of this thesis.
+    \item This research is focused on the \textbf{design and prototype implementation of the agentic AI framework} (the Safety Agent Suite). The integration of content based on Cognitive Behavioral Therapy (CBT) and a blockchain-based gamification system serve as proof-of-concept features to validate the framework's capabilities, not as primary research areas themselves.
+
+    \item The evaluation of the framework is based on \textbf{functional, scenario-based testing} of the prototype's agentic workflows. It does not measure the long-term psychological impact on students or the real-world operational savings for the institution.
+
+    \item The data utilized for testing the analytics agent will consist of \textbf{anonymized, pre-existing chat logs or simulated data} to ensure user privacy and controlled testing conditions.
+
+    \item This research will not provide an exhaustive analysis of differential privacy algorithms or blockchain scalability. It will, however, demonstrate their integration into the system to fulfill the architectural requirements of \textbf{privacy-first analytics} and \textbf{novel user engagement}.
 \end{enumerate}
 
 % \noindent Agar penelitian ini lebih terarah dan mendalam, ruang lingkupnya dibatasi sebagai berikut:
@@ -96,7 +101,7 @@ The structure of this thesis is outlined as follows:
 
 \textbf{Chapter II: Literature Review and Theoretical Framework.} This chapter presents a comprehensive review of relevant prior research in the fields of conversational AI, the application of gamification in educational and well-being contexts, related blockchain applications, and studies on user engagement and student welfare. Furthermore, this chapter establishes the theoretical foundation that underpins the core concepts and technologies utilized in this research.
 
-\textbf{Chapter III: System Design and Architecture.} This chapter outlines the methodology and technical blueprint for the system. This chapter explains the adoption of Design Science Research and presents the system's high-level conceptual architecture, including its core functional components. It details the underlying technical architecture, justifying the chosen technology stack, and describes the database structure. The chapter also covers the user interface design for system administration and specifies the integrated security and privacy measures.
+\textbf{Chapter III: System Design and Architecture.} This chapter outlines the methodology and technical blueprint for the system. It explains the adoption of Design Science Research and presents the system's high-level conceptual architecture, focusing on the four components of the \textbf{Safety Agent Suite}. It details the underlying cloud-native technical architecture, justifying the chosen technology stack, including the use of \textbf{LangGraph} for orchestration and a \textbf{FastAPI} backend. It also describes the database structure, user interface design, and integrated security and privacy measures like differential privacy.
 
 \textbf{Chapter IV: Implementation and Evaluation.} This chapter describes the development and testing of the system prototype. This chapter details the technical environment used for implementation and demonstrates the functional prototype that was built. It then explains the testing process used to evaluate the system's performance against its design requirements. The chapter concludes by presenting the results from these tests and providing an analysis of the findings.
 
