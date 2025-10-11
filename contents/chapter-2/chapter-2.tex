@@ -254,18 +254,21 @@ By integrating Gemini 2.5 via its API, the agentic framework gains access to sta
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: LLM Orchestration Frameworks (LangChain)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{LLM Orchestration Frameworks (LangChain)}
-\label{subsec:langchain}
+\subsection{LLM Orchestration Frameworks}
+\label{subsec:llm_orchestration}
 
-While LLMs provide powerful reasoning capabilities, they are inherently stateless and lack direct access to external data or tools. An LLM, in isolation, cannot query a database, call an API, or access a private document. To build sophisticated, stateful applications that overcome these limitations, an orchestration framework is required. \textbf{LangChain} is an open-source framework designed specifically for this purpose, providing the essential "glue" to connect LLMs with external resources and compose them into complex applications \cite{FIND_CITATION_PLEASE}.
+While LLMs provide powerful reasoning capabilities, they are inherently stateless and lack direct access to external data or tools. An LLM, in isolation, cannot query a database, call an API, or access a private document. To build sophisticated, stateful applications that overcome these limitations, an orchestration framework is required.
 
-The core philosophy of LangChain is to provide modular components that can be "chained" together to create complex workflows. The most recent and fundamental abstraction in LangChain is the \textbf{LangChain Expression Language (LCEL)}. LCEL provides a declarative, composable syntax for building chains, where the pipe (`|`) operator streams the output of one component into the input of the next. Every component in an LCEL chain is a "Runnable," a standardized interface that supports synchronous, asynchronous, batch, and streaming invocations, making it highly versatile for production environments \cite{FIND_CITATION_PLEASE}.
+\subsubsection{LangChain: The Building Blocks of LLM Applications}
+\label{subsubsec:langchain_building_blocks}
+
+\textbf{LangChain} is an open-source framework designed specifically for this purpose, providing the essential "glue" to connect LLMs with external resources and compose them into complex applications \cite{barua2024llmagentsreview,yu2025agentworkflow}. The core philosophy of LangChain is to provide modular components that can be "chained" together to create complex workflows. The most recent and fundamental abstraction in LangChain is the \textbf{LangChain Expression Language (LCEL)}. LCEL provides a declarative, composable syntax for building chains, where the pipe (`|`) operator streams the output of one component into the input of the next. Every component in an LCEL chain is a "Runnable," a standardized interface that supports synchronous, asynchronous, batch, and streaming invocations, making it highly versatile for production environments \cite{yu2025agentworkflow, pospech2025metagraph}.
 
 A simple LCEL chain can be represented as:
 $$ \text{Chain} = \text{PromptTemplate} \ | \ \text{LLM} \ | \ \text{OutputParser} $$
 In this sequence, user input is first formatted by a `PromptTemplate`, the result is passed to the `LLM` for processing, and the LLM's raw output is then transformed into a structured format (e.g., JSON) by an `OutputParser`.
 
-For this thesis, the most critical application of LangChain is its ability to create \textbf{agents}. A LangChain agent uses an LLM not just for text processing, but as a reasoning engine to make decisions. This is often based on a framework known as \textbf{ReAct (Reasoning and Acting)}, which enables the LLM to synergize reasoning and action \cite{FIND_CITATION_PLEASE}. The agent is given access to a set of \textbf{Tools}—which are simply functions that can interact with the outside world (e.g., a database query function, a file reader, a web search API). The agent's operational loop, managed by an \textbf{Agent Executor}, can be formalized as an iterative process.
+For this thesis, the most critical application of LangChain is its ability to create \textbf{agents}. A LangChain agent uses an LLM not just for text processing, but as a reasoning engine to make decisions. This is often based on a framework known as \textbf{ReAct (Reasoning and Acting)}, which enables the LLM to synergize reasoning and action \cite{yao2022react, barua2024llmagentsreview}. The agent is given access to a set of \textbf{Tools}—which are simply functions that can interact with the outside world (e.g., a database query function, a file reader, a web search API). The agent's operational loop, managed by an \textbf{Agent Executor}, can be formalized as an iterative process.
 
 Let $G$ be the initial goal and $H_t$ be the history of actions and observations up to step $t$. The process at each step $t$ is:
 \begin{enumerate}
@@ -280,7 +283,7 @@ Let $G$ be the initial goal and $H_t$ be the history of actions and observations
     $$ H_t = H_{t-1} \oplus (a_t, o_t) $$
     This loop continues until the LLM determines the goal $G$ is met and generates a final answer.
 \end{enumerate}
-This iterative loop is what transforms a passive LLM into a proactive, problem-solving agent. For example, the \textbf{Analytics Agent} in this framework, when tasked with "summarizing student stress trends," would use this loop to formulate a SQL query (Thought and Action), execute it (Observation), and then use the results to generate a final summary. This orchestration is fundamental to enabling the autonomous capabilities central to this thesis.
+This iterative loop is what transforms a passive LLM into a proactive, problem-solving agent. For example, the \textbf{Insights Agent} in this framework, when tasked with "summarizing student stress trends," would use this loop to formulate a SQL query (Thought and Action), execute it (Observation), and then use the results to generate a final summary. This orchestration is fundamental to enabling the autonomous capabilities central to this thesis.
 
 % --- DESCRIPTION FOR A DIAGRAM ---
 % You could add a diagram here with the following description:
@@ -291,6 +294,27 @@ This iterative loop is what transforms a passive LLM into a proactive, problem-s
 %   \label{fig:langchain_agent}
 % \end{figure}
 
+\subsubsection{LangGraph: Orchestrating Multi-Agent Systems}
+
+While LangChain's standard agent executors are powerful, they are often designed for linear, sequential execution paths. For a sophisticated multi-agent system like the \textbf{Safety Agent Suite}, where agents must collaborate, hand off tasks, and operate in a cyclical, stateful manner, a more robust orchestration mechanism is required. This is the role of \textbf{LangGraph}, an extension of LangChain designed for building durable, stateful, multi-agent applications by modeling them as cyclical graphs \cite{yang2025aiagentprotocols,rauch2025modularagents}.
+
+The core concept of LangGraph is to represent the agentic workflow as a \textbf{state graph}. This is a directed graph where nodes represent functions or LLM calls (the "work" to be done) and edges represent the conditional logic that directs the flow of execution from one node to another. A central \textbf{State} object is passed between nodes, allowing each agent or tool to read the current state, perform its function, and then update the state with its results. This creates a persistent, auditable record of the agent's operations \cite{mathew2025largelanguagemodelagents,pospech2025metagraph}.
+
+A LangGraph workflow can be defined by the following components:
+\begin{itemize}
+    \item \textbf{State Graph:} The overall structure, $G = (N, E)$, where $N$ is a set of nodes and $E$ is a set of directed edges. The graph's state is explicitly defined by a state object that is passed and updated throughout the execution.
+    \item \textbf{Nodes:} Each node represents an agent or a tool. When called, a node receives the current state object as input and returns a dictionary of updates to be applied to the state. For example, the `Safety Triage Agent` node would take the user's message from the state, process it, and return an update specifying the assessed risk level.
+    \item \textbf{Edges:} Edges connect the nodes and control the flow of the application. LangGraph supports \textbf{conditional edges}, which are crucial for agentic behavior. After a node executes, a routing function is called to inspect the current state and decide which node to move to next \cite{yu2025agentworkflow,pospech2025metagraph}. For example, after the `Safety Triage Agent` runs, a conditional edge might route the workflow to the `Service Desk Agent` if the risk is moderate, or directly to an "escalate" tool if the risk is critical.
+\end{itemize}
+
+This cyclical, stateful approach provides several key advantages for this framework:
+\begin{enumerate}
+    \item \textbf{Explicit Multi-Agent Collaboration:} LangGraph allows for the explicit definition of workflows where different agents are called in sequence or in parallel, and their outputs are used to inform the next step \cite{tran2025multiagentcollaboration, mathew2025largelanguagemodelagents}. This is essential for the \textbf{Safety Agent Suite}, where the `Insights Agent`'s output must trigger the `Support Coach Agent`.
+    \item \textbf{State Management and Durability:} Because the state is explicitly managed, the agent's "memory" of the conversation and its previous actions is robust. The graph's execution can be paused, resumed, and inspected, which is vital for long-running, interactive coaching sessions.
+    \item \textbf{Flexibility and Control:} Unlike the more constrained loops of standard agent executors, LangGraph allows for the creation of arbitrary cycles. An agent can loop, retry a tool call if it fails, or route to a human-in-the-loop for verification, providing a much higher degree of control and reliability for a safety-critical application \cite{tang2025autoagent, aquinodeazevedo2025ragtomultiagent}.
+\end{enumerate}
+
+By using LangGraph to orchestrate the \textbf{Safety Agent Suite}, this framework moves beyond simple, linear agentic loops and implements a true multi-agent system capable of complex, stateful, and collaborative problem-solving \cite{yang2025aiagentprotocols, tran2025multiagentcollaboration}.
 
 % ============================================================
 % ============================================================
@@ -300,14 +324,17 @@ This iterative loop is what transforms a passive LLM into a proactive, problem-s
 
 \section{Synthesis and Identification of the Research Gap}
 
-The preceding review of the literature and theoretical landscape reveals a critical disconnect. On one hand, the field has produced increasingly sophisticated but fundamentally \textbf{reactive} conversational agents for mental health. On the other, it has developed proactive institutional analytics that remain bottlenecked by a reliance on \textbf{manual intervention}. The failure of the existing literature is not in the individual components, but in the lack of integration between them. This creates a significant and unaddressed research gap: the need for an \textbf{integrated, autonomous, and proactive framework} that can systemically bridge the chasm from data-driven insight to automated, personalized intervention.
+The preceding review of the literature and theoretical landscape reveals a critical disconnect. On one hand, the field has produced increasingly sophisticated but fundamentally \textbf{reactive} conversational agents for mental health. On the other, it has developed proactive institutional analytics that remain bottlenecked by a reliance on \textbf{manual intervention}. The failure of the existing literature is not in the individual components, but in the lack of integration between them.
 
-Current systems are not designed as a cohesive ecosystem. The analytical tools do not automatically trigger the intervention tools, and the conversational agents do not operate with an awareness of the broader institutional context provided by analytics. The central argument of this thesis is that the next frontier in institutional mental health support lies not in the incremental improvement of any single component, but in the \textbf{synergistic integration of multiple specialized agents} into a single, closed-loop system. Such a system, architected as a Multi-Agent System (MAS), is capable of emergent behaviors that are more than the sum of its parts.
+This creates a significant and unaddressed research gap: the need for an \textbf{integrated, autonomous, and proactive framework} that can systemically bridge the chasm from data-driven insight to automated, personalized intervention and administrative action. Current systems are not designed as a cohesive ecosystem. The analytical tools do not automatically trigger the intervention tools, the conversational agents do not seamlessly hand off tasks to administrative agents, and the user-facing support does not operate with an awareness of the broader institutional context provided by analytics.
 
-Therefore, this research directly addresses the identified gap by proposing and prototyping a novel agentic AI framework where:
+The central argument of this thesis is that the next frontier in institutional mental health support lies not in the incremental improvement of any single component, but in the \textbf{synergistic integration of multiple specialized agents} into a single, closed-loop system. Such a system, architected as a Multi-Agent System (MAS), is capable of emergent behaviors that are more than the sum of its parts.
+
+Therefore, this research directly addresses the identified gap by proposing and prototyping a novel agentic AI framework, the \textbf{Safety Agent Suite}, where:
 \begin{itemize}
-    \item An \textbf{Analytics Agent} autonomously identifies trends, moving beyond the static dashboards of current well-being analytics and creating actionable intelligence.
-    \item An \textbf{Intervention Agent} acts on this intelligence by automating targeted outreach campaigns, explicitly closing the "insight-to-action" gap that renders current proactive models inefficient and unscalable.
-    \item A \textbf{Triage Agent} provides immediate, context-aware support, functioning as the intelligent and ever-present front-door to the entire support ecosystem, overcoming the limitations of purely reactive chatbots.
+    \item An \textbf{Insights Agent (IA)} autonomously identifies trends, moving beyond the static dashboards of current well-being analytics and creating actionable intelligence.
+    \item A \textbf{Support Coach Agent (SCA)} and a \textbf{Safety Triage Agent (STA)} act on this intelligence and on real-time user needs, providing both proactive, personalized coaching and immediate, context-aware crisis support. They function as the intelligent front-door to the support ecosystem, overcoming the limitations of purely reactive chatbots.
+    \item A \textbf{Service Desk Agent (SDA)} closes the "insight-to-action" loop on an administrative level, automating the workflows for clinical case management and resource allocation that currently render proactive models inefficient and unscalable.
 \end{itemize}
-By designing and evaluating a system where these agents work in concert, this thesis pioneers a holistic solution that is fundamentally more proactive, scalable, and efficient than the disparate tools described in the current literature.
+
+By designing and evaluating a system where these agents work in concert, orchestrated by LangGraph, this thesis pioneers a holistic solution that is fundamentally more proactive, scalable, and efficient than the disparate tools described in the current literature.
