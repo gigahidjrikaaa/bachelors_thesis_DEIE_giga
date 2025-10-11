@@ -4,6 +4,10 @@
 % Bab ini menjelaskan metode atau cara yang digunakan dalam penelitian ini untuk 
 % mencapai maksud dan tujuan seperti yang tertulis dalam sub-bab 1.3 [jika diinginkan, kalian dapat menuliskan Kembali tujuan penelitian yang ingin dicapai di sini].
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.1 - DSR METHODOLOGY %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \section{Research Methodology: Design Science Research (DSR)}
 \label{sec:dsr_methodology}
 
@@ -34,75 +38,164 @@ The complete workflow of this research, following the DSR methodology, is visual
 	\label{fig:dsr_flowchart}
 \end{figure}
 
-% Purpose: To formally establish the academic methodology underpinning your constructive research, directly addressing the need for a research method.
-
-% Elaboration Points:
-
-% Provide a formal definition of Design Science Research, citing key literature (e.g., Hevner et al., 2004). Explain that DSR's goal is to create innovative artifacts that solve real-world problems.
-
-% Outline the stages of DSR and map them to your thesis structure:
-
-% Problem Identification & Motivation (Addressed in Chapter 1).
-
-% Definition of Objectives for a Solution (Addressed in Chapter 1).
-
-% Design & Development (The focus of this chapter, Chapter 3, and the next, Chapter 4).
-
-% Demonstration (The focus of the testing in Chapter 4).
-
-% Evaluation & Communication (Addressed in Chapter 4 and Chapter 5, and through this thesis itself).
-
-% Include a flowchart diagram illustrating your research process from start to finish.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.2 - SYSTEM OVERVIEW %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{System Overview and Conceptual Design}
 
-Purpose: To provide a high-level, 10,000-foot view of the system's purpose and its main components, making it understandable before diving into technical specifics.
+The artifact proposed and developed in this research is a novel agentic AI framework designed to address the systemic inefficiencies of traditional, reactive mental health support models in Higher Education Institutions. The conceptual architecture is predicated on the principles of a Multi-Agent System (MAS), wherein a suite of collaborative, specialized intelligent agents—collectively termed the \textbf{Safety Agent Suite}—work in concert to create a proactive, scalable, and data-driven support ecosystem. This framework is designed not as a monolithic application, but as a dynamic, closed-loop system that operates on two interconnected levels: a micro-level loop for real-time, individual student support and a macro-level loop for strategic, institutional oversight and proactive intervention \cite{FIND_CITATION_HERE}.
 
-Elaboration Points:
+The system's primary entities and their designated interaction points are illustrated in the conceptual context diagram in Figure \ref{fig:context_diagram}. These entities are:
+\begin{itemize}
+    \item \textbf{Students:} As the primary users, students interact with the system's conversational interface (UGM-AICare's `/aika` page). This serves as their direct entry point to the support ecosystem, where they engage with the agents responsible for coaching and immediate assistance.
+    \item \textbf{University Staff/Counselors:} As the system's administrators and clinical supervisors, these stakeholders interact with a secure Admin Dashboard. This interface serves as the human-in-the-loop control center, providing aggregated analytics for strategic decision-making and a case management system for handling high-risk escalations.
+    \item \textbf{The Agentic AI Backend:} This is the core computational engine of the framework. It hosts the four agents of the Safety Agent Suite, manages their stateful interactions via LangGraph, and serves as the central hub for all data processing, logic execution, and communication with external services and databases.
+\end{itemize}
 
-Present a concise paragraph describing the conceptual model: "The proposed framework is an ecosystem of three collaborative, intelligent agents that work in concert to transform an institution's mental health support from a reactive to a proactive model..."
+Conceptually, the framework's architecture is best understood as two distinct but integrated operational loops:
 
-Include a high-level Context Diagram showing the main entities (Students, University Staff/Counselors) and systems (UGM-AICare User App, Agentic AI Backend, Admin Dashboard) and how they interact.
+\begin{enumerate}
+    \item \textbf{The Real-Time Interaction Loop:} This loop handles immediate, synchronous interactions with individual students. When a student sends a message, it is first processed by the \textbf{Safety Triage Agent (STA)} for risk assessment. If the context is deemed safe, the \textbf{Support Coach Agent (SCA)} takes over to provide personalized, evidence-based guidance. Should the user require administrative assistance, such as scheduling an appointment, the workflow is seamlessly handed off to the \textbf{Service Desk Agent (SDA)}. This loop is designed for high-availability, low-latency responses, ensuring that students receive immediate and appropriate support.
+    \item \textbf{The Strategic Oversight Loop:} This loop operates on a longer, asynchronous timescale to enable proactive, institution-wide strategy. The \textbf{Insights Agent (IA)} periodically analyzes the anonymized, aggregated data from all student interactions. It generates reports on population-level well-being trends, sentiment analysis, and emerging topics of concern. These reports are delivered to administrators via the Admin Dashboard, providing the empirical evidence needed for data-driven resource allocation, such as commissioning new workshops or adjusting counseling staff schedules. This loop directly addresses the "insight-to-action" gap that plagues current systems \cite{FIND_CITATION_HERE}.
+\end{enumerate}
+
+The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem.
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][9cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: System Context Diagram} \\ \vspace{1cm} This diagram should be a high-level illustration of the system's architecture and stakeholders. It should visually represent: \\ 
+    1. An external "Student" entity interacting via a "UGM-AICare User App (/aika)" interface. \\
+    2. An external "University Staff/Counselor" entity interacting via an "Admin Dashboard" interface. \\
+    3. A central "Agentic AI Backend" system, which contains four internal components: the STA, SCA, SDA, and IA. \\
+    4. Arrows indicating the flow of information: Students send messages to the Backend; the Backend provides real-time responses. The Backend sends aggregated data and alerts to the Admin Dashboard; Staff use the dashboard to configure and oversee the Backend.}}
+    \caption{A high-level context diagram illustrating the primary entities, system interfaces, and the central role of the Agentic AI Framework.}
+    \label{fig:context_diagram}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.3 - FUNCTIONAL ARCHITECTURE %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Functional Architecture: The Agentic Core}
-Purpose: To detail the "what" of the system. This section explains the specific roles and functions of each agent. This is the heart of your functional design.
 
-Elaboration Points: Create a subsection for each of the three agents. For each, define its:
+The functional architecture of the framework is designed as a Multi-Agent System (MAS), where the system's overall intelligence and capability emerge from the coordinated actions of its four specialized agents. This section details the "what" of the system by defining the specific role, operational logic, and capabilities of each agent within the \textbf{Safety Agent Suite}. Each agent functions as a distinct component within the LangGraph state machine, perceiving its environment through the shared state, executing its logic, and updating the state with its results.
 
-\subsection{The Analytics Agent}
+\subsection{The Safety Triage Agent (STA): The Real-Time Guardian}
 
-Goal: To autonomously identify mental health trends from anonymized user data.
+\subsubsection{Goal}
+The primary objective of the STA is to function as a real-time, automated safety monitor for every user interaction. Its goal is to assess the immediate risk level of a user's conversation to detect potential crises and trigger an appropriate escalation protocol without delay, ensuring that safety is the foremost priority of the system.
 
-Perception (Inputs): Anonymized conversation logs from the PostgreSQL database.
+\subsubsection{Perception (Inputs)}
+The STA perceives the conversational environment by intercepting each user message before it is processed by other agents. Its primary input is the raw text of the user's current utterance. Let $M_t$ be the user's message at time $t$. The STA's perception is solely focused on this message:
+\begin{itemize}
+    \item \textbf{Current User Message ($M_t$):} A string containing the user's latest input.
+\end{itemize}
 
-Processing Logic: Describe the NLP tasks it performs: topic modeling, sentiment analysis, and summarization.
+\subsubsection{Processing Logic}
+The core logic of the STA is a high-speed classification task. Upon receiving the message $M_t$, the agent invokes a specialized function, powered by the Gemini 2.5 Pro model, to classify the message into one of several predefined risk categories. The classification function, $f_{STA}$, can be represented as:
+$$ R_t = f_{STA}(M_t; \theta_{LLM}) $$
+where $\theta_{LLM}$ represents the parameters of the underlying Large Language Model, and the output, $R_t$, is an element of the set of possible risk levels, $R \in \{\text{Low, Moderate, Critical}\}$. The prompt for this classification is highly optimized for speed and accuracy, instructing the model to evaluate the text for indicators of self-harm, severe distress, or explicit requests for urgent help.
 
-Action (Outputs): A structured weekly report (in JSON format) containing key insights (e.g., top 5 trending stress topics, overall sentiment score).
+\subsubsection{Action (Outputs)}
+Based on the classification result $R_t$, the STA's action is to update the system's state, which in turn determines the next step in the LangGraph workflow.
+\begin{itemize}
+    \item \textbf{State Update:} The agent's primary output is an update to the shared state graph, setting the \texttt{risk\_level} variable to the value of $R_t$.
+    \item \textbf{Trigger Escalation (if $R_t$ = Critical):} If a critical risk is detected, the agent's action triggers a conditional edge in the graph that invokes the \texttt{escalate\_crisis} tool. This tool flags the conversation on the Admin Dashboard, logs the event, and instructs the Service Desk Agent (SDA) to create a high-priority case. It also immediately presents the user with pre-defined emergency resources.
+\end{itemize}
 
-\subsection{The Intervention Agent}
+\subsection{The Support Coach Agent (SCA): The Empathetic Mentor}
 
-Goal: To automate targeted, proactive outreach campaigns.
+\subsubsection{Goal}
+The SCA is the primary user-facing conversational agent, designed to provide personalized, evidence-based mental health coaching. Its goal is to engage the student in a supportive, empathetic dialogue, guiding them through structured self-help modules based on established therapeutic principles like Cognitive Behavioral Therapy (CBT), and to foster engagement through a gamified reward system.
 
-Perception (Inputs): The structured report from the Analytics Agent and a set of predefined "campaign rules."
+\subsubsection{Perception (Inputs)}
+The SCA operates on the history of the conversation and the user's profile. Its key inputs from the state graph are:
+\begin{itemize}
+    \item \textbf{Conversation History ($H_{t-1}$):} The full transcript of the conversation up to the previous turn.
+    \item \textbf{User's Current Message ($M_t$):} The message deemed safe by the STA.
+    \item \textbf{User State:} Information about the user's progress, including completed modules and earned achievements.
+\end{itemize}
 
-Processing Logic: A rule-based engine that maps insights to actions (e.g., IF 'exam stress' > threshold THEN trigger 'time-management-workshop' campaign).
+\subsubsection{Processing Logic}
+The SCA's logic is generative and context-aware. It uses the Gemini 2.5 Pro model to generate a conversational response, $A_t$, that is empathetic and relevant to the user's message and history.
+$$ A_t = f_{SCA}(M_t, H_{t-1}; \theta_{LLM}) $$
+This agent has access to a toolset that allows it to retrieve and present structured content. When a user's query or the conversation flow indicates a need for a specific skill (e.g., managing anxiety), the SCA can decide to invoke its \texttt{retrieve\_cbt\_module} tool to fetch and present the relevant exercise.
 
-Action (Outputs): A signal sent to the orchestration layer (n8n) with target audience segment and message content.
+\subsubsection{Action (Outputs)}
+\begin{itemize}
+    \item \textbf{Conversational Response:} A human-like text response to be displayed to the user.
+    \item \textbf{Tool Call (Content Delivery):} Invocation of tools to present CBT exercises or other self-help modules.
+    \item \textbf{Tool Call (Gamification):} Upon completion of a module, the SCA can call the \texttt{mint\_achievement\_badge} tool, which interacts with the blockchain service to issue a non-fungible token (NFT) to the user's account as a verifiable record of their progress.
+\end{itemize}
 
-\subsection{The Triage Agent}
+\subsection{The Service Desk Agent (SDA): The Administrative Orchestrator}
 
-Goal: To efficiently route a student to the most appropriate level of support in real-time.
+\subsubsection{Goal}
+The SDA functions as the administrative backbone of the support system. Its primary goal is to automate the operational workflows related to clinical case management and resource scheduling, thereby reducing the manual burden on university staff and ensuring that escalations and requests are handled efficiently and reliably.
 
-Perception (Inputs): A user's live conversation with the chatbot.
+\subsubsection{Perception (Inputs)}
+The SDA is primarily triggered by events from other agents or direct commands from the Admin Dashboard. Its inputs are structured data, not conversational text:
+\begin{itemize}
+    \item \textbf{Escalation Event:} A signal from the STA containing the conversation ID and risk level of a flagged case.
+    \item \textbf{Scheduling Request:} A structured request from the SCA (initiated by a user) containing the user's ID and desired appointment times.
+    \item \textbf{Admin Commands:} Directives from a human administrator via the dashboard (e.g., "close case," "add note").
+\end{itemize}
 
-Processing Logic: A real-time text classification model to determine the conversation's severity level (e.g., Level 1: Casual, Level 2: Moderate, Level 3: Red Flag).
+\subsubsection{Processing Logic}
+The SDA's logic is procedural and tool-based. It does not engage in open-ended conversation but rather executes a sequence of pre-defined actions based on its inputs. For example, upon receiving an escalation event, its logic is to execute the \texttt{create\_case} tool, followed by the \texttt{assign\_case\_status} tool with the "New" parameter.
 
-Action (Outputs): A structured recommendation (e.g., suggest a self-help module, suggest booking a counselor, provide an emergency hotline).
+\subsubsection{Action (Outputs)}
+\begin{itemize}
+    \item \textbf{Database Operations:} The SDA's primary actions are database mutations, such as creating, updating, or closing case records in the clinical management database.
+    \item \textbf{API Calls to External Services:} It can interact with external calendar systems to check for counselor availability and book appointments.
+    \item \textbf{Notifications:} It sends automated email or dashboard notifications to counselors when a new case is assigned to them or when a student books an appointment.
+\end{itemize}
 
-Include a detailed Data Flow Diagram (DFD) showing how data moves between these three agents and the database.
+\subsection{The Insights Agent (IA): The Strategic Analyst}
 
-\section{Technical Architecture: The Hybrid System}
+\subsubsection{Goal}
+The IA is designed to function as the institution's automated well-being analyst. Its goal is to autonomously process anonymized, aggregated conversation data to identify population-level mental health trends, sentiment shifts, and emerging topics of concern. This provides the institution with actionable, data-driven intelligence to inform resource allocation and proactive strategy.
+
+\subsubsection{Perception (Inputs)}
+The IA is activated by a time-based trigger (e.g., a weekly Cron job) and its primary input is the entire corpus of anonymized conversation logs.
+\begin{itemize}
+    \item \textbf{Time-Based Trigger:} A signal from the n8n orchestration layer to begin its analysis.
+    \item \textbf{Anonymized Database Access:} Read-only access to the \texttt{conversation\_logs} table, from which all personally identifiable information (PII) has been redacted.
+\end{itemize}
+
+\subsubsection{Processing Logic}
+The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks performed on the collected data. This includes:
+\begin{itemize}
+    \item \textbf{Topic Modeling:} Using algorithms like Latent Dirichlet Allocation (LDA) or modern transformer-based clustering to identify the most prevalent topics of discussion (e.g., "exam stress," "social isolation").
+    \item \textbf{Sentiment Analysis:} Calculating the overall sentiment score for the student population over the given period and tracking its change over time.
+    \item \textbf{Summarization:} Using the Gemini 2.5 Pro model to generate concise, human-readable summaries of the key findings from the topic and sentiment analysis.
+\end{itemize}
+
+\subsubsection{Action (Outputs)}
+\begin{itemize}
+    \item \textbf{Structured Report Generation:} The final output is a structured report (e.g., in JSON or PDF format) containing visualizations (e.g., charts of topic frequency over time) and the generated summaries.
+    \item \textbf{Dashboard Update:} The agent pushes this report to the Admin Dashboard, updating the analytics view for university staff.
+    \item \textbf{Email Notification:} It can be configured to automatically email the report to a list of stakeholders, such as the head of counseling services.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][10cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Data Flow Diagram (DFD)} \\ \vspace{1cm} This diagram should illustrate the flow of data between the four agents, the user, the admin, and the database. Key flows to show include: \\
+    1. User Message -> STA -> SCA -> User Response (Normal Flow). \\
+    2. User Message -> STA -> SDA -> Admin Dashboard (Crisis Flow). \\
+    3. SCA -> Blockchain Service (Gamification Flow). \\
+    4. IA -> Database -> Admin Dashboard (Analytics Flow).}}
+    \caption{A Data Flow Diagram illustrating the movement of information between the agents of the Safety Agent Suite and external entities.}
+    \label{fig:dfd}
+\end{figure}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.4 - TECHNICAL ARCHITECTURE %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Technical Architecture}
 Purpose: To detail the "how" of the system—the engineering blueprint, including justification for key technology choices.
 
 Elaboration Points:
@@ -112,9 +205,6 @@ A detailed diagram showing the interplay between all technologies: Next.js (Admi
 
 \subsection{The "Brain": FastAPI + LangChain Service}
 Justify the choice of FastAPI (for performance, async support) and LangChain (for LLM orchestration). Detail the API design, defining key endpoints (e.g., /api/agents/generate-report) and their request/response schemas.
-
-\subsection{The "Nervous System": n8n Workflows} 
-Justify the choice of n8n for robust workflow automation. Provide screenshots or diagrams of the primary n8n workflows (e.g., the "Weekly Report Generation" workflow triggered by a Cron job).
 
 \section{Database Design}
 Purpose: To define the data persistence layer of the system.
