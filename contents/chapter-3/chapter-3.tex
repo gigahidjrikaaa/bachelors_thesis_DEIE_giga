@@ -78,6 +78,7 @@ The synergy between these two loops is the cornerstone of the framework's design
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Functional Architecture: The Agentic Core}
+\label{chap:functional_architecture}
 
 The functional architecture of the framework is designed as a Multi-Agent System (MAS), where the system's overall intelligence and capability emerge from the coordinated actions of its four specialized agents. This section details the "what" of the system by defining the specific role, operational logic, and capabilities of each agent within the \textbf{Safety Agent Suite}. Each agent functions as a distinct component within the LangGraph state machine, perceiving its environment through the shared state, executing its logic, and updating the state with its results.
 
@@ -196,15 +197,192 @@ The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks pe
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Technical Architecture}
-Purpose: To detail the "how" of the system—the engineering blueprint, including justification for key technology choices.
+\label{chap:technical_architecture}
 
-Elaboration Points:
+This section details the "how" of the system, providing the engineering blueprint for the agentic AI framework. The architecture is designed following a modern, service-oriented pattern, which decouples the primary components of the system into distinct, independently deployable services. This approach enhances maintainability, scalability, and promotes a clean separation of concerns \cite{FIND_CITATION_HERE}. The framework consists of three core services: a unified frontend application, a backend service that houses the agentic core, and a data persistence service for all storage needs.
 
-\subsection{Overall System Architecture Diagram}
-A detailed diagram showing the interplay between all technologies: Next.js (Admin Dashboard), FastAPI (Backend), PostgreSQL, LangChain (as a library), and n8n (as a separate, orchestrated service). Show the communication protocols (e.g., REST API, direct DB connection).
+\subsection{Overall System Architecture}
+\label{sec:overall_system_architecture}
 
-\subsection{The "Brain": FastAPI + LangChain Service}
-Justify the choice of FastAPI (for performance, async support) and LangChain (for LLM orchestration). Detail the API design, defining key endpoints (e.g., /api/agents/generate-report) and their request/response schemas.
+The overall technical architecture is visualized in Figure \ref{fig:system_architecture_diagram}. It is a monolithic frontend-backend structure composed of three primary services that work in concert to deliver the full functionality of the framework to both students and administrators.
+
+\begin{enumerate}
+    \item \textbf{Frontend Service (UGM-AICare Web Application):} This is a comprehensive web application built using the \textbf{Next.js} framework. It serves two distinct user-facing roles from a single codebase:
+        \begin{itemize}
+            \item \textbf{The User Portal:} This is the interface for students. It provides access to features such as a journaling system, a user dashboard for tracking progress, and the `/aika` chat interface for direct interaction with the Support Coach Agent (SCA) and Safety Triage Agent (STA). It also handles features like appointment scheduling with counselors.
+            \item \textbf{The Admin Dashboard:} This is a secure, role-protected area of the application for university staff and counselors. Its responsibilities include rendering the analytics and insights provided by the Insights Agent (IA), displaying real-time alerts for flagged conversations, and providing a case management system to act on escalations from the STA and SDA.
+        \end{itemize}
+    \item \textbf{Backend Service (The Agentic Core):} This service is the "brain" of the entire operation, built using the \textbf{FastAPI} Python framework. It exposes a \textbf{REST API} through which the unified Next.js frontend communicates. The backend is responsible for handling all business logic, including processing incoming chat messages from the User Portal, orchestrating the agents within the LangGraph state machine, making calls to the Google Gemini API, and interacting with the database. The asynchronous capabilities of FastAPI are critical for efficiently managing multiple concurrent conversations and long-running agentic tasks.
+    \item \textbf{Data Persistence Service:} A \textbf{PostgreSQL} relational database serves as the single source of truth for the system. It is responsible for storing all persistent data, including user information (anonymized), conversation logs, clinical case data, and generated reports.
+\end{enumerate}
+
+Communication between the unified frontend and the backend is exclusively handled via a secure, stateless REST API. The backend service is the only component with direct access to the database, ensuring a clear and secure data access pattern. This architecture allows for a cohesive user experience while maintaining a strong separation between presentation logic (frontend) and business logic (backend).
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][12cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Overall System Architecture} \\ \vspace{1cm} This diagram should be a component diagram illustrating the core services and user interfaces. It should show: \\
+    1. A large box for the "Frontend Service (Next.js)" which contains two smaller boxes within it: "User Portal" and "Admin Dashboard". \\
+    2. An external "Student" actor pointing to the "User Portal". \\
+    3. An external "Administrator/Counselor" actor pointing to the "Admin Dashboard". \\
+    4. A box for the "Backend Service (FastAPI)" containing the "Agentic Core (LangGraph)" and the four agents (STA, SCA, SDA, IA). \\
+    5. A box for the "Database Service (PostgreSQL)". \\
+    6. A double-arrow labeled "REST API (HTTPS)" connecting the "Frontend Service" box to the "Backend Service" box. \\
+    7. An arrow labeled "Direct DB Connection" connecting the Backend to the Database. \\
+    8. An arrow from the Backend to an external "Google Gemini API" service.}}
+    \caption{The high-level technical architecture of the system, illustrating the unified frontend serving both users and admins, the backend agentic core, and the database service.}
+    \label{fig:system_architecture_diagram}
+\end{figure}
+
+\subsection{Backend Service: The Agentic Core}
+\label{sec:backend_service}
+
+The backend service is the central nervous system and cognitive engine of the entire framework. It is a Python-based application responsible for executing all business logic, orchestrating the agentic workflows, and serving as the intermediary between the user-facing application and the data persistence layer. To meet the demanding requirements of a real-time, AI-powered conversational system, the backend is built upon a modern, high-performance technology stack.
+
+\subsubsection{API Framework: FastAPI}
+\label{sec:api_framework}
+
+The foundation of the backend service is the \textbf{FastAPI} framework. This choice was made after careful consideration of several alternatives, based on its specific suitability for building high-performance, API-driven services that interact with machine learning models \cite{FIND_CITATION_HERE}. The primary justifications for its selection are:
+
+\begin{itemize}
+    \item \textbf{Asynchronous Support:} FastAPI is built on top of ASGI (Asynchronous Server Gateway Interface), allowing it to handle requests asynchronously. This is a critical requirement for this framework, as interactions with the Google Gemini API are I/O-bound operations. Asynchronous handling ensures that the server can manage multiple concurrent user conversations and long-running agentic tasks without blocking, leading to a highly responsive and scalable system.
+    \item \textbf{High Performance:} Leveraging Starlette for web routing and Pydantic for data validation, FastAPI is one of the fastest Python web frameworks available, delivering performance on par with NodeJS and Go applications \cite{FIND_CITATION_HERE}. This is essential for minimizing latency in the real-time chat interface.
+    \item \textbf{Data Validation and Serialization:} FastAPI uses Pydantic type hints to enforce rigorous data validation for all incoming and outgoing API requests. This not only reduces the likelihood of data-related bugs but also automatically serializes data to and from JSON, streamlining the development process.
+    \item \textbf{Automatic Interactive Documentation:} The framework automatically generates interactive API documentation (via Swagger UI and ReDoc) based on the Pydantic models. This creates a reliable, always-up-to-date contract for the frontend team and simplifies the testing and debugging process.
+\end{itemize}
+
+The backend exposes a RESTful API for all communication with the frontend service. The design follows standard REST principles, using conventional HTTP methods to perform operations on resources. A summary of key endpoints is provided in Table \ref{tab:api_endpoints}.
+
+\begin{table}[h]
+    \centering
+    \caption{Key Endpoints of the Backend REST API.}
+    \label{tab:api_endpoints}
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
+        \midrule
+        \texttt{POST} & \texttt{/api/chat/message} & Submits a user message for processing by the agentic core. \\
+        \texttt{GET} & \texttt{/api/insights/latest} & Fetches the latest strategic report from the Insights Agent. \\
+        \texttt{POST} & \texttt{/api/appointments} & Creates a new appointment with a counselor via the SDA. \\
+        \texttt{GET} & \texttt{/api/admin/cases} & Retrieves all flagged cases for the admin dashboard. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\subsubsection{Agent Orchestration: LangGraph}
+
+To manage the complex, cyclical, and stateful interactions between the four agents, the framework employs \textbf{LangGraph}. LangGraph extends the linear "chain" paradigm of LangChain by modeling agentic workflows as a state graph, which is essential for building robust multi-agent systems \cite{FIND_CITATION_HERE}.
+
+The core of the orchestration is a central \textbf{State Graph}, where the application's state is explicitly defined and passed between nodes. This state object, implemented as a Pydantic class, contains all relevant information for a given workflow, such as the full \texttt{`conversation\_history`}, the \texttt{`current\_risk\_level`} as determined by the STA, and the \texttt{`active\_case\_id`}.
+
+The workflow is structured as follows:
+\begin{itemize}
+    \item \textbf{Nodes:} Each of the four agents (STA, SCA, SDA, IA) and their associated tools are implemented as nodes in the graph. A node is a function that receives the current state, performs its task (e.g., makes an LLM call, queries the database), and returns a dictionary of updates to be merged back into the state.
+    \item \textbf{Edges:} The flow of control between nodes is managed by edges. Crucially, the framework uses \textbf{conditional edges} to implement the agentic logic. After a node executes, a routing function inspects the updated state to decide which node to call next. For example, after the STA node classifies a message, a conditional edge checks the \texttt{`current\_risk\_level`} in the state. If the level is `CRITICAL`, the edge routes the workflow to the SDA node to create a case; otherwise, it routes to the SCA node to continue the conversation. This structure is visualized in Figure \ref{fig:langgraph_conceptual}.
+\end{itemize}
+
+This stateful, cyclical approach allows for sophisticated agentic behaviors, such as retrying failed tool calls, handing off tasks between agents, and maintaining a durable memory of the interaction, which are critical for the reliability and safety of the system.
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: LangGraph Conceptual State Graph} \\ \vspace{1cm} This diagram should illustrate the agent workflow as a state graph. It should show: \\
+    1. An entry point "User Message". \\
+    2. A node for "Safety Triage Agent (STA)". \\
+    3. A conditional branch from STA: An edge labeled "Risk: Low/Moderate" leads to the "Support Coach Agent (SCA)" node. An edge labeled "Risk: Critical" leads to the "Service Desk Agent (SDA)" node. \\
+    4. The SCA node has a loop back to itself for conversation and can also branch to the SDA node for administrative tasks like booking. \\
+    5. The SDA node connects to the "Admin Dashboard" and database.}}
+    \caption{Conceptual diagram of the LangGraph state machine, showing how conditional edges route the workflow between the STA, SCA, and SDA based on the conversation's state.}
+    \label{fig:langgraph_conceptual}
+\end{figure}
+
+\subsubsection{Asynchronous Task Scheduling}
+
+To facilitate the proactive, long-term analysis performed by the Insights Agent (IA), the framework requires a mechanism for scheduling periodic tasks. Instead of relying on an external workflow orchestration tool like n8n, a task scheduler is integrated directly into the FastAPI backend service.
+
+For this purpose, the \textbf{APScheduler} (Advanced Python Scheduler) library is utilized. This choice was made for the following reasons:
+\begin{itemize}
+    \item \textbf{Integration and Simplicity:} As a Python library, APScheduler integrates seamlessly into the FastAPI application's event loop. This avoids the operational complexity and additional infrastructure requirements of deploying and maintaining a separate workflow management service.
+    \item \textbf{Sufficient Functionality:} For the primary requirement of running the IA's analysis on a fixed schedule (e.g., weekly), APScheduler's cron-style triggering is perfectly suited and provides a lightweight yet robust solution.
+\end{itemize}
+The scheduler is configured to trigger the IA's main analysis function at a predefined interval. This function then executes its NLP pipeline, generates the strategic report, and pushes the results to the database and relevant stakeholders, thus closing the strategic oversight loop of the framework without manual intervention.
+
+\subsection{Frontend Service: The UGM-AICare Web Application}
+
+The frontend service is the primary human-computer interface for the entire framework, serving both students and administrative staff. It is engineered as a monolithic frontend application using the \textbf{Next.js} React framework. This choice was deliberate, allowing for the development and maintenance of two distinct user experiences—the public-facing User Portal and the secure Admin Dashboard within a single, cohesive codebase. This approach simplifies dependency management and ensures a consistent design language across the platform while leveraging Next.js's powerful features for routing and role-based access control \cite{FIND_CITATION_HERE}.
+
+The selection of Next.js is justified by several key architectural advantages that directly support the project's requirements:
+
+\begin{itemize}
+    \item \textbf{Hybrid Rendering Strategies:} Next.js provides the flexibility to employ different rendering strategies on a per-page basis. For the dynamic, data-heavy Admin Dashboard, \textbf{Server-Side Rendering (SSR)} can be utilized to ensure that staff always see the most up-to-date case information and analytics. For the public-facing User Portal, a combination of SSR for dynamic content (like the user's dashboard) and \textbf{Static Site Generation (SSG)} for informational pages ensures both data freshness and optimal performance.
+    \item \textbf{Component-Based Architecture:} Built upon React, Next.js facilitates a modular and reusable component-based architecture. This allows for the creation of discrete UI components (e.g., the chat window, dashboard widgets, journaling entries) that can be developed, tested, and maintained in isolation, significantly improving the scalability and maintainability of the codebase.
+    \item \textbf{Integrated API Routes:} Next.js includes a built-in capability to create API routes within the same project. While the primary business logic resides in the separate FastAPI backend, this feature is leveraged to handle server-side frontend tasks, such as proxying requests to the backend API, securely managing session tokens, and hiding sensitive API keys from the client-side browser.
+\end{itemize}
+
+The application is functionally divided into two main areas:
+
+\subsubsection{The User Portal}
+This is the student-facing portion of the application, designed to be an accessible and engaging entry point to the university's mental health resources. Its key functional components include:
+\begin{itemize}
+    \item \textbf{The `/aika` Conversational Interface:} A real-time chat component that serves as the primary interaction point with the Support Coach Agent (SCA) and the underlying Safety Triage Agent (STA). It is responsible for managing the state of the conversation and rendering responses from the backend.
+    \item \textbf{Journaling System:} A private, secure feature allowing students to write and review personal journal entries, a common practice in CBT-based therapies.
+    \item \textbf{User Dashboard:} A personalized space where students can track their progress through coaching modules and view their earned gamification rewards, including the NFT achievement badges.
+    \item \textbf{Appointment Scheduling:} An interface that communicates with the Service Desk Agent (SDA) via the backend API to allow students to view available slots and book appointments with human counselors.
+\end{itemize}
+
+\subsubsection{The Admin Dashboard}
+This is a secure, authentication-protected area of the application designed for counselors and administrative staff. It functions as the central control and oversight panel for the entire agentic framework. Key features include:
+\begin{itemize}
+    \item \textbf{Insights Visualization:} Renders the reports and data visualizations generated by the Insights Agent (IA), providing staff with a clear, actionable overview of student well-being trends.
+    \item \textbf{Real-Time Case Management:} Displays alerts for conversations flagged as "critical" by the STA. It provides an interface for counselors to review the flagged conversation, manage the case status, and document actions taken, directly interacting with the workflows managed by the SDA.
+    \item \textbf{System Configuration:} Provides an interface for administrators to configure certain parameters of the agentic system, such as the email list for IA reports or the thresholds for proactive interventions.
+\end{itemize}
+
+All dynamic data and actions within both the User Portal and the Admin Dashboard are handled through asynchronous requests to the backend REST API, ensuring a clean and complete separation between the presentation layer (frontend) and the business logic and agentic core (backend).
+
+\subsection{Data Persistence Layer: PostgreSQL}
+
+The data persistence layer is the architectural component responsible for the storage, retrieval, and management of all long-term data within the framework. For this system, \textbf{PostgreSQL}, a powerful, open-source object-relational database system, was selected as the data persistence service. This decision was based on its robustness, feature set, and suitability for an application that handles structured, relational, and sensitive data \cite{FIND_CITATION_HERE}.
+
+The choice of a relational database model, and PostgreSQL specifically, is justified by the following key factors:
+
+\begin{itemize}
+    \item \textbf{Data Integrity and ACID Compliance:} The nature of the application, which involves managing user interactions, clinical case escalations, and appointments, requires strong guarantees of data integrity. PostgreSQL's full compliance with ACID (Atomicity, Consistency, Isolation, Durability) properties ensures that all transactions are processed reliably. This is a non-negotiable requirement for a system where a missed escalation or a lost conversation log could have significant consequences.
+    \item \textbf{Structured and Relational Data Model:} The data generated by the framework is inherently relational. There are clear, defined relationships between users, their conversation sessions, the messages within those sessions, and the clinical cases that may arise from them. A relational schema allows for the enforcement of these relationships at the database level through foreign key constraints, ensuring a consistent and logical data model.
+    \item \textbf{Scalability and Concurrency Control:} PostgreSQL is renowned for its robust implementation of Multi-Version Concurrency Control (MVCC), which allows for high concurrency by enabling read operations to occur without blocking write operations. This is critical for the system's architecture, as the Insights Agent (IA) will perform large-scale read queries for analytics, while the real-time agents (STA, SCA, SDA) will be continuously writing new data from user interactions.
+    \item \textbf{Extensibility and Advanced Features:} PostgreSQL supports a rich set of data types, advanced indexing capabilities, and powerful query optimization. This provides the flexibility to handle complex analytical queries from the IA efficiently and to extend the database schema in the future without requiring a migration to a different database system.
+\end{itemize}
+
+The backend service is the sole component with direct credentials to access the database. All interactions from the frontend are proxied through the backend's REST API, which enforces business logic and authorization before any database transaction is executed. This centralized access model is a critical security measure that prevents direct, unauthorized access to the data persistence layer.
+
+The detailed logical structure of the database, including the table schemas and their relationships, will be presented in the \textbf{Database Design} section, which includes a full Entity-Relationship Diagram (ERD).
+
+\subsection{Deployment and Scalability Considerations}
+
+While the preceding sections have detailed the logical design of the framework's services, a comprehensive technical architecture must also account for the practical implementation of deploying and managing these services. For the UGM-AICare project, a pragmatic and robust deployment strategy centered on containerization within a dedicated Virtual Machine (VM) has been adopted. This approach ensures a consistent and reproducible environment while leveraging the specific infrastructure made available for this research.
+
+The deployment environment is a Virtual Machine generously provided through a research collaboration with \textbf{PT INA17}. The entire application stack is deployed on this single server, using \textbf{Docker} as the core technology to manage the services \cite{FIND_CITATION_HERE}. Docker is used to package the Next.js frontend, the FastAPI backend, and the PostgreSQL database into lightweight, portable containers. This containerization strategy provides several key advantages in a single-server environment:
+\begin{itemize}
+    \item \textbf{Consistency and Reproducibility:} By defining each service's environment and dependencies within a `Dockerfile`, the framework eliminates environment-specific issues, guaranteeing that the application runs on the production VM exactly as it does in development.
+    \item \textbf{Isolation:} Each service runs in its own isolated container. This is particularly crucial for preventing dependency conflicts between the Python-based backend and the Node.js-based frontend, ensuring that they can be updated and maintained independently without interfering with one another.
+    \item \textbf{Simplified Management:} Using `docker-compose`, the entire multi-container application can be managed with a single configuration file, simplifying the processes of starting, stopping, and updating the services.
+\end{itemize}
+
+To manage incoming web traffic and route it to the appropriate services, \textbf{Nginx} is employed as a reverse proxy. It is installed on the host VM and configured to handle all domain-related tasks. Its responsibilities include:
+\begin{itemize}
+    \item \textbf{SSL Termination:} Nginx manages the SSL certificates, terminating HTTPS connections and forwarding decrypted traffic to the appropriate internal container. This centralizes security management.
+    \item \textbf{Request Routing:} It inspects incoming requests and routes them based on their path. For example, requests to `/api/*` are forwarded to the FastAPI backend container, while all other requests are routed to the Next.js frontend container. This allows both services to appear as if they are running on the same domain and port to the end-user.
+\end{itemize}
+
+Regarding scalability, while this single-VM deployment does not involve automated horizontal scaling like a Kubernetes cluster, it is designed with future growth in mind:
+\begin{itemize}
+    \item \textbf{Vertical Scaling:} The most direct path to scaling is vertical. The resources of the Virtual Machine (CPU, RAM, storage) can be increased as the application's user base and data load grow.
+    \item \textbf{Container-Level Scaling:} Should the VM's resources permit, it is possible to run multiple instances of the most resource-intensive service—the FastAPI backend—on the same machine. Nginx can be configured to act as a load balancer, distributing incoming API requests across these multiple backend containers, thereby increasing the system's capacity to handle concurrent users.
+\end{itemize}
+
+This deployment strategy provides a stable, secure, and maintainable foundation for the UGM-AICare prototype, while offering clear pathways for future scaling as the project evolves.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.5 - ADDITIONAL ARCHITECTURAL CONSIDERATIONS %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Database Design}
 Purpose: To define the data persistence layer of the system.
