@@ -1,9 +1,6 @@
 \chapter{System Design and Architecture}
 \label{chap:system_design}
 
-% Bab ini menjelaskan metode atau cara yang digunakan dalam penelitian ini untuk 
-% mencapai maksud dan tujuan seperti yang tertulis dalam sub-bab 1.3 [jika diinginkan, kalian dapat menuliskan Kembali tujuan penelitian yang ingin dicapai di sini].
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SECTION 3.1 - DSR METHODOLOGY %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -272,12 +269,12 @@ The backend exposes a RESTful API for all communication with the frontend servic
 
 To manage the complex, cyclical, and stateful interactions between the four agents, the framework employs \textbf{LangGraph}. LangGraph extends the linear "chain" paradigm of LangChain by modeling agentic workflows as a state graph, which is essential for building robust multi-agent systems \cite{FIND_CITATION_HERE}.
 
-The core of the orchestration is a central \textbf{State Graph}, where the application's state is explicitly defined and passed between nodes. This state object, implemented as a Pydantic class, contains all relevant information for a given workflow, such as the full \texttt{`conversation\_history`}, the \texttt{`current\_risk\_level`} as determined by the STA, and the \texttt{`active\_case\_id`}.
+The core of the orchestration is a central \textbf{State Graph}, where the application's state is explicitly defined and passed between nodes. This state object, implemented as a Pydantic class, contains all relevant information for a given workflow, such as the full \texttt{conversation\_history}, the \texttt{current\_risk\_level} as determined by the STA, and the \texttt{active\_case\_id}. 
 
 The workflow is structured as follows:
 \begin{itemize}
     \item \textbf{Nodes:} Each of the four agents (STA, SCA, SDA, IA) and their associated tools are implemented as nodes in the graph. A node is a function that receives the current state, performs its task (e.g., makes an LLM call, queries the database), and returns a dictionary of updates to be merged back into the state.
-    \item \textbf{Edges:} The flow of control between nodes is managed by edges. Crucially, the framework uses \textbf{conditional edges} to implement the agentic logic. After a node executes, a routing function inspects the updated state to decide which node to call next. For example, after the STA node classifies a message, a conditional edge checks the \texttt{`current\_risk\_level`} in the state. If the level is `CRITICAL`, the edge routes the workflow to the SDA node to create a case; otherwise, it routes to the SCA node to continue the conversation. This structure is visualized in Figure \ref{fig:langgraph_conceptual}.
+    \item \textbf{Edges:} The flow of control between nodes is managed by edges. Crucially, the framework uses \textbf{conditional edges} to implement the agentic logic. After a node executes, a routing function inspects the updated state to decide which node to call next. For example, after the STA node classifies a message, a conditional edge checks the \texttt{current\_risk\_level} in the state. If the level is `CRITICAL`, the edge routes the workflow to the SDA node to create a case; otherwise, it routes to the SCA node to continue the conversation. This structure is visualized in Figure \ref{fig:langgraph_conceptual}.
 \end{itemize}
 
 This stateful, cyclical approach allows for sophisticated agentic behaviors, such as retrying failed tool calls, handing off tasks between agents, and maintaining a durable memory of the interaction, which are critical for the reliability and safety of the system.
@@ -381,62 +378,503 @@ Regarding scalability, while this single-VM deployment does not involve automate
 This deployment strategy provides a stable, secure, and maintainable foundation for the UGM-AICare prototype, while offering clear pathways for future scaling as the project evolves.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% SECTION 3.5 - ADDITIONAL ARCHITECTURAL CONSIDERATIONS %%%
+%%% SECTION 3.5 - DATABASE DESIGN %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Database Design}
-Purpose: To define the data persistence layer of the system.
+\label{sec:database_design}
 
-Elaboration Points:
+The database is the foundational layer of the system's architecture, responsible for the structured persistence and integrity of all data generated and consumed by the agentic framework. The schema is designed using a \textbf{relational model} to logically represent the relationships between the core entities of the application and to enforce strict data integrity through constraints. This design ensures that the data model can robustly support the distinct operational requirements of all four agents—from the real-time transactional needs of the STA and SDA to the large-scale analytical queries of the IA while adhering to the principles of privacy and data security. The following subsections detail the logical structure of the database, including the Entity-Relationship Diagram (ERD) and the specific schemas of the key tables.
 
-Present a clean Entity-Relationship Diagram (ERD).
+\subsection{Entity-Relationship Diagram (ERD)}
+\label{subsec:erd}
 
-% Add table of key columns and data types for the most important table
-\begin{table}[h]
+The logical schema of the database is formally represented by the Entity-Relationship Diagram (ERD) shown in Figure \ref{fig:erd}. This diagram provides a visual blueprint of the core entities within the system, their attributes, and the relationships that connect them. The design is normalized to reduce data redundancy and ensure logical consistency, with relationships enforced through primary and foreign key constraints.
+
+The key entities and their relationships are as follows:
+\begin{itemize}
+    \item \textbf{Core Interaction Entities:} The central entities that capture user engagement are \texttt{users}, \texttt{conversations}, and \texttt{messages}. A \texttt{user} (representing a student with an anonymized identifier) can have multiple \texttt{conversations}, and each \texttt{conversation} is composed of multiple \texttt{messages}. This one-to-many relationship structure allows for a clear and chronological record of all interactions.
+    \item \textbf{Case Management Entities:} To support the functional requirements of the STA and SDA, the \texttt{cases} and \texttt{case\_notes} entities are introduced. A \texttt{case} is directly linked to a single \texttt{conversation} in which a critical risk was detected. Each \texttt{case} can have multiple \texttt{case\_notes}, which are time-stamped entries made by counselors during their review, thereby creating a formal audit trail for each escalation.
+    \item \textbf{Administrative Entities:} The \texttt{counselors} and \texttt{appointments} entities support the administrative functions of the Service Desk Agent. A many-to-many relationship exists between \texttt{users} and \texttt{counselors} through the \texttt{appointments} table, which links a specific \texttt{user} and a \texttt{counselor} at a scheduled time.
+    \item \textbf{Gamification Entity:} The \texttt{achievements} entity supports the gamification features of the Support Coach Agent. It links a \texttt{user} to a specific achievement they have unlocked, storing metadata such as the date earned and the blockchain transaction hash for the minted NFT.
+\end{itemize}
+
+This relational structure ensures that data is logically organized and that complex queries—from retrieving a single conversation's history to aggregating data for the Insights Agent—can be performed efficiently and reliably.
+
+\begin{figure}[h]
     \centering
-    \caption{Key Columns and Data Types for \texttt{conversation\_logs} Table}
-    \label{tab:conversation-logs}
-    \begin{tabular}{|l|l|l|}
-        \hline
-        \textbf{Column Name} & \textbf{Data Type} & \textbf{Description} \\
-        \hline
-        id & SERIAL PRIMARY KEY & Unique identifier \\
-        user\_id & UUID & Reference to user (anonymized) \\
-        timestamp & TIMESTAMP WITH TIME ZONE & Time of message \\
-        message & TEXT & User or agent message content \\
-        sender & VARCHAR(16) & 'user' or 'agent' \\
-        sentiment\_score & FLOAT & Sentiment analysis result \\
-        topic & VARCHAR(64) & NLP-inferred topic label \\
-        \hline
-    \end{tabular}
-\end{table}
+    \fbox{\parbox[c][12cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Entity-Relationship Diagram (ERD)} \\ \vspace{1cm} This diagram should visually represent the database schema using standard ERD notation (e.g., Crow's Foot notation). It must include the following entities and relationships: \\
+    - \textbf{users} (PK: \texttt{user\_id}) \\
+    - \textbf{conversations} (PK: \texttt{conversation\_id}, FK: \texttt{user\_id}) \\
+    - \textbf{messages} (PK: \texttt{message\_id}, FK: \texttt{conversation\_id}) \\
+    - \textbf{cases} (PK: \texttt{case\_id}, FK: \texttt{conversation\_id}, FK: \texttt{assigned\_counselor\_id}) \\
+    - \textbf{case\_notes} (PK: \texttt{note\_id}, FK: \texttt{case\_id}) \\
+    - \textbf{counselors} (PK: \texttt{counselor\_id}) \\
+    - \textbf{appointments} (PK: \texttt{appointment\_id}, FK: \texttt{user\_id}, FK: \texttt{counselor\_id}) \\
+    - \textbf{achievements} (PK: \texttt{achievement\_id}, FK: \texttt{user\_id}) \\
+    Lines with appropriate symbols should connect these entities to show one-to-many relationships (e.g., one \texttt{user} to many \texttt{conversations}).}}
+    \caption{The Entity-Relationship Diagram for the UGM-AICare database, illustrating the tables and their logical relationships.}
+    \label{fig:erd}
+\end{figure}
+
+\subsection{Detailed Table Schemas}
+
+This subsection provides a detailed specification for the primary tables in the database schema. For each table, the columns, their corresponding data types in PostgreSQL, and their constraints are defined. The descriptions highlight how each attribute supports the functional requirements of the user-facing application and the four agents of the Safety Agent Suite.
+
+\subsubsection{Users Table}
+The \texttt{users} table serves as the central repository for student information. To adhere to the principle of Privacy by Design, this table is intentionally minimal and uses a non-identifiable primary key.
+
+\begin{longtable}{@{}llll@{}}
+    \caption{Schema for the \texttt{users} table.} \label{tab:users_schema} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{4}{c}%
+    {{\tablename\ \thetable{} -- continued from previous page}} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endfoot
+    \texttt{user\_id} & \texttt{UUID} & PK, NOT NULL & A universally unique identifier serving as the primary key. This anonymized ID is used across the system to track user activity without storing PII. \\
+    \texttt{created\_at} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp indicating when the user account was created. \\
+\end{longtable}
+
+\subsubsection{Conversation Logs Table}
+The \texttt{conversation\_logs} table is one of the most critical tables in the system. It archives every message from every conversation, serving as the primary data source for the Insights Agent (IA) and providing the necessary context for the real-time agents.
+
+\begin{longtable}{@{}llll@{}}
+    \caption{Schema for the \texttt{conversation\_logs} table.} \label{tab:conversation_logs_schema} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{4}{c}%
+    {{\tablename\ \thetable{} -- continued from previous page}} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endfoot
+    \texttt{message\_id} & \texttt{BIGSERIAL} & PK, NOT NULL & Unique identifier for each message. \\
+    \texttt{conversation\_id} & \texttt{UUID} & FK (conversations), NOT NULL & Foreign key linking the message to a specific conversation session. \\
+    \texttt{user\_id} & \texttt{UUID} & FK (users), NOT NULL & Foreign key linking the message to the user who sent it. Indexed for fast retrieval of a user's history. \\
+    \texttt{sender} & \texttt{VARCHAR(16)} & NOT NULL & Indicates the author of the message (e.g., 'user' or 'agent'). \\
+    \texttt{message\_text} & \texttt{TEXT} & NOT NULL & The raw text content of the message. \\
+    \texttt{timestamp} & \texttt{TIMESTAMPTZ} & NOT NULL & The exact time the message was recorded. \\
+    \texttt{sentiment\_score} & \texttt{FLOAT} & & A sentiment score (e.g., from -1 to 1) calculated for the message, used by the IA. \\
+    \texttt{topic} & \texttt{VARCHAR(64)} & & An NLP-inferred topic label for the message, used by the IA. \\
+\end{longtable}
+
+\subsubsection{Cases Table}
+The \texttt{cases} table is the core of the case management system, operated primarily by the Service Desk Agent (SDA) and monitored by human counselors. Each record represents an incident that was flagged by the Safety Triage Agent (STA).
+
+\begin{longtable}{@{}llll@{}}
+    \caption{Schema for the \texttt{cases} table.} \label{tab:cases_schema} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{4}{c}%
+    {{\tablename\ \thetable{} -- continued from previous page}} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endfoot
+    \texttt{case\_id} & \texttt{UUID} & PK, NOT NULL & Unique identifier for the case. \\
+    \texttt{conversation\_id} & \texttt{UUID} & FK (conversations), NOT NULL & Foreign key linking the case to the specific conversation where the risk was detected. \\
+    \texttt{status} & \texttt{VARCHAR(32)} & NOT NULL & The current status of the case (e.g., 'new', 'in\_progress', 'resolved'). \\
+    \texttt{severity} & \texttt{VARCHAR(32)} & NOT NULL & The risk level assigned by the STA (e.g., 'critical'). \\
+    \texttt{assigned\_counselor\_id} & \texttt{UUID} & FK (counselors) & Foreign key linking the case to a specific counselor for review. \\
+    \texttt{created\_at} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp for when the case was created. \\
+    \texttt{updated\_at} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp for the last update to the case. \\
+\end{longtable}
+
+\subsubsection{Achievements Table}
+This table supports the gamification functionality driven by the Support Coach Agent (SCA), tracking the achievements unlocked by users.
+
+\begin{longtable}{@{}llll@{}}
+    \caption{Schema for the \texttt{achievements} table.} \label{tab:achievements_schema} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endfirsthead
+    \multicolumn{4}{c}%
+    {{\tablename\ \thetable{} -- continued from previous page}} \\
+    \toprule
+    \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endfoot
+    \texttt{achievement\_id} & \texttt{SERIAL} & PK, NOT NULL & Unique identifier for the achievement record. \\
+    \texttt{user\_id} & \texttt{UUID} & FK (users), NOT NULL & Foreign key linking the achievement to the user. \\
+    \texttt{achievement\_name} & \texttt{VARCHAR(128)} & NOT NULL & The name of the achievement (e.g., 'Completed First CBT Module'). \\
+    \texttt{date\_earned} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp for when the achievement was awarded. \\
+    \texttt{blockchain\_tx\_hash} & \texttt{VARCHAR(256)} & & The transaction hash of the minted NFT on the blockchain, providing a verifiable proof of achievement. \\
+\end{longtable}
+
+\subsection{Data Integrity and Relationships}
+
+A robust database schema is defined not only by its entities and attributes but also by the rules that govern the relationships between them. In this framework, data integrity is paramount, particularly given the sensitive nature of the information being managed. The logical consistency and reliability of the data are enforced at the database level through the rigorous application of relational constraints, primarily foreign keys and referential integrity actions.
+
+\subsubsection{Foreign Key Constraints}
+The primary mechanism for enforcing relationships between tables is the use of \textbf{foreign key constraints}. A foreign key in one table points to a primary key in another table, creating a formal link that the database system actively maintains. This ensures that no orphaned records can exist; for example, a message cannot be created without being linked to a valid, existing conversation. Key relationships enforced in this schema include:
+
+\begin{itemize}
+    \item \textbf{User to Conversations:} The \texttt{user\_id} column in the \texttt{conversations} table is a foreign key that references the \texttt{users} table. This establishes a one-to-many relationship, ensuring every conversation is owned by a single, valid user.
+    \item \textbf{Conversation to Messages:} Similarly, the \texttt{conversation\_id} in the \texttt{messages} table is a foreign key referencing the \texttt{conversations} table, creating the one-to-many link that groups messages into a single session.
+    \item \textbf{Conversation to Cases:} The \texttt{conversation\_id} in the \texttt{cases} table is a foreign key to the \texttt{conversations} table. This critical link ensures that every case record is tied directly to the specific conversation in which a risk was detected, providing a clear and auditable path for counselors.
+    \item \textbf{Case to Counselors:} The \texttt{assigned\_counselor\_id} in the \texttt{cases} table is a foreign key referencing the \texttt{counselors} table, ensuring that cases can only be assigned to valid staff members.
+\end{itemize}
+
+\subsubsection{Referential Integrity Actions}
+To further ensure data consistency during deletion operations, referential integrity actions such as \texttt{ON DELETE CASCADE} are selectively employed. This rule dictates that if a parent record is deleted, all child records that reference it are also automatically deleted. For instance, the relationship between a \texttt{conversation} and its constituent \texttt{messages} is configured with a cascading delete. This means that if a conversation record is ever removed from the database (e.g., due to a data retention policy), all associated messages are automatically purged as well, preventing orphaned message records and ensuring the database remains in a consistent state. This automated management is crucial for maintaining the long-term integrity of the data persistence layer.
+
+\subsection{Schema Design for Privacy and Anonymization}
+
+A foundational principle of this framework is \textbf{Privacy by Design (PbD)}, which dictates that privacy considerations must be embedded into the core architecture from the outset, not applied as an afterthought \cite{FIND_CITATION_HERE}. The database schema is a critical implementation of this principle, incorporating several key design patterns to protect user anonymity and minimize data exposure.
+
+\subsubsection{User Anonymization by Default}
+The primary strategy for protecting user privacy is to disassociate conversational data from any real-world Personally Identifiable Information (PII). This is achieved at the schema level:
+
+\begin{itemize}
+    \item \textbf{Non-Identifiable Primary Keys:} The \texttt{users} table's primary key, \texttt{user\_id}, is a randomly generated Universally Unique Identifier (UUID). This ID is used as the sole identifier for a user across all related tables (e.g., \texttt{conversations}, \texttt{messages}, \texttt{cases}). Crucially, the database schema intentionally omits any columns that would store direct PII such as student names, university ID numbers, or email addresses.
+    \item \textbf{Decoupling of Sensitive Data:} While the core conversational system is fully anonymized, features like appointment scheduling may require linking a user to a real-world identity. This information is handled outside of the primary analytical database. Any tables containing PII are strictly segregated and are not accessible by the analytical or conversational agents, ensuring a clear boundary between operational and analytical data.
+\end{itemize}
+
+\subsubsection{Data Minimization and Access Control}
+The schema is designed to support the principle of data minimization, ensuring that agents and services only have access to the information strictly necessary for their function.
+
+\begin{itemize}
+    \item \textbf{Purpose-Driven Schema for Analytics:} The \texttt{conversation\_logs} table, which is the data source for the Insights Agent (IA), is designed specifically for aggregated analysis. It contains the message text and metadata like timestamps and sentiment scores but deliberately excludes any link back to sensitive administrative data.
+    \item \textbf{Role-Based Access at the Application Layer:} While not a schema-level feature, the backend application enforces strict access controls. The database user credentials assigned to the IA, for example, have read-only permissions and are restricted to only the anonymized \texttt{conversation\_logs} table. This prevents any possibility of the analytical agent accessing clinical case notes or other sensitive information.
+\end{itemize}
+
+\subsubsection{Application-Layer PII Redaction}
+To further mitigate the risk of unintentional data exposure, a PII redaction process is implemented in the backend service \textbf{before} any message is written to the \texttt{conversation\_logs} table. When a user sends a message, the FastAPI application performs a redaction step to identify and remove common PII patterns (e.g., email addresses, phone numbers, names). This means that the data is anonymized before it is even persisted for long-term analysis, providing an additional layer of defense and ensuring that the data processed by the Insights Agent is fundamentally privacy-safe.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.6 - USER EXPERIENCE %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{User Experience (UX) Design}
+
+Effective artifact design in Design Science Research necessitates a deep understanding of the end-users' needs, goals, and contexts. Therefore, prior to designing the visual user interface, a user experience (UX) design process was undertaken to ensure the final application is not only functional but also intuitive, accessible, and aligned with the specific needs of its target users. This process was centered around the development of user personas and the formulation of key user stories, which served as foundational guides for all subsequent UI design and feature prioritization decisions \cite{FIND_CITATION_HERE}.
+
+\subsection{User Personas}
+
+To empathize with the primary users of the system, two distinct personas were created. These personas are fictional, archetypal users whose characteristics, goals, and pain points represent the intended audience for the User Portal and the Admin Dashboard, respectively.
+
+\subsubsection{Primary Persona: The Student}
+\begin{itemize}
+    \item \textbf{Name:} Budi
+    \item \textbf{Profile:} A first-year undergraduate student at UGM, living away from home for the first time. He is navigating the academic pressures of a demanding course load while also trying to build a new social life.
+    \item \textbf{Goals:}
+        \begin{itemize}
+            \item To find a private and non-judgmental space to articulate his feelings of stress and anxiety.
+            \item To learn practical, evidence-based coping strategies that he can apply to his daily life.
+            \item To feel a sense of progress and accomplishment in managing his well-being.
+            \item If needed, to find a way to connect with a professional counselor without a complicated or intimidating process.
+        \end{itemize}
+    \item \textbf{Pain Points \& Hesitations:}
+        \begin{itemize}
+            \item He is worried about the stigma associated with seeking mental health support and fears that his peers or professors might find out.
+            \item He finds the process of booking a formal counseling session to be daunting and is unsure if his problems are "serious enough" to warrant it.
+            \item He often feels overwhelmed late at night, when traditional support services are unavailable.
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{Secondary Persona: The University Counselor}
+\begin{itemize}
+    \item \textbf{Name:} Dr. Astuti
+    \item \textbf{Profile:} The Head of Counseling Services at the university. She is an experienced clinical psychologist who is deeply committed to student well-being but is constrained by limited resources.
+    \item \textbf{Goals:}
+        \begin{itemize}
+            \item To move from a reactive, crisis-driven support model to a more proactive, preventative one.
+            \item To gain a better, data-driven understanding of the most pressing mental health challenges facing the student population at any given time.
+            \item To allocate her team's limited time and resources more effectively, focusing on students who need the most help.
+            \item To ensure that no student in critical distress falls through the cracks.
+        \end{itemize}
+    \item \textbf{Pain Points \& Hesitations:}
+        \begin{itemize}
+            \item Her team is overwhelmed with a long waiting list for appointments, and she worries about students who need help but are not reaching out.
+            \item The data she currently has is anecdotal, making it difficult to justify requests for more resources or to design targeted, preventative workshops.
+            \item She spends a significant amount of time on administrative tasks rather than on clinical work.
+        \end{itemize}
+\end{itemize}
+
+\subsection{Key User Scenarios and Stories}
+
+Derived from the user personas, a set of key user stories was formulated to guide the design of the application's features. These stories capture the desired functionalities from the user's perspective.
+
+\subsubsection{For the Student (Budi)}
+\begin{itemize}
+    \item \textbf{Scenario 1: Seeking Immediate Support.}
+        \begin{itemize}
+            \item \textit{As a student feeling overwhelmed after a difficult exam, I want to chat with an AI assistant that can listen to me and offer some immediate coping strategies, so that I can manage my anxiety in the moment.}
+        \end{itemize}
+    \item \textbf{Scenario 2: Building Skills Over Time.}
+        \begin{itemize}
+            \item \textit{As a student who wants to improve my well-being, I want to be guided through structured exercises and track my progress, so that I can feel a sense of accomplishment and see how far I've come.}
+        \end{itemize}
+    \item \textbf{Scenario 3: Accessing Professional Help.}
+        \begin{itemize}
+            \item \textit{As a student who has decided I need to talk to a person, I want a simple and discreet way to book an appointment with a counselor, so that I can get professional help without navigating a complex bureaucracy.}
+        \end{itemize}
+\end{itemize}
+
+\subsubsection{For the Counselor (Dr. Astuti)}
+\begin{itemize}
+    \item \textbf{Scenario 1: Proactive Strategy.}
+        \begin{itemize}
+            \item \textit{As the Head of Counseling, I want to receive a weekly automated report on the top mental health trends among students, so that I can plan targeted workshops and allocate my team's resources effectively.}
+        \end{itemize}
+    \item \textbf{Scenario 2: Crisis Management.}
+        \begin{itemize}
+            \item \textit{As a counselor, I want to receive an immediate alert on my dashboard when a student's conversation is flagged for critical risk, so that I can intervene quickly and ensure the student's safety.}
+        \end{itemize}
+\end{itemize}
+
+These personas and user stories form the user-centric foundation upon which the User Interface (UI), detailed in the following section, was designed.
+
+\subsection{Core Design Principles}
+
+Based on the insights gathered from the user personas and scenarios, the following core design principles were established to guide the user interface and interaction design of the UGM-AICare platform:
+
+\begin{itemize}
+    \item \textbf{Principle 1: Privacy and Discretion First.} Every design choice must prioritize the user's sense of privacy and safety. This means avoiding stigmatizing language, ensuring private information is never displayed unnecessarily, and giving the user control over their data. This directly addresses Budi's fear of stigma.
+    \item \textbf{Principle 2: Clarity Over Clutter.} The interfaces, especially for the student, must be simple, clean, and intuitive. When a user is in distress, they should not be burdened with a complex UI. This principle guides the design towards clear navigation and focused content.
+    \item \textbf{Principle 3: Actionable Insights for Administrators.} The Admin Dashboard must present data in a way that is immediately understandable and actionable. It should not be a raw data dump, but a curated set of visualizations that directly supports Dr. Astuti's goal of making informed, proactive decisions.
+    \item \textbf{Principle 4: Foster a Sense of Progress.} To encourage sustained engagement, the UI should incorporate elements that provide positive reinforcement and a clear sense of accomplishment, directly supporting Budi's desire to feel progress in his well-being journey.
+\end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.7 - USER INTERFACE %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{User Interface (UI) Design}
-Purpose: To show the design of the human interface for the system's administrative users.
 
-Elaboration Points:
+The User Interface (UI) design translates the principles and user stories from the UX research phase into a tangible, visual blueprint for the UGM-AICare application. The design of both the Admin Dashboard and the User Portal is guided by the core principles of clarity, privacy, and actionability. The following mockups represent the key screens of the application, designed to meet the specific needs of the personas—Dr. Astuti and Budi.
 
-Define the primary user persona for the dashboard (e.g., "Dr. Astuti, Head of Counseling Services").
+\subsection{The Admin Dashboard: An Interface for Proactive Oversight}
 
-Present wireframes or high-fidelity mockups for the key screens of the Admin Dashboard (e.g., the main analytics view, the report history page).
+The Admin Dashboard is designed for Dr. Astuti, the Head of Counseling Services. Its primary purpose is to provide actionable, at-a-glance insights and an efficient case management system, enabling a shift from reactive to proactive support.
+
+\subsubsection{Main Analytics View}
+As shown in Figure \ref{fig:ui_admin_dashboard}, the main dashboard is the central hub for strategic oversight.
+\begin{itemize}
+    \item \textbf{Design Justification:} To address Dr. Astuti's goal of gaining a data-driven understanding of student well-being, the dashboard prominently features key performance indicators (KPIs) at the top, such as "Overall Sentiment Trend" and "Active Cases." The main panel is dedicated to a time-series visualization of the "Top Trending Topics" identified by the Insights Agent (IA). This design directly supports her user story of wanting an automated report to plan targeted workshops effectively.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: Admin Dashboard - Main View} \\ \vspace{1cm} This mockup should show a professional dashboard interface with: \\
+    1. A navigation bar on the left. \\
+    2. A header with "Analytics Dashboard". \\
+    3. Top-level KPI cards: "Overall Sentiment: -0.2 (Down 5%)", "New Cases This Week: 12". \\
+    4. A large central chart titled "Weekly Trending Topics" showing a bar chart with topics like "Exam Stress", "Social Anxiety", etc. \\
+    5. A table on the right titled "Recent Critical Alerts" with entries for flagged conversations.}}
+    \caption{High-fidelity mockup of the Admin Dashboard's main analytics view.}
+    \label{fig:ui_admin_dashboard}
+\end{figure}
+
+\subsubsection{Case Management View}
+When a conversation is flagged by the STA, it appears in the case management view, depicted in Figure \ref{fig:ui_case_management}.
+\begin{itemize}
+    \item \textbf{Design Justification:} To address Dr. Astuti's pain point of being overwhelmed by administrative tasks and her goal of ensuring no student in crisis is missed, this screen is designed for efficiency. It presents a clean, sortable table of all active cases. When a case is selected, it displays the relevant (anonymized) conversation log, the severity level assigned by the STA, and clear action buttons like "Assign to Counselor" or "Mark as Resolved." This streamlines the workflow from automated detection to human intervention.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: Admin Dashboard - Case Management} \\ \vspace{1cm} This mockup should show a two-panel layout: \\
+    1. A table on the left listing cases with columns for "Case ID", "Status", "Severity", and "Assigned To". \\
+    2. A detailed view on the right showing the selected case, including the anonymized chat transcript and a section for counselors to add notes.}}
+    \caption{Mockup of the case management interface for counselors.}
+    \label{fig:ui_case_management}
+\end{figure}
+
+\subsection{The User Portal: A Private and Supportive Space}
+
+The User Portal is designed for Budi, the first-year student. The UI prioritizes simplicity, privacy, and a sense of calm, directly addressing his hesitation to seek help and his desire for a non-intimidating support tool.
+
+\subsubsection{The '/aika' Chat Interface}
+The core of the student experience is the chat interface, shown in Figure \ref{fig:ui_chat}.
+\begin{itemize}
+    \item \textbf{Design Justification:} To align with the principle of "Clarity Over Clutter," the interface is intentionally minimalist, resembling modern messaging applications to feel familiar and intuitive. There are no distracting elements; the focus is solely on the conversation between Budi and the Support Coach Agent. This design directly supports his goal of finding a private and focused space to articulate his feelings.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: User Portal - Chat Interface} \\ \vspace{1cm} This mockup should show a clean, simple chat window. \\
+    1. A header with "Aika - Your UGM-AICare Companion". \\
+    2. A chat history area with bubbles for the user's messages and Aika's responses. \\
+    3. A text input box at the bottom. The design should be calming, using a soft color palette.}}
+    \caption{Mockup of the main conversational interface for students.}
+    \label{fig:ui_chat}
+\end{figure}
+
+\subsubsection{The User Dashboard and Gamification}
+To foster engagement and a sense of progress, the user dashboard (Figure \ref{fig:ui_user_dashboard}) visualizes the student's journey.
+\begin{itemize}
+    \item \textbf{Design Justification:} This screen directly supports Budi's goal of feeling a sense of accomplishment. It includes a section for "My Progress" that shows completed modules and a gallery for "My Achievements" where the earned NFT badges are displayed. This visual feedback, based on the design principle of "Foster a Sense of Progress," reinforces positive behavior and encourages continued engagement with the platform's coaching features.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: User Portal - Dashboard} \\ \vspace{1cm} This mockup should show a personalized dashboard for the student. \\
+    1. A welcoming message like "Welcome back, Budi!". \\
+    2. A section titled "My Progress" with a list of completed CBT modules (e.g., "Mindful Breathing - Completed"). \\
+    3. A visually appealing section titled "My Achievements" displaying the icons for the earned NFT badges. \\
+    4. A clear call-to-action button: "Continue Chat with Aika".}}
+    \caption{Mockup of the student's personal dashboard, showing progress and gamification elements.}
+    \label{fig:ui_user_dashboard}
+\end{figure}
+
+\subsection{Interaction Flows and User Journeys}
+
+While the preceding sections have defined the static components of the user interface, this subsection details the dynamic, step-by-step user journeys for key scenarios. These flows illustrate how a user navigates the application to achieve a specific goal and how the different agents of the Safety Agent Suite collaborate to facilitate these interactions.
+
+\subsubsection{Journey 1: Making an Appointment with a Counselor}
+This journey is designed to be as frictionless as possible, directly addressing Budi's hesitation with complex administrative processes.
+\begin{enumerate}
+    \item \textbf{Initiation:} The user can initiate the process in two ways: either by navigating to an "Appointments" section in the User Portal or by expressing the intent to speak with a counselor during a chat with the Support Coach Agent (SCA).
+    \item \textbf{Agent Handoff:} If initiated via chat, the SCA recognizes the intent and calls a tool that invokes the Service Desk Agent (SDA).
+    \item \textbf{Scheduling:} The SDA's \texttt{check\_calendar\_availability} tool fetches available time slots from the counselors' calendars and presents them to the user in a simple interface.
+    \item \textbf{Confirmation:} The user selects a time slot. The SDA then calls its \texttt{book\_appointment} tool, which confirms the appointment in the system and sends a confirmation notification to both the user and the assigned counselor.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Flowchart: Appointment Booking Journey} \\ \vspace{1cm} This flowchart should illustrate the steps from initiation (either via chat or a dedicated UI) to the final confirmation, showing the roles of the SCA and SDA.}}
+    \caption{User journey for booking a counselor appointment.}
+    \label{fig:journey_appointment}
+\end{figure}
+
+\subsubsection{Journey 2: Standard Interaction with Aika (SCA)}
+This flow represents the primary use case of the chat interface, where a student seeks supportive conversation.
+\begin{enumerate}
+    \item \textbf{Initiation:} The user navigates to the `/aika` chat page and sends a message.
+    \item \textbf{Real-Time Triage:} The message is first intercepted by the Safety Triage Agent (STA), which performs an instantaneous risk assessment.
+    \item \textbf{Safe Handoff:} Assuming the risk is classified as "Low" or "Moderate," the message is passed to the Support Coach Agent (SCA).
+    \item \textbf{Conversational Loop:} The SCA generates an empathetic, context-aware response and sends it to the user. This loop (User Message -> STA -> SCA -> User Response) continues for the duration of the conversation.
+\end{enumerate}
+
+\subsubsection{Journey 3: Crisis Escalation and Case Management}
+This journey illustrates the system's core safety protocol.
+\begin{enumerate}
+    \item \textbf{Detection:} During a standard conversation, the user sends a message that the STA classifies as "Critical."
+    \item \textbf{Automated Escalation:} The STA immediately interrupts the normal flow. It invokes a tool that:
+        \begin{itemize}
+            \item Displays pre-defined emergency resources to the user.
+            \item Sends a high-priority alert to the Admin Dashboard.
+            \item Instructs the Service Desk Agent (SDA) to create a new case, linking it to the conversation.
+        \end{itemize}
+    \item \textbf{Human Intervention:} A counselor (Dr. Astuti) sees the alert on the dashboard, reviews the case created by the SDA, and assigns it to a staff member for immediate follow-up. The counselor uses the case management interface to document all actions taken.
+\end{enumerate}
+
+\begin{figure}[h]
+    \centering
+    \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Flowchart: Crisis Escalation Journey} \\ \vspace{1cm} This flowchart should show the path from STA detection to the SDA creating a case and the final review by a human counselor on the Admin Dashboard.}}
+    \caption{The user and system journey during a critical risk escalation.}
+    \label{fig:journey_escalation}
+\end{figure}
+
+\subsubsection{Journey 4: Administrator Reviewing Weekly Insights}
+This flow describes how an administrator like Dr. Astuti uses the system for strategic planning.
+\begin{enumerate}
+    \item \textbf{Automated Analysis:} On its pre-defined schedule (e.g., Sunday at midnight), the Insights Agent (IA) is triggered.
+    \item \textbf{Report Generation:} The IA queries the anonymized database, performs its analysis, and generates a new strategic report.
+    \item \textbf{Notification and Access:} The IA sends an email notification to Dr. Astuti and pushes the new report to the Admin Dashboard.
+    \item \textbf{Review:} Dr. Astuti logs into the dashboard, navigates to the analytics view, and reviews the latest trends to inform her weekly planning.
+\end{enumerate}
+
+\subsubsection{Journey 5: Proactive Outreach by the SCA}
+This journey demonstrates the system's proactive capabilities, closing the loop from insight to intervention.
+\begin{enumerate}
+    \item \textbf{Configuration:} Based on the IA's report showing a spike in "exam stress," Dr. Astuti configures a proactive outreach campaign from the Admin Dashboard. She targets all active users and selects a pre-defined message offering a time management module.
+    \item \textbf{Agent Action:} The system tasks the Support Coach Agent (SCA) to act.
+    \item \textbf{User Contact:} The next time a targeted student (Budi) logs into the platform, the SCA initiates the conversation with the configured message, such as, "Hi Budi, with exams coming up, many students are feeling stressed. Would you like to try a quick module on effective study habits?"
+\end{enumerate}
+
+\subsubsection{Journey 6: Contextual Module Suggestion}
+This flow shows how the SCA provides relevant support within a natural conversation.
+\begin{enumerate}
+    \item \textbf{Conversation Context:} During a chat, a student (Budi) expresses feelings of anxiety and worry about an upcoming presentation.
+    \item \textbf{Intent Recognition:} The SCA, using the reasoning power of the Gemini API, recognizes this as an opportunity to offer a specific, helpful tool.
+    \item \textbf{Module Suggestion:} The SCA responds empathetically and then suggests a relevant intervention. For example: "It sounds like that presentation is causing a lot of anxiety. I have a guided breathing exercise that many students find helpful for calming their nerves in moments like this. Would you like to try it?"
+    \item \textbf{Module Delivery:} If the user agrees, the SCA invokes its \text{retrieve\_cbt\_module} tool and presents the exercise directly within the chat interface.
+\end{enumerate}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.8 - SECURITY & PRIVACY %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Security and Privacy by Design}
-Purpose: To demonstrate that critical security and privacy considerations are integral to the architecture.
 
-Elaboration Points:
+Given the profoundly sensitive nature of mental health data, the design and implementation of the UGM-AICare framework are fundamentally guided by the principles of \textbf{Privacy by Design (PbD)}. As established in the theoretical background, PbD dictates that privacy and security must be the default, embedded proactively into the system's architecture from the very beginning, rather than being treated as subsequent additions \cite{FIND_CITATION_PLEASE}. This section details the specific technical and procedural mechanisms implemented to ensure the confidentiality, integrity, and ethical use of user data.
 
-Detail the Data Anonymization Pipeline: How is Personally Identifiable Information (PII) identified and redacted from chat logs before they are stored for analysis?
+\subsection{Data Anonymization and Minimization}
 
-Describe the Role-Based Access Control (RBAC) mechanism for the admin dashboard.
+The cornerstone of the framework's privacy strategy is a multi-layered approach to data anonymization, ensuring that the data used for analytics is irrevocably decoupled from any real-world user identity.
 
-Mention standard security practices like data encryption in transit (TLS) and at rest.
+\subsubsection{Application-Layer PII Redaction Pipeline}
+To prevent the accidental storage of Personally Identifiable Information (PII), a redaction pipeline is executed within the FastAPI backend for every message received from a user *before* it is written to the \texttt{conversation\_logs} table. This automated process involves:
+\begin{enumerate}
+    \item \textbf{Pattern Matching:} The system uses regular expressions to identify and remove common PII patterns, such as email addresses, phone numbers, and student ID numbers.
+    \item \textbf{Named Entity Recognition (NER):} A lightweight NLP model is used to identify and redact proper nouns that are likely to be names of people or specific locations.
+\end{enumerate}
+This proactive redaction ensures that the data persisted for long-term storage and analysis is anonymized by default.
 
-\section{Alur Tugas Akhir}
+\subsubsection{Anonymized User Identifiers}
+As detailed in the database design, the system never stores a user's real name, email, or university ID. Each user is assigned a randomly generated Universally Unique Identifier (UUID) upon their first interaction, which serves as their primary key throughout the database. This ensures that even within the system, a user's activity is linked to a pseudonym, not a real identity.
 
-Menguraikan prosedur yang akan digunakan dan jadwal atau alur penyelesaian setiap 
-tahap. Alur penelian ini dapat disajikan dalam bentuk diagram. Diagram dapat disusun dengan aturan yang baik semisal menggunakan \textit{flowchart}. Aturan dan tutorial pembuatan \textit{flowchart} dapat dilihat di \textcolor{blue}{http://ugm.id/flowcharttutorial}. Setelah menggambarkannya, penulis wajib menjelaskan langkah-langkah setiap alur tugas akhir dalam sub bab tersendiri sesuai dengan kebutuhan.
+\subsection{Architectural Security Measures}
 
-\section{Etika, Masalah, dan Keterbatasan Penelitian (Opsional))}
+Beyond anonymization, the framework implements standard, industry-best-practice security measures to protect the integrity and confidentiality of the entire system.
 
-Bagian ini membahas pertimbangan etis penelitian dan [potensi] masalah serta
-keterbatasannya. Jika menyangkut penelitian dengan makhluk hidup, maka dibutuhkan adanya \textit{ethical clearance}, di bagian ini hal itu akan dibahas. Demikian juga tentang keterbatasan ataupun masalah yang akan timbul.
+\begin{itemize}
+    \item \textbf{Role-Based Access Control (RBAC):} Access to the Admin Dashboard is strictly controlled by an RBAC mechanism. Only authenticated and authorized university staff with an `ADMIN` role may have access to configure the system and view flagged cases.
+    \item \textbf{Secure Communication (HTTPS/TLS):} All communication between the user's browser, the Next.js frontend, and the FastAPI backend occurs exclusively over HTTPS, with traffic encrypted using Transport Layer Security (TLS). This prevents eavesdropping and man-in-the-middle attacks, ensuring that all data is confidential while in transit.
+    \item \textbf{Data Encryption at Rest:} The PostgreSQL database is configured to encrypt all data at rest. This means that even if an unauthorized party were to gain access to the physical storage on the server, the database files would be unreadable without the encryption keys.
+    \item \textbf{Secure Deployment Environment:} The entire application stack is deployed within a secure Virtual Machine provided by PT INA17, protected by firewalls and managed access controls. The Nginx reverse proxy is configured with up-to-date security headers to protect against common web vulnerabilities like cross-site scripting (XSS) and clickjacking \cite{FIND_CITATION_HERE}.
+\end{itemize}
+
+\subsection{Ethical Safeguards and Human Oversight}
+
+Technology alone is insufficient to guarantee ethical operation. Therefore, the system is designed with procedural safeguards that ensure human oversight for all critical functions.
+
+\begin{itemize}
+    \item \textbf{Human-in-the-Loop for Safety:} The framework is explicitly designed to be a tool that assists, but does not replace, human counselors. Every critical risk escalation from the Safety Triage Agent (STA) creates a case that requires mandatory review and action by a qualified human professional. The system automates the detection and reporting, but the final clinical judgment and intervention remain firmly in human hands.
+    \item \textbf{Purpose Limitation:} The data collected through the chat interface is used for the sole and explicit purposes of providing in-the-moment support, managing clinical escalations, and generating anonymized, aggregated statistics for improving the university's support services. The data is not used for any other purpose, such as academic assessment or disciplinary action. This principle is enforced through the technical separation of the anonymized analytical data from any administrative records.
+\end{itemize}
+
+\section{Ethical Considerations and Research Limitations}
+
+The development of an AI-driven framework for mental health support necessitates a thorough examination of the ethical implications and a transparent acknowledgment of the research's limitations. This section addresses these considerations, framing the ethical design choices and defining the boundaries of the study's findings.
+
+\subsection{Ethical Considerations}
+
+The design of the Safety Agent Suite is grounded in the university's fundamental duty of care to its students. The following ethical principles were central to the framework's architecture.
+
+\begin{itemize}
+    \item \textbf{Informed Consent and Transparency:} A core ethical requirement is that users must be explicitly informed that they are interacting with an AI system. The user interface must clearly state that "Aika" is an AI assistant and provide a link to a privacy policy that explains in simple terms how their data is anonymized and used for aggregated statistical analysis. Users must provide explicit consent to these terms before beginning their first interaction.
+    \item \textbf{The Risk of AI Misinterpretation:} While Large Language Models are powerful, they are not infallible and can misinterpret the nuances of human emotion and language. The most significant ethical risk is the failure to detect a genuine crisis (a false negative). The architecture mitigates this risk through the \textbf{human-in-the-loop} design of the Safety Triage Agent (STA). Every automated escalation is treated as a high-priority alert that requires mandatory review and follow-up by a qualified human counselor, ensuring that the final judgment on safety-critical situations is never left to the machine alone.
+    \item \textbf{AI as a Support Tool, Not a Replacement for Therapy:} It is ethically imperative to clearly define the system's role. The UGM-AICare framework is designed as a sub-clinical, supportive tool and a bridge to professional care, not as a substitute for it. The Support Coach Agent (SCA) is programmed to state this boundary clearly and to encourage users to seek professional help for serious or persistent issues, using the Service Desk Agent (SDA) to facilitate the booking process.
+    \item \textbf{Data Privacy and Purpose Limitation:} As detailed in the Security and Privacy by Design section, the system is architected to protect user anonymity. Furthermore, the principle of purpose limitation is strictly enforced. The data collected is used only for the explicit purposes of providing in-the-moment support and generating aggregated, anonymized insights to improve the university's services. It is never used for academic assessment, disciplinary action, or any other purpose outside its stated mission \cite{FIND_CITATION_HERE}.
+\end{itemize}
+
+\subsection{Research Limitations}
+
+This study, as a work of Design Science Research focused on the creation and evaluation of a novel artifact, is subject to several important limitations that define the scope of its conclusions.
+
+\begin{itemize}
+    \item \textbf{Methodological Limitation: Evaluation of a Prototype:} The evaluation of this framework, as will be detailed in Chapter 4, is based on the functional testing of a proof-of-concept prototype against predefined scenarios. This thesis validates the *technical feasibility* of the agentic workflows and the *architectural integrity* of the design. However, it is not a clinical trial and does not measure the long-term psychological impact or therapeutic efficacy of the system on actual students. Such claims would require a separate, longitudinal study with appropriate clinical oversight.
+    \item \textbf{Technical Limitation: Inherent Risks of LLMs:} The framework relies on the Google Gemini 2.5 API. Like all LLMs, it is subject to inherent limitations. These include the potential for the model to reflect biases present in its vast training data and the possibility of generating factually incorrect or nonsensical responses ("hallucinations"). While the system's use of structured tools and prompts is designed to mitigate these risks, they cannot be eliminated entirely.
+    \item \textbf{Data Limitation: Use of Simulated Data:} The evaluation of the Insights Agent (IA) will be conducted using anonymized, pre-existing chat logs or simulated data. While this is necessary to protect user privacy during the development phase, it means that the agent's performance has not been validated on the specific linguistic patterns and diversity of a live, campus-wide user base. The effectiveness of the topic modeling and sentiment analysis in a real-world context would require further validation post-deployment.
+\end{itemize}

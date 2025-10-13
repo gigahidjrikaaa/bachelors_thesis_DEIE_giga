@@ -4,13 +4,18 @@
 \section{Background}
 \label{sec:background}
 
-Higher Education Institutions (HEIs) are facing a critical and growing challenge in supporting student well-being \cite{hill2024studentwellbeing, duraku2024overcoming}. A landmark report highlights the escalating prevalence of mental health and substance use issues among student populations, urging institutions to adopt a more comprehensive support model \cite{scherer2021mentalhealth}. This crisis not only jeopardizes students' academic success and personal development but also places an immense, unsustainable strain on the institutions tasked with supporting them \cite{baik2019universities}.
+
+Higher Education Institutions (HEIs) are facing a critical and growing challenge in supporting student well-being \cite{hill2024studentwellbeing, duraku2024overcoming}. A landmark report highlights the escalating prevalence of mental health and substance use issues among student populations, urging institutions to adopt a more comprehensive support model \cite{scherer2021mentalhealth}. This crisis not only jeopardizes students' academic success and personal development but also places an immense, unsustainable strain on the institutions tasked with supporting them. Recent global surveys indicate that nearly 42\% of university students meet the criteria for at least one mental health disorder, while the average counselor-to-student ratio in higher education remains around 1:1,500, well above recommended levels for effective service delivery \cite{lipson2022healthy, gallagher2023counselor}.
 
 The traditional support model, centered around on-campus counseling services, is fundamentally \textbf{reactive}. It relies on students to self-identify their distress and navigate the process of seeking help. This paradigm faces significant operational challenges, including insufficient staffing, long waiting lists, and an inability to provide immediate, 24/7 support, which ultimately limits access for a large portion of the student body \cite{baik2019universities}. Consequently, a critical gap persists between the need for mental health services and their actual provision, leaving many students without timely support \cite{outay2024multiagent}.
 
 To bridge this gap, a paradigm shift from a reactive to a \textbf{proactive} support model is imperative \cite{outay2024multiagent}. The engine for this evolution is \textbf{Digital Transformation}, a process that leverages technology to fundamentally reshape organizational processes and enhance value delivery within HEIs \cite{omirali2025digitaltrust}. Within this context, Artificial Intelligence (AI) has emerged as a key enabling technology, with systematic reviews confirming its significant potential to analyze complex data, automate processes, and deliver personalized interventions at scale within the higher education landscape \cite{pati2025agentic, karunanayake2025nextgen}.
 
-This research moves beyond conventional AI applications by proposing the use of \textbf{Agentic AI}. An intelligent agent is an autonomous system capable of perception, decision-making, and proactive action to achieve specific goals \cite{saleem2025multiagent}, representing a new frontier in educational technology \cite{salutari2024mas}. We propose that a framework built upon a system of collaborative intelligent agents, a Multi-Agent System (MAS), a concept already explored for smart campus management \cite{salutari2024mas}, can create a truly transformative ecosystem. Such a system would not only serve as a support tool for students but, more importantly, would function as a strategic asset for the institution, enabling data-driven decision-making, automating operational workflows, and facilitating a proactive stance on student well-being. This thesis details the design, development, and evaluation of such a framework, prototyped within the UGM-AICare project.
+However, most existing AI applications in university mental health remain limited to passive chatbots or predictive dashboards that, while insightful, depend on human operators to interpret and act upon their outputs, a limitation widely recognized as the \textit{insight-to-action gap} \cite{jorno2018actionableinsight, susnjak2022dashboard}. This thesis argues that overcoming this gap requires a more autonomous paradigm, in which AI systems do not merely predict or inform but can proactively decide and act.
+
+This research therefore moves beyond conventional AI applications by proposing the use of \textbf{Agentic AI}. An intelligent agent is an autonomous system capable of perception, decision-making, and proactive action to achieve specific goals \cite{saleem2025multiagent, wooldridge2009introductionmas}, representing a new frontier in educational technology \cite{salutari2024mas}. We propose that a framework built upon a system of collaborative intelligent agents, a \textbf{Multi-Agent System (MAS)}, can create a truly transformative ecosystem. Such a system would not only serve as a support tool for students but, more importantly, would function as a strategic asset for the institution, enabling data-driven decision-making, automating operational workflows, and facilitating a proactive stance on student well-being. 
+
+This framework is prototyped within the \textbf{UGM-AICare Project}, a collaborative university research initiative focused on developing AI-driven mental health and well-being tools for the Universitas Gadjah Mada (UGM) community. The project serves as the practical testbed for validating the proposed agentic system in a real institutional context.
 
 
 %-------------------------------------------------
@@ -23,9 +28,9 @@ The inefficiency and reactive nature of current university mental health support
 \begin{enumerate}
     \item The primary challenge is the \textbf{design of a cohesive, safety-oriented agentic AI framework} capable of automating key institutional processes. This requires a shift from a monolithic chatbot to a multi-agent system where specialized agents handle distinct tasks, including real-time crisis detection, personalized coaching, clinical case management, and privacy-preserving analytics.
 
-    \item A significant technical challenge lies in the \textbf{implementation of a cloud-native architecture} to realize this framework. This involves orchestrating multiple AI agents using \textbf{LangGraph}, powered by a robust Large Language Model (Google Gemini), and integrating them within a secure FastAPI backend with an internal task scheduler.
+    \item The technical challenge of \textbf{orchestrating a heterogeneous multi-agent system} in a robust, scalable, and secure cloud-native architecture. This involves managing stateful, long-running interactions and ensuring reliable communication between agents powered by external, non-deterministic LLMs.
 
-    \item Finally, there is a need to \textbf{evaluate the potential impact} of such a framework on institutional operational efficiency and its ability to support data-driven, safety-first decision-making. This will be validated through a proof-of-concept prototype and scenario-based testing focused on the agentic workflows.
+    \item The methodological challenge of \textbf{validating the framework's functional capabilities and potential for impact in the absence of a full-scale clinical trial}. This requires developing meaningful, scenario-based testing protocols that can effectively demonstrate the agentic workflows and their advantages over static systems.
 \end{enumerate}
 
 To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Support Coach Agent (SCA)}, a \textbf{Service Desk Agent (SDA)}, and an \textbf{Isingts Agent (IA)}.
@@ -37,9 +42,9 @@ To address these challenges, this thesis proposes and details the \textbf{Safety
 
 The primary objectives of this thesis are:
 \begin{enumerate}
-    \item To design the conceptual and technical framework for the agentic AI system.
-    \item To implement a functional proof-of-concept prototype.
-    \item To evaluate the prototype's capabilities against predefined functional scenarios.
+    \item To design an agentic AI framework, grounded in the BDI model of rational agency, that systematically bridges the 'insight-to-action' gap in institutional mental health support.
+    \item To implement a functional proof-of-concept prototype, the 'Safety Agent Suite,' demonstrating the orchestration of specialized agents (triage, coaching, service desk, insights) using LangGraph.
+    \item To evaluate the prototype's core agentic workflows through scenario-based testing, validating its capacity for proactive intervention and automated administrative action.
 \end{enumerate}
 
 %-------------------------------------------------	
@@ -56,7 +61,7 @@ To ensure the feasibility and focus of this research, the following boundaries a
 
     \item The data utilized for testing the analytics agent will consist of \textbf{anonymized, pre-existing chat logs or simulated data} to ensure user privacy and controlled testing conditions.
 
-    \item This research will not provide an exhaustive analysis of differential privacy algorithms or blockchain scalability. It will, however, demonstrate their integration into the system to fulfill the architectural requirements of \textbf{privacy-first analytics} and \textbf{novel user engagement}.
+    \item This research will not provide an exhaustive analysis of differential privacy algorithms or blockchain scalability. It will, however, dimplement a functional data pipeline that incorporates a specific PII redaction technique and successfully executes transactions on a blockchain testnet to fulfill the architectural requirements of \textbf{privacy-first analytics} and \textbf{novel user engagement}.
 \end{enumerate}
 
 % \noindent Agar penelitian ini lebih terarah dan mendalam, ruang lingkupnya dibatasi sebagai berikut:
