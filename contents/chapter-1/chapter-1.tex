@@ -71,47 +71,25 @@ These questions directly inform the evaluation in Chapter IV through scenario-ba
 To ensure the feasibility and focus of this research, the following boundaries are established:
 
 \begin{enumerate}
-    \item This research is focused on the \textbf{design and prototype implementation of the agentic AI framework} (the Safety Agent Suite). The integration of content based on Cognitive Behavioral Therapy (CBT) and a blockchain-based gamification system serve as proof-of-concept features to validate the framework's capabilities, not as primary research areas themselves.
+    \item This research is focused on the \textbf{design and prototype implementation of the agentic AI framework} (the Safety Agent Suite). Supporting content such as CBT-informed prompts is limited to curated scripts; broader engagement mechanics (e.g., badges, external loyalty systems) are out of scope.
 
     \item The evaluation of the framework is based on \textbf{functional, scenario-based testing} of the prototype's agentic workflows. It does not measure the long-term psychological impact on students or the real-world operational savings for the institution.
 
     \item The data utilized for testing the analytics agent will consist of \textbf{anonymized, pre-existing chat logs or simulated data} to ensure user privacy and controlled testing conditions.
 
-    \item This research will not provide an exhaustive analysis of differential privacy algorithms or blockchain scalability. It will, however, dimplement a functional data pipeline that incorporates a specific PII redaction technique and successfully executes transactions on a blockchain testnet to fulfill the architectural requirements of \textbf{privacy-first analytics} and \textbf{novel user engagement}.
+    \item This research does not pursue full differential privacy proofs or external ledger integrations. Instead, it implements a lightweight privacy pipeline with PII redaction and aggregate-only reporting thresholds to demonstrate \textbf{privacy-aware insights} within the prototype.
 \end{enumerate}
-
-% \noindent Agar penelitian ini lebih terarah dan mendalam, ruang lingkupnya dibatasi sebagai berikut:
-
-% \begin{enumerate}
-%     \item \textbf{Objek Penelitian:} Fokus pada desain, pengembangan prototipe, dan evaluasi platform terintegrasi yang menggabungkan \textit{hybrid conversational AI}, \textit{gamification}, dan \textit{blockchain} untuk mahasiswa. Studi kasus dapat difokuskan pada mahasiswa UGM atau lingkungan universitas serupa di Indonesia.
-%     \item \textbf{Teknologi:} Implementasi \textit{hybrid conversational AI} akan menggunakan kombinasi \textit{Pre-trained LLM} Gemini dengan RAG berbasis dokumen kesehatan mental UGM. Implementasi \textit{blockchain} akan menggunakan EDUChain (L2 Ethereum) untuk fitur \textit{achievement badges minting}. Mekanisme \textit{gamification} akan mencakup \textit{badges}, \textit{points}, dan sistem \textit{levelling}.
-%     \item \textbf{Metode Penelitian:} Menggunakan pendekatan \textit{Design Science Research} (DSR) yang meliputi tahap desain artifak (platform), pengembangan prototipe, dan evaluasi. Evaluasi akan menggunakan metode campuran (\textit{mixed methods}), menggabungkan analisis data log penggunaan platform, survei, dan/atau wawancara dengan kelompok pengguna terbatas.
-%     \item \textbf{Waktu dan Tempat Penelitian:} Penelitian dilaksanakan dalam periode [Sebutkan periode, misal: Semester Gasal 2024/2025 hingga Semester Genap 2024/2025] di lingkungan [Sebutkan, misal: Laboratorium Departemen Teknik Elektro dan Teknologi Informasi UGM dan melibatkan partisipan mahasiswa UGM secara daring].
-%     \item \textbf{Populasi dan Sampel:} Populasi adalah mahasiswa aktif [Sebutkan jenjang, misal: S1] di [Sebutkan Fakultas/Universitas]. Sampel untuk evaluasi adalah sejumlah [Sebutkan jumlah, misal: 30-50] mahasiswa yang dipilih melalui [Sebutkan metode sampling, misal: purposive sampling atau voluntary sampling].
-%     \item \textbf{Variabel dan Indikator:} Variabel independen adalah penggunaan platform dan fitur-fiturnya. Variabel dependen meliputi metrik \textit{user engagement} (misal: frekuensi login, durasi sesi, jumlah interaksi AI, progres gamifikasi) dan indikator kesejahteraan (misal: skor skala PSS - Perceived Stress Scale, skor skala koneksi sosial, feedback kualitatif).
-%     \item \textbf{Keterbatasan Penelitian:} Penelitian ini tidak mencakup implementasi skala penuh di seluruh universitas. Evaluasi aspek kesejahteraan bersifat subjektif berdasarkan persepsi pengguna. Aspek keamanan \textit{blockchain} dievaluasi pada level prototipe dan tidak mencakup audit keamanan ekstensif. Model AI mungkin memiliki keterbatasan dalam menangani semua topik atau kondisi kesehatan mental yang kompleks dan tidak menggantikan konseling profesional.
-% \end{enumerate}
-
-%-------------------------------------------------
 
 \section{Contributions}
 \label{sec:contributions}
 
+This thesis contributes a focused blueprint and evidence base for safety‑oriented agentic support:
+
 \begin{enumerate}
-    \item Academic: A novel framework for applying agentic AI in an institutional (higher education) context.
-    \item Practical: A blueprint for UGM to develop a more proactive, data-driven, and efficient mental health support system.
+    \item \textbf{Safety pipeline specification}. A concrete guideline for triage and escalation: risk cues and scoring, guardrails and redaction steps, decision thresholds, human‑in‑the‑loop invariants, and service targets such as time‑to‑escalation.
+    \item \textbf{Agent orchestration design}. A LangGraph view of the Safety Agent Suite—nodes, edges, and typed state schemas—plus the supporting tool‑use protocol (validated schemas, idempotency, retry/backoff) that keeps workflows predictable.
+    \item \textbf{Evaluation assets and findings}. Scenario-based tests (synthetic crisis set, adversarial prompts, blinded coaching rubric) and their results, covering safety sensitivity, orchestration reliability, latency, and coaching quality under human oversight.
 \end{enumerate}
-
-% Penelitian ini diharapkan dapat memberikan manfaat signifikan bagi berbagai pihak:
-
-% \begin{itemize}
-%     \item \textbf{Bagi Mahasiswa:} Menyediakan akses terhadap platform digital inovatif yang dapat mendukung kebutuhan informasi, interaksi sosial, motivasi, dan akses ke sumber daya kesejahteraan secara terintegrasi, aman, dan menarik.
-%     \item \textbf{Bagi Institusi Pendidikan (UGM dan lainnya):} Memberikan model dan bukti konsep (\textit{proof-of-concept}) mengenai pemanfaatan teknologi AI, \textit{gamification}, dan \textit{blockchain} untuk meningkatkan layanan dukungan mahasiswa, engagement, dan strategi peningkatan kesejahteraan di era digital.
-%     \item \textbf{Bagi Komunitas Akademik dan Riset:} Menambah khazanah ilmu pengetahuan di bidang Teknik Informasi, khususnya terkait interaksi manusia-komputer (HCI), AI dalam pendidikan (\textit{AI in Education}), aplikasi \textit{blockchain} non-finansial, dan desain sistem terintegrasi untuk kesejahteraan digital (\textit{digital well-being}). Menjadi dasar bagi penelitian selanjutnya di area ini.
-%     \item \textbf{Bagi Pengembang Teknologi:} Memberikan wawasan praktis mengenai tantangan dan strategi dalam mengintegrasikan tiga teknologi kompleks (\textit{conversational AI, gamification, blockchain}) dalam satu platform yang berfokus pada pengguna akhir.
-% \end{itemize}
-
-%-------------------------------------------------
 
 \section{Thesis Outline}
 \label{sec:thesis_outline}
@@ -120,7 +98,7 @@ The structure of this thesis is outlined as follows:
 
 \textbf{Chapter I: Introduction.} This chapter elaborates on the background of the study, the justification for the research's significance, the problem formulation to be addressed, and the specific objectives to be achieved. It also defines the scope and limitations of the research, outlines the expected contributions, and presents the overall organizational structure of the thesis report.
 
-\textbf{Chapter II: Literature Review and Theoretical Framework.} This chapter presents a comprehensive review of relevant prior research in the fields of conversational AI, the application of gamification in educational and well-being contexts, related blockchain applications, and studies on user engagement and student welfare. Furthermore, this chapter establishes the theoretical foundation that underpins the core concepts and technologies utilized in this research.
+\textbf{Chapter II: Literature Review and Theoretical Framework.} This chapter surveys prior work on agentic and conversational AI for mental health, safety-critical triage systems, human-in-the-loop design, and privacy-aware analytics. It establishes the theoretical foundation that underpins the core concepts and technologies utilized in this research.
 
 \textbf{Chapter III: System Design and Architecture.} This chapter outlines the methodology and technical blueprint for the system. It explains the adoption of Design Science Research and presents the system's high-level conceptual architecture, focusing on the four components of the \textbf{Safety Agent Suite}. It details the underlying cloud-native technical architecture, justifying the chosen technology stack, including the use of \textbf{LangGraph} for agent orchestration and a \textbf{FastAPI} backend for the core application logic. It also describes the database structure, user interface design, and integrated security and privacy measures like differential privacy.
 

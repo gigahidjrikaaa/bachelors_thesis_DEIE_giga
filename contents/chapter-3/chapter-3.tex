@@ -15,24 +15,50 @@ The DSR process model, as outlined by Peffers et al., provides an iterative fram
 \begin{enumerate}
     \item \textbf{Problem Identification and Motivation:} This initial stage, which involves defining the specific research problem and justifying the value of a solution, is addressed in \textbf{Chapter \ref{chap:introduction}} of this thesis. We have identified the inefficiencies of the reactive mental health support model as the core problem.
 
-    \item \textbf{Definition of Objectives for a Solution:} Based on the identified problem, this stage involves defining the objectives and desired capabilities of the artifact. These objectives, which center on creating a proactive, automated, and data-driven framework, are also detailed in \textbf{Chapter \ref{chap:introduction}}.
+    \item \textbf{Define Objectives and Knowledge Base:} Building on the identified problem, this stage formalizes the solution objectives and anchors them in the relevant knowledge base. The initial objectives are articulated in \textbf{Chapter \ref{chap:introduction}}, and they are refined and theoretically grounded through the literature synthesis in \textbf{Chapter \ref{sec:literature_review}}.
 
     \item \textbf{Design and Development:} This is the core constructive phase where the artifact's architecture and functionalities are developed. This stage is the primary focus of the present chapter, \textbf{Chapter \ref{chap:system_design}}, which outlines the functional and technical blueprint of the agentic AI framework.
 
-    \item \textbf{Demonstration:} In this stage, the designed artifact is demonstrated to solve one or more instances of the problem. This will be accomplished through the implementation of a functional prototype, as will be detailed in \textbf{Chapter IV}.
+    \item \textbf{Demonstration:} In this stage, the designed artifact is demonstrated to solve representative instances of the problem. The functional prototype and its scenario walkthroughs are presented in \textbf{Chapter~IV}, particularly Sections \ref{sec:setup} and \ref{sec:rq1}.
 
-    \item \textbf{Evaluation:} This stage involves observing and measuring how well the artifact supports a solution to the problem. The prototype's capabilities will be evaluated against predefined functional scenarios in \textbf{Chapter IV}, with the findings and their implications discussed.
+    \item \textbf{Evaluation:} This stage observes and measures how well the artifact supports the solution objectives. The scenario-based tests and their analysis are reported in \textbf{Chapter~IV}, Sections \ref{sec:rq1}--\ref{sec:discussion}.
 
-    \item \textbf{Communication:} The final stage involves communicating the problem, the artifact, and its utility to a relevant audience. This entire thesis document serves as the primary communication artifact for this research.
+    \item \textbf{Communication of Results:} The final stage disseminates the artifact, findings, and implications to the target audience. This thesis (culminating in \textbf{Chapter~V} and supported by the appendices) serves as the primary communication vehicle.
 \end{enumerate}
+
+Stages 4-6 therefore operationalize the empirical programme for the research questions defined in Chapter \ref{sec:research_questions}. The demonstration assets in Chapter~IV (Sections~\ref{sec:setup} and \ref{sec:rq1}) instantiate the scenarios for RQ1--RQ4, while the evaluation stage reports the quantitative indicators detailed in Chapter~IV: STA sensitivity/specificity for safety (RQ1), orchestration reliability metrics such as tool-call success and latency for resilience (RQ2), rubric-based CBT quality scores for coaching (RQ3), and stability of aggregate analytics for the Insights Agent (RQ4). The communication stage synthesizes these findings in Chapter~V so that institutional stakeholders can interpret the metrics and translate them into policy and operational decisions. Together, the paragraph-level traceability between stages and metrics makes the DSR cycle a roadmap for the scenario-based evaluation that follows.
 
 The complete workflow of this research, following the DSR methodology, is visualized in Figure \ref{fig:dsr_flowchart}. This diagram illustrates the iterative path from problem formulation through to the final conclusions and recommendations.
 
+\definecolor{ugmBlue}{RGB}{0,73,144}
+\definecolor{ugmGold}{RGB}{217,160,33}
+
 \begin{figure}[h]
-	\centering
-    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: DSR Research Workflow} \\ \vspace{1cm} This flowchart should illustrate the DSR stages as they apply to this thesis: \\ 1. Box: "Problem Identification (Chapter 1)" -> \\ 2. Box: "Literature Review \& Theoretical Grounding (Chapter 2)" -> \\ 3. Box: "Artifact Design \& Architecture (Chapter 3)" -> \\ 4. Box: "Prototype Implementation (Chapter 4)" -> \\ 5. Box: "Scenario-Based Evaluation (Chapter 4)" -> \\ 6. Box: "Conclusion \& Future Work (Chapter V)" \\ \textit{(Note: Follow guidelines from http://ugm.id/flowcharttutorial for styling.)}}}
-	\caption{The Design Science Research (DSR) process model as applied in this thesis.}
-	\label{fig:dsr_flowchart}
+    \centering
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=2.4cm,
+        process/.style={rectangle, rounded corners=4pt, draw=ugmBlue, very thick, minimum width=4.0cm, minimum height=1.1cm, align=center, fill=ugmBlue!6},
+        arrow/.style={-Latex, thick, ugmBlue},
+        looparrow/.style={-Latex, thick, ugmGold}
+    ]
+        \node[process] (problem) {Problem Identification\\\footnotesize (Chapter~\ref{chap:introduction})};
+        \node[process, right=of problem] (literature) {Objectives \& Knowledge Base\\\footnotesize (Ch.~\ref{chap:introduction},~\ref{sec:literature_review})};
+        \node[process, right=of literature] (design) {Artifact Design \& Development\\\footnotesize (Chapter~\ref{chap:system_design})};
+        \node[process, right=of design] (implementation) {Prototype Demonstration\\\footnotesize (Chapter~IV, Sec.~\ref{sec:setup})};
+        \node[process, right=of implementation] (evaluation) {Scenario Evaluation\\\footnotesize (Chapter~IV, Secs.~\ref{sec:rq1}--\ref{sec:discussion})};
+        \node[process, right=of evaluation] (conclusion) {Communication of Results\\\footnotesize (Chapter~V)};
+
+        \draw[arrow] (problem) -- (literature);
+        \draw[arrow] (literature) -- (design);
+        \draw[arrow] (design) -- (implementation);
+        \draw[arrow] (implementation) -- (evaluation);
+        \draw[arrow] (evaluation) -- (conclusion);
+        \draw[looparrow, looseness=1.1] (evaluation.south) to[out=-90, in=-90] (design.south);
+        \draw[looparrow, looseness=1.2] (implementation.north) to[out=90, in=90] (literature.north);
+    \end{tikzpicture}}
+    \caption{The Design Science Research (DSR) process model as applied in this thesis. Iterative loops capture how evaluation informs redesign and how implementation insights update the knowledge base.}
+    \label{fig:dsr_flowchart}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -41,7 +67,7 @@ The complete workflow of this research, following the DSR methodology, is visual
 
 \section{System Overview and Conceptual Design}
 
-The artifact proposed and developed in this research is a novel agentic AI framework designed to address the systemic inefficiencies of traditional, reactive mental health support models in Higher Education Institutions. The conceptual architecture is predicated on the principles of a Multi-Agent System (MAS), wherein a suite of collaborative, specialized intelligent agents—collectively termed the \textbf{Safety Agent Suite}—work in concert to create a proactive, scalable, and data-driven support ecosystem. This framework is designed not as a monolithic application, but as a dynamic, closed-loop system that operates on two interconnected levels: a micro-level loop for real-time, individual student support and a macro-level loop for strategic, institutional oversight and proactive intervention \cite{kashiv2025aidrivennetworks, nwoke2025insightautomation}.
+The artifact proposed and developed in this research is a novel agentic AI framework designed to address the systemic inefficiencies of traditional, reactive mental health support models in Higher Education Institutions. The conceptual architecture is predicated on the principles of a Multi-Agent System (MAS), wherein a suite of collaborative, specialized intelligent agents, collectively termed the \textbf{Safety Agent Suite}, work in concert to create a proactive, scalable, and data-driven support ecosystem. This framework is designed not as a monolithic application, but as a dynamic, closed-loop system that operates on two interconnected levels: a micro-level loop for real-time, individual student support and a macro-level loop for strategic, institutional oversight and proactive intervention \cite{kashiv2025aidrivennetworks, nwoke2025insightautomation}.
 
 The system's primary entities and their designated interaction points are illustrated in the conceptual context diagram in Figure \ref{fig:context_diagram}. These entities are:
 \begin{itemize}
@@ -59,14 +85,59 @@ Conceptually, the framework's architecture is best understood as two distinct bu
 
 The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem.
 
+\subsubsection{Orchestration Alternatives and Rationale}
+
+Classical multi-agent systems literature distinguishes between centralized planners, market-based negotiation schemes, and more recent graph-structured controllers for coordinating autonomous agents \cite{wooldridge1995intelligentagents,wooldridge2009introductionmas}. Contemporary surveys focused on LLM-powered agents show that orchestration frameworks such as LangGraph provide deterministic state persistence, guardrails, and cycle control that are difficult to obtain in purely contract-net or ad-hoc workflow engines \cite{yang2025aiagentprotocols,tran2025multiagentcollaboration,yu2025agentworkflow}. Table~\ref{tab:orchestration_patterns} contrasts these patterns and summarizes why the Safety Agent Suite adopts a graph-based orchestration.
+
+\begin{table}[h]
+    \centering
+    \caption{Comparison of orchestration patterns for the Safety Agent Suite.}
+    \label{tab:orchestration_patterns}
+    \begin{tabular}{p{3.4cm}p{4.0cm}p{4.0cm}}
+        \toprule
+        \textbf{Approach} & \textbf{Coordination Strengths} & \textbf{Limitations and Implications for Safety Agent Suite} \\
+        \midrule
+        Centralized workflow/planner \cite{wooldridge2009introductionmas} & Deterministic control flow and straightforward verification of simple pipelines. & Brittle when the conversation requires branching or repeated loops; a single orchestrator becomes a failure hotspot and hinders human-in-the-loop escalations needed for STA. \\
+        Contract-net / market-based negotiation \cite{wooldridge1995intelligentagents,tran2025multiagentcollaboration} & Decentralized task allocation and flexibility for loosely coupled agents. & Negotiation latency and probabilistic assignment make it difficult to guarantee triage deadlines and safety invariants; insufficient for crisis escalation SLAs. \\
+        Graph-based, stateful orchestrator (LangGraph) \cite{yang2025aiagentprotocols,yu2025agentworkflow} & Explicit state persistence, guard conditions, and cyclic workflows that support guardrails, retries, and logging. & Requires deliberate state-schema design and emerging tooling, but best aligns with the need for deterministic escalation paths, auditing, and metric capture in Chapters~IV and~V. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+In practice, LangGraph's stateful edges allow the Safety Triage Agent to enforce risk-score thresholds before delegating to the Support Coach Agent, while still preserving the ability to retry, log, and escalate without bespoke infrastructure. This orchestration choice therefore underpins the evaluation metrics reported later for tool-call reliability, latency, and auditability.
+
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][9cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: System Context Diagram} \\ \vspace{1cm} This diagram should be a high-level illustration of the system's architecture and stakeholders. It should visually represent: \\ 
-    1. An external "Student" entity interacting via a "UGM-AICare User App (/aika)" interface. \\
-    2. An external "University Staff/Counselor" entity interacting via an "Admin Dashboard" interface. \\
-    3. A central "Agentic AI Backend" system, which contains four internal components: the STA, SCA, SDA, and IA. \\
-    4. Arrows indicating the flow of information: Students send messages to the Backend; the Backend provides real-time responses. The Backend sends aggregated data and alerts to the Admin Dashboard; Staff use the dashboard to configure and oversee the Backend.}}
-    \caption{A high-level context diagram illustrating the primary entities, system interfaces, and the central role of the Agentic AI Framework.}
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        entity/.style={rectangle, rounded corners=4pt, draw=ugmBlue, very thick, fill=ugmBlue!6, align=center, minimum width=3.6cm, minimum height=1.4cm},
+        external/.style={entity, fill=white},
+        datastore/.style={rectangle, draw=ugmBlue, thick, fill=ugmBlue!10, align=center, minimum width=4.4cm, minimum height=1.2cm},
+        innerbox/.style={rectangle, rounded corners=3pt, draw=ugmBlue!70, fill=ugmBlue!12, minimum width=3.0cm, minimum height=0.85cm, font=\footnotesize, align=center},
+        arrow/.style={-Latex, thick, ugmBlue},
+        dashedarrow/.style={-Latex, thick, ugmBlue, dashed}
+    ]
+        \node[external] (student) {Student\\\footnotesize UGM-AICare App};
+        \node[entity, right=3.8cm of student, minimum width=4.6cm, minimum height=4.5cm] (backend) {};
+        \node at (backend.north) [yshift=-0.35cm, font=\bfseries\small, text=ugmBlue] {Safety Agent Suite};
+        \node[innerbox] (sta) at ([yshift=0.75cm]backend.center) {Safety Triage Agent};
+        \node[innerbox, below=0.2cm of sta] (sca) {Support Coach Agent};
+        \node[innerbox, below=0.2cm of sca] (sda) {Service Desk Agent};
+        \node[innerbox, below=0.2cm of sda] (ia) {Insights Agent};
+        \node[external, right=3.6cm of backend] (staff) {University Staff\\\footnotesize Admin Dashboard};
+        \node[datastore, below=1.8cm of backend] (dataplatform) {Data Platform\\\footnotesize Encrypted storage \& analytics};
+        \node[external, above=1.8cm of backend] (llm) {LLM Service\\\footnotesize (Gemini API)};
+
+        \draw[arrow] (student) -- node[above, font=\footnotesize]{Messages, mood signal} (backend);
+        \draw[arrow] (backend) -- node[above, font=\footnotesize]{Coach responses, resources} (student);
+        \draw[arrow] (backend) -- node[above, font=\footnotesize]{Alerts, insights} (staff);
+        \draw[dashedarrow] (staff) -- node[below, font=\footnotesize]{Escalation reviews, configuration} (backend);
+        \draw[arrow] (backend) -- node[right, font=\footnotesize]{Anonymised logs, metrics} (dataplatform);
+        \draw[dashedarrow] (dataplatform) -- node[left, font=\footnotesize]{Aggregated reports} (backend);
+        \draw[arrow] (backend) -- node[right, font=\footnotesize]{Structured prompts, tool calls} (llm);
+        \draw[dashedarrow] (llm) -- node[left, font=\footnotesize]{Generated responses} (backend);
+    \end{tikzpicture}}
+    \caption{High-level context of the Safety Agent Suite showing primary stakeholders, orchestration boundaries, and data exchanges. Dashed arrows denote supervisory or configuration interactions.}
     \label{fig:context_diagram}
 \end{figure}
 
@@ -105,14 +176,14 @@ Based on the classification result $R_t$, the STA's action is to update the syst
 \subsection{The Support Coach Agent (SCA): The Empathetic Mentor}
 
 \subsubsection{Goal}
-The SCA is the primary user-facing conversational agent, designed to provide personalized, evidence-based mental health coaching. Its goal is to engage the student in a supportive, empathetic dialogue, guiding them through structured self-help modules based on established therapeutic principles like Cognitive Behavioral Therapy (CBT), and to foster engagement through a gamified reward system.
+The SCA is the primary user-facing conversational agent, designed to provide personalized, evidence-based mental health coaching. Its goal is to engage the student in a supportive, empathetic dialogue, guiding them through structured self-help modules based on established therapeutic principles like Cognitive Behavioral Therapy (CBT), and to sustain engagement through gentle progress tracking and timely check-ins.
 
 \subsubsection{Perception (Inputs)}
 The SCA operates on the history of the conversation and the user's profile. Its key inputs from the state graph are:
 \begin{itemize}
     \item \textbf{Conversation History ($H_{t-1}$):} The full transcript of the conversation up to the previous turn.
     \item \textbf{User's Current Message ($M_t$):} The message deemed safe by the STA.
-    \item \textbf{User State:} Information about the user's progress, including completed modules and earned achievements.
+    \item \textbf{User State:} Information about the user's progress, including completed modules and outstanding check-ins.
 \end{itemize}
 
 \subsubsection{Processing Logic}
@@ -124,7 +195,7 @@ This agent has access to a toolset that allows it to retrieve and present struct
 \begin{itemize}
     \item \textbf{Conversational Response:} A human-like text response to be displayed to the user.
     \item \textbf{Tool Call (Content Delivery):} Invocation of tools to present CBT exercises or other self-help modules.
-    \item \textbf{Tool Call (Gamification):} Upon completion of a module, the SCA can call the \texttt{mint\_achievement\_badge} tool, which interacts with the blockchain service to issue a non-fungible token (NFT) to the user's account as a verifiable record of their progress.
+    \item \textbf{Tool Call (Progress Logging):} Upon completion of a module, the SCA can call the \texttt{record\_module\_completion} tool to update the student's progress log in the shared state and database.
 \end{itemize}
 
 \subsection{The Service Desk Agent (SDA): The Administrative Orchestrator}
@@ -179,12 +250,40 @@ The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks pe
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][10cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Data Flow Diagram (DFD)} \\ \vspace{1cm} This diagram should illustrate the flow of data between the four agents, the user, the admin, and the database. Key flows to show include: \\
-    1. User Message -> STA -> SCA -> User Response (Normal Flow). \\
-    2. User Message -> STA -> SDA -> Admin Dashboard (Crisis Flow). \\
-    3. SCA -> Blockchain Service (Gamification Flow). \\
-    4. IA -> Database -> Admin Dashboard (Analytics Flow).}}
-    \caption{A Data Flow Diagram illustrating the movement of information between the agents of the Safety Agent Suite and external entities.}
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=2.3cm,
+        actor/.style={rectangle, rounded corners=4pt, draw=ugmBlue, very thick, fill=white, align=center, minimum width=2.8cm, minimum height=1.1cm},
+        agent/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, fill=ugmBlue!7, align=center, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
+        datastore/.style={rectangle, draw=ugmBlue, thick, fill=ugmBlue!10, align=center, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
+        arrow/.style={-Latex, thick, ugmBlue},
+        dashedarrow/.style={-Latex, thick, ugmBlue, dashed}
+    ]
+        \node[actor] (user) {Student};
+        \node[agent, right=of user] (sta) {Safety Triage Agent};
+        \node[agent, right=of sta] (sca) {Support Coach Agent};
+        \node[actor, right=of sca] (studentReturn) {Student Response};
+
+        \draw[arrow] (user) -- node[above, font=\footnotesize]{Message} (sta);
+        \draw[arrow] (sta) -- node[above, font=\footnotesize]{Safe prompt} (sca);
+        \draw[arrow] (sca) -- node[above, font=\footnotesize]{Coaching reply} (studentReturn);
+
+        \node[agent, below=2.0cm of sta] (sda) {Service Desk Agent};
+        \node[actor, right=of sda] (admin) {Counselor / Staff};
+        \draw[arrow] (sta) -- node[left, font=\footnotesize]{Escalation} (sda);
+        \draw[arrow] (sda) -- node[above, font=\footnotesize]{Case alert} (admin);
+        \draw[dashedarrow] (admin) -- node[below, font=\footnotesize]{Resolution update} (sda);
+
+        \node[datastore, below=2.0cm of sca] (progress) {Progress Logs};
+        \draw[arrow] (sca) -- node[right, font=\footnotesize]{Module completion} (progress);
+
+        \node[agent, below=1.6cm of progress] (ia) {Insights Agent};
+        \node[datastore, right=of ia] (analytics) {Aggregated Reports};
+        \draw[arrow] (progress) -- node[right, font=\footnotesize]{Anonymised traces} (ia);
+        \draw[arrow] (ia) -- node[above, font=\footnotesize]{Weekly summary} (analytics);
+        \draw[arrow] (ia) -- node[left, font=\footnotesize]{Trend alert} (admin);
+    \end{tikzpicture}}
+    \caption{Data flow between the Safety Agent Suite and its users. Solid arrows show operational data paths; dashed arrows show supervisory feedback.}
     \label{fig:dfd}
 \end{figure}
 
@@ -217,16 +316,43 @@ Communication between the unified frontend and the backend is exclusively handle
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][12cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Overall System Architecture} \\ \vspace{1cm} This diagram should be a component diagram illustrating the core services and user interfaces. It should show: \\
-    1. A large box for the "Frontend Service (Next.js)" which contains two smaller boxes within it: "User Portal" and "Admin Dashboard". \\
-    2. An external "Student" actor pointing to the "User Portal". \\
-    3. An external "Administrator/Counselor" actor pointing to the "Admin Dashboard". \\
-    4. A box for the "Backend Service (FastAPI)" containing the "Agentic Core (LangGraph)" and the four agents (STA, SCA, SDA, IA). \\
-    5. A box for the "Database Service (PostgreSQL)". \\
-    6. A double-arrow labeled "REST API (HTTPS)" connecting the "Frontend Service" box to the "Backend Service" box. \\
-    7. An arrow labeled "Direct DB Connection" connecting the Backend to the Database. \\
-    8. An arrow from the Backend to an external "Google Gemini API" service.}}
-    \caption{The high-level technical architecture of the system, illustrating the unified frontend serving both users and admins, the backend agentic core, and the database service.}
+    \begin{tikzpicture}[
+        box/.style={rectangle, draw=ugmBlue, very thick, rounded corners=6pt, align=center, fill=ugmBlue!5},
+        subbox/.style={rectangle, draw=ugmBlue!70, thick, rounded corners=4pt, align=center, fill=white, minimum width=3.3cm, minimum height=1.1cm, font=\footnotesize},
+        actor/.style={rectangle, draw=ugmBlue, very thick, rounded corners=4pt, fill=white, align=center, minimum width=2.7cm, minimum height=1.1cm},
+        datastore/.style={rectangle, draw=ugmBlue, thick, align=center, fill=ugmBlue!10, minimum width=3.7cm, minimum height=1.2cm},
+        arrow/.style={-Latex, thick, ugmBlue},
+        doublearrow/.style={<->, >=Latex, thick, ugmBlue}
+    ]
+        \node[actor] (student) {Student};
+        \node[box, right=2.2cm of student, minimum width=5.6cm, minimum height=4.8cm] (frontend) {};
+        \node at (frontend.north) [yshift=-0.35cm, font=\bfseries\small, text=ugmBlue] {Frontend Service (Next.js)};
+        \node[subbox] (portal) at ([yshift=0.9cm]frontend.center) {User Portal / `/aika` Chat};
+        \node[subbox, below=0.4cm of portal] (dashboard) {Admin Dashboard};
+        \node[subbox, below=0.4cm of dashboard, minimum width=3.3cm] (shared) {Shared UI Components};
+
+        \node[box, right=3.0cm of frontend, minimum width=6.0cm, minimum height=5.4cm] (backend) {};
+        \node at (backend.north) [yshift=-0.35cm, font=\bfseries\small, text=ugmBlue] {Backend Service (FastAPI)};
+        \node[subbox, minimum width=4.2cm] (core) at ([yshift=1.1cm]backend.center) {Agentic Core (LangGraph)};
+        \node[subbox, below=0.35cm of core, minimum width=4.2cm] (sta) {Safety Triage Agent};
+        \node[subbox, below=0.25cm of sta, minimum width=4.2cm] (sca) {Support Coach Agent};
+        \node[subbox, below=0.25cm of sca, minimum width=4.2cm] (sda) {Service Desk Agent};
+        \node[subbox, below=0.25cm of sda, minimum width=4.2cm] (ia) {Insights Agent};
+
+        \node[datastore, below=2.5cm of backend] (database) {Database Service (PostgreSQL)};
+        \node[actor, right=2.6cm of backend] (gemini) {Google Gemini API};
+        \node[actor, above=2.6cm of frontend] (admin) {Counselor / Staff};
+
+        \draw[doublearrow] (frontend) -- node[above, font=\footnotesize]{REST API (HTTPS)} (backend);
+        \draw[arrow] (backend) -- node[right, font=\footnotesize]{Direct DB connection} (database);
+        \draw[arrow] (backend) -- node[above, font=\footnotesize]{Structured prompts \& tool calls} (gemini);
+        \draw[arrow] (student) -- node[above, font=\footnotesize]{Web / Mobile access} (portal.west);
+        \draw[arrow] (admin) -- node[right, font=\footnotesize]{Secure login} (dashboard.north);
+        \draw[arrow] (dashboard.south) -- node[right, font=\footnotesize]{Case actions} (backend.north);
+        \draw[arrow] (core.east) -- ++(1.2,0) |- node[pos=0.25, right, font=\footnotesize]{LLM responses} (gemini.south);
+        \draw[arrow] (ia.south) -- node[left, font=\footnotesize]{Aggregated insights} (database.north);
+    \end{tikzpicture}
+    \caption{High-level technical architecture showing the unified Next.js frontend, FastAPI backend with LangGraph agents, and supporting services.}
     \label{fig:system_architecture_diagram}
 \end{figure}
 
@@ -281,13 +407,31 @@ This stateful, cyclical approach allows for sophisticated agentic behaviors, suc
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: LangGraph Conceptual State Graph} \\ \vspace{1cm} This diagram should illustrate the agent workflow as a state graph. It should show: \\
-    1. An entry point "User Message". \\
-    2. A node for "Safety Triage Agent (STA)". \\
-    3. A conditional branch from STA: An edge labeled "Risk: Low/Moderate" leads to the "Support Coach Agent (SCA)" node. An edge labeled "Risk: Critical" leads to the "Service Desk Agent (SDA)" node. \\
-    4. The SCA node has a loop back to itself for conversation and can also branch to the SDA node for administrative tasks like booking. \\
-    5. The SDA node connects to the "Admin Dashboard" and database.}}
-    \caption{Conceptual diagram of the LangGraph state machine, showing how conditional edges route the workflow between the STA, SCA, and SDA based on the conversation's state.}
+    \begin{tikzpicture}[
+        state/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, align=center, fill=ugmBlue!6, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
+        decision/.style={diamond, draw=ugmGold!80!black, thick, fill=ugmGold!20, aspect=2, align=center, font=\footnotesize},
+        arrow/.style={-Latex, thick, ugmBlue},
+        riskarrow/.style={-Latex, thick, ugmGold}
+    ]
+        \node[state] (entry) {User Message\\(turn $t$)};
+        \node[state, right=2.6cm of entry] (sta) {Safety Triage Agent\\(risk assessment)};
+        \node[decision, right=2.5cm of sta] (risk) {Risk Level?};
+        \node[state, above right=1.6cm and 2.1cm of risk] (sca) {Support Coach Agent\\(empathetic response)};
+        \node[state, below right=1.6cm and 2.1cm of risk] (sda) {Service Desk Agent\\(case actions)};
+        \node[state, right=3.1cm of sca] (userout) {Response to Student};
+        \node[state, right=3.1cm of sda] (adminout) {Admin Dashboard\\Escalation Record};
+
+        \draw[arrow] (entry) -- node[above, font=\footnotesize]{contextual state} (sta);
+        \draw[arrow] (sta) -- node[above, font=\footnotesize]{risk score $R_t$} (risk);
+        \draw[riskarrow] (risk) -- node[above, font=\footnotesize]{Low/Moderate} (sca);
+        \draw[riskarrow] (risk) -- node[below, font=\footnotesize]{Critical} (sda);
+        \draw[arrow] (sca) -- node[above, font=\footnotesize]{coaching reply} (userout);
+        \draw[arrow] (sda) -- node[above, font=\footnotesize]{case ticket, alert} (adminout);
+        \draw[arrow, looseness=1.1, out=170, in=190] (sca.west) to node[above, font=\footnotesize]{next turn} (sta.north);
+        \draw[arrow, looseness=1.1, out=-170, in=-190] (sda.west) to node[below, font=\footnotesize]{status updates} (sta.south);
+        \draw[arrow, dashed, very thick, color=ugmBlue!70] (sca.south) -- node[right, font=\footnotesize]{booking request} (sda.north);
+    \end{tikzpicture}
+    \caption{Conceptual LangGraph state machine showing how conversation turns pass through the Safety Triage Agent before branching to the Support Coach or Service Desk agents, with feedback loops preserving state.}
     \label{fig:langgraph_conceptual}
 \end{figure}
 
@@ -304,7 +448,7 @@ The scheduler is configured to trigger the IA's main analysis function at a pred
 
 \subsection{Frontend Service: The UGM-AICare Web Application}
 
-The frontend service is the primary human-computer interface for the entire framework, serving both students and administrative staff. It is engineered as a monolithic frontend application using the \textbf{Next.js} React framework. This choice was deliberate, allowing for the development and maintenance of two distinct user experiences—the public-facing User Portal and the secure Admin Dashboard within a single, cohesive codebase. This approach simplifies dependency management and ensures a consistent design language across the platform while leveraging Next.js's powerful features for routing and role-based access control \cite{vercel2024nextjsdocs, granicz2022modernreact}.
+The frontend service is the primary human-computer interface for the entire framework, serving both students and administrative staff. It is engineered as a monolithic frontend application using the \textbf{Next.js} React framework. This choice was deliberate, allowing for the development and maintenance of two distinct user experiences, the public-facing User Portal and the secure Admin Dashboard within a single, cohesive codebase. This approach simplifies dependency management and ensures a consistent design language across the platform while leveraging Next.js's powerful features for routing and role-based access control \cite{vercel2024nextjsdocs, granicz2022modernreact}.
 
 The selection of Next.js is justified by several key architectural advantages that directly support the project's requirements:
 
@@ -321,7 +465,7 @@ This is the student-facing portion of the application, designed to be an accessi
 \begin{itemize}
     \item \textbf{The `/aika` Conversational Interface:} A real-time chat component that serves as the primary interaction point with the Support Coach Agent (SCA) and the underlying Safety Triage Agent (STA). It is responsible for managing the state of the conversation and rendering responses from the backend.
     \item \textbf{Journaling System:} A private, secure feature allowing students to write and review personal journal entries, a common practice in CBT-based therapies.
-    \item \textbf{User Dashboard:} A personalized space where students can track their progress through coaching modules and view their earned gamification rewards, including the NFT achievement badges.
+    \item \textbf{User Dashboard:} A personalized space where students can track their progress through coaching modules, revisit completed exercises, and see reminders for upcoming check-ins.
     \item \textbf{Appointment Scheduling:} An interface that communicates with the Service Desk Agent (SDA) via the backend API to allow students to view available slots and book appointments with human counselors.
 \end{itemize}
 
@@ -372,7 +516,7 @@ To manage incoming web traffic and route it to the appropriate services, \textbf
 Regarding scalability, while this single-VM deployment does not involve automated horizontal scaling like a Kubernetes cluster, it is designed with future growth in mind:
 \begin{itemize}
     \item \textbf{Vertical Scaling:} The most direct path to scaling is vertical. The resources of the Virtual Machine (CPU, RAM, storage) can be increased as the application's user base and data load grow.
-    \item \textbf{Container-Level Scaling:} Should the VM's resources permit, it is possible to run multiple instances of the most resource-intensive service—the FastAPI backend—on the same machine. Nginx can be configured to act as a load balancer, distributing incoming API requests across these multiple backend containers, thereby increasing the system's capacity to handle concurrent users.
+    \item \textbf{Container-Level Scaling:} Should the VM's resources permit, it is possible to run multiple instances of the most resource-intensive service, which is the FastAPI backend, on the same machine. Nginx can be configured to act as a load balancer, distributing incoming API requests across these multiple backend containers, thereby increasing the system's capacity to handle concurrent users.
 \end{itemize}
 
 This deployment strategy provides a stable, secure, and maintainable foundation for the UGM-AICare prototype, while offering clear pathways for future scaling as the project evolves.
@@ -384,7 +528,7 @@ This deployment strategy provides a stable, secure, and maintainable foundation 
 \section{Database Design}
 \label{sec:database_design}
 
-The database is the foundational layer of the system's architecture, responsible for the structured persistence and integrity of all data generated and consumed by the agentic framework. The schema is designed using a \textbf{relational model} to logically represent the relationships between the core entities of the application and to enforce strict data integrity through constraints. This design ensures that the data model can robustly support the distinct operational requirements of all four agents—from the real-time transactional needs of the STA and SDA to the large-scale analytical queries of the IA while adhering to the principles of privacy and data security. The following subsections detail the logical structure of the database, including the Entity-Relationship Diagram (ERD) and the specific schemas of the key tables.
+The database is the foundational layer of the system's architecture, responsible for the structured persistence and integrity of all data generated and consumed by the agentic framework. The schema is designed using a \textbf{relational model} to logically represent the relationships between the core entities of the application and to enforce strict data integrity through constraints. This design ensures that the data model can robustly support the distinct operational requirements of all four agents, from the real-time transactional needs of the STA and SDA to the large-scale analytical queries of the IA while adhering to the principles of privacy and data security. The following subsections detail the logical structure of the database, including the Entity-Relationship Diagram (ERD) and the specific schemas of the key tables.
 
 \subsection{Entity-Relationship Diagram (ERD)}
 \label{subsec:erd}
@@ -396,24 +540,38 @@ The key entities and their relationships are as follows:
     \item \textbf{Core Interaction Entities:} The central entities that capture user engagement are \texttt{users}, \texttt{conversations}, and \texttt{messages}. A \texttt{user} (representing a student with an anonymized identifier) can have multiple \texttt{conversations}, and each \texttt{conversation} is composed of multiple \texttt{messages}. This one-to-many relationship structure allows for a clear and chronological record of all interactions.
     \item \textbf{Case Management Entities:} To support the functional requirements of the STA and SDA, the \texttt{cases} and \texttt{case\_notes} entities are introduced. A \texttt{case} is directly linked to a single \texttt{conversation} in which a critical risk was detected. Each \texttt{case} can have multiple \texttt{case\_notes}, which are time-stamped entries made by counselors during their review, thereby creating a formal audit trail for each escalation.
     \item \textbf{Administrative Entities:} The \texttt{counselors} and \texttt{appointments} entities support the administrative functions of the Service Desk Agent. A many-to-many relationship exists between \texttt{users} and \texttt{counselors} through the \texttt{appointments} table, which links a specific \texttt{user} and a \texttt{counselor} at a scheduled time.
-    \item \textbf{Gamification Entity:} The \texttt{achievements} entity supports the gamification features of the Support Coach Agent. It links a \texttt{user} to a specific achievement they have unlocked, storing metadata such as the date earned and the blockchain transaction hash for the minted NFT.
+    \item \textbf{Progress Tracking Entity:} The \texttt{progress\_logs} entity records module completions and check-ins initiated by the Support Coach Agent. It links a \texttt{user} to a specific module, storing metadata such as the date completed and any follow-up reminders.
 \end{itemize}
 
-This relational structure ensures that data is logically organized and that complex queries—from retrieving a single conversation's history to aggregating data for the Insights Agent—can be performed efficiently and reliably.
+This relational structure ensures that data is logically organized and that complex queries (from retrieving a single conversation's history to aggregating data for the Insights Agent) can be performed efficiently and reliably.
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][12cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Entity-Relationship Diagram (ERD)} \\ \vspace{1cm} This diagram should visually represent the database schema using standard ERD notation (e.g., Crow's Foot notation). It must include the following entities and relationships: \\
-    - \textbf{users} (PK: \texttt{user\_id}) \\
-    - \textbf{conversations} (PK: \texttt{conversation\_id}, FK: \texttt{user\_id}) \\
-    - \textbf{messages} (PK: \texttt{message\_id}, FK: \texttt{conversation\_id}) \\
-    - \textbf{cases} (PK: \texttt{case\_id}, FK: \texttt{conversation\_id}, FK: \texttt{assigned\_counselor\_id}) \\
-    - \textbf{case\_notes} (PK: \texttt{note\_id}, FK: \texttt{case\_id}) \\
-    - \textbf{counselors} (PK: \texttt{counselor\_id}) \\
-    - \textbf{appointments} (PK: \texttt{appointment\_id}, FK: \texttt{user\_id}, FK: \texttt{counselor\_id}) \\
-    - \textbf{achievements} (PK: \texttt{achievement\_id}, FK: \texttt{user\_id}) \\
-    Lines with appropriate symbols should connect these entities to show one-to-many relationships (e.g., one \texttt{user} to many \texttt{conversations}).}}
-    \caption{The Entity-Relationship Diagram for the UGM-AICare database, illustrating the tables and their logical relationships.}
+    \begin{tikzpicture}[
+        entity/.style={rectangle, draw=ugmBlue, very thick, rounded corners=4pt, align=left, fill=ugmBlue!5, minimum width=4.2cm, font=\footnotesize},
+        relationship/.style={-Latex, thick, ugmBlue}
+    ]
+        \node[entity] (users) {\textbf{users}\newline PK \texttt{user\_id}\newline email\_hash\newline profile\_flags};
+        \node[entity, right=3.8cm of users] (conversations) {\textbf{conversations}\newline PK \texttt{conversation\_id}\newline FK \texttt{user\_id}\newline created\_at};
+        \node[entity, right=3.8cm of conversations] (messages) {\textbf{messages}\newline PK \texttt{message\_id}\newline FK \texttt{conversation\_id}\newline speaker\_role\newline sentiment\_score};
+
+        \node[entity, below=2.4cm of users] (progress) {\textbf{progress\_logs}\newline PK \texttt{progress\_id}\newline FK \texttt{user\_id}\newline module\_code\newline completed\_at};
+        \node[entity, below=2.2cm of conversations] (cases) {\textbf{cases}\newline PK \texttt{case\_id}\newline FK \texttt{conversation\_id}\newline FK \texttt{assigned\_counselor\_id}\newline status, severity};
+        \node[entity, below=2.2cm of messages] (casenotes) {\textbf{case\_notes}\newline PK \texttt{note\_id}\newline FK \texttt{case\_id}\newline author\_id\newline note\_body};
+
+        \node[entity, below=2.4cm of progress] (counselors) {\textbf{counselors}\newline PK \texttt{counselor\_id}\newline name\newline availability\_band};
+        \node[entity, below=2.4cm of cases] (appointments) {\textbf{appointments}\newline PK \texttt{appointment\_id}\newline FK \texttt{user\_id}\newline FK \texttt{counselor\_id}\newline scheduled\_at};
+
+        \draw[relationship] (users) -- node[above, font=\scriptsize]{1\,:\,N} (conversations);
+        \draw[relationship] (conversations) -- node[above, font=\scriptsize]{1\,:\,N} (messages);
+        \draw[relationship] (users) -- node[left, font=\scriptsize]{1\,:\,N} (progress);
+        \draw[relationship] (conversations) -- node[right, font=\scriptsize]{1\,:\,0..1} (cases);
+        \draw[relationship] (cases) -- node[right, font=\scriptsize]{1\,:\,N} (casenotes);
+        \draw[relationship] (cases) -- node[left, font=\scriptsize]{N\,:\,1} (counselors);
+        \draw[relationship] (counselors) -- node[above, font=\scriptsize]{1\,:\,N} (appointments);
+        \draw[relationship] (users) -- node[above, font=\scriptsize]{1\,:\,N} (appointments);
+    \end{tikzpicture}
+    \caption{Entity--relationship diagram summarising the core tables that support conversational history, safety escalation, and progress tracking. Cardinalities indicate the dominant one-to-many relationships.}
     \label{fig:erd}
 \end{figure}
 
@@ -495,11 +653,11 @@ The \texttt{cases} table is the core of the case management system, operated pri
     \texttt{updated\_at} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp for the last update to the case. \\
 \end{longtable}
 
-\subsubsection{Achievements Table}
-This table supports the gamification functionality driven by the Support Coach Agent (SCA), tracking the achievements unlocked by users.
+\subsubsection{Progress Logs Table}
+This table captures the module completions and wellness check-ins driven by the Support Coach Agent (SCA), providing a lightweight audit trail of student progress.
 
 \begin{longtable}{@{}llll@{}}
-    \caption{Schema for the \texttt{achievements} table.} \label{tab:achievements_schema} \\
+    \caption{Schema for the \texttt{progress\_logs} table.} \label{tab:progress_logs_schema} \\
     \toprule
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
     \midrule
@@ -512,11 +670,12 @@ This table supports the gamification functionality driven by the Support Coach A
     \endhead
     \bottomrule
     \endfoot
-    \texttt{achievement\_id} & \texttt{SERIAL} & PK, NOT NULL & Unique identifier for the achievement record. \\
-    \texttt{user\_id} & \texttt{UUID} & FK (users), NOT NULL & Foreign key linking the achievement to the user. \\
-    \texttt{achievement\_name} & \texttt{VARCHAR(128)} & NOT NULL & The name of the achievement (e.g., 'Completed First CBT Module'). \\
-    \texttt{date\_earned} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp for when the achievement was awarded. \\
-    \texttt{blockchain\_tx\_hash} & \texttt{VARCHAR(256)} & & The transaction hash of the minted NFT on the blockchain, providing a verifiable proof of achievement. \\
+    \texttt{progress\_id} & \texttt{SERIAL} & PK, NOT NULL & Unique identifier for the progress record. \\
+    \texttt{user\_id} & \texttt{UUID} & FK (users), NOT NULL & Foreign key linking the log entry to the user. \\
+    \texttt{module\_code} & \texttt{VARCHAR(64)} & NOT NULL & Identifier for the CBT module or exercise completed. \\
+    \texttt{completed\_at} & \texttt{TIMESTAMPTZ} & NOT NULL & Timestamp for when the module was completed. \\
+    \texttt{follow\_up\_due\_at} & \texttt{TIMESTAMPTZ} & & Optional reminder for a follow-up check-in, if applicable. \\
+    \texttt{notes} & \texttt{TEXT} & & Optional remarks recorded by the SCA (e.g., student's self-reported mood). \\
 \end{longtable}
 
 \subsection{Data Integrity and Relationships}
@@ -524,7 +683,7 @@ This table supports the gamification functionality driven by the Support Coach A
 A robust database schema is defined not only by its entities and attributes but also by the rules that govern the relationships between them. In this framework, data integrity is paramount, particularly given the sensitive nature of the information being managed. The logical consistency and reliability of the data are enforced at the database level through the rigorous application of relational constraints, primarily foreign keys and referential integrity actions.
 
 \subsubsection{Foreign Key Constraints}
-The primary mechanism for enforcing relationships between tables is the use of \textbf{foreign key constraints}. A foreign key in one table points to a primary key in another table, creating a formal link that the database system actively maintains. This ensures that no orphaned records can exist; for example, a message cannot be created without being linked to a valid, existing conversation. Key relationships enforced in this schema include:
+The primary mechanism for enforcing relationships between tables is the use of \textbf{foreign key constraints}. A foreign key in one table points to a primary key in another table, creating a formal link that the database system actively maintains. This ensures that no orphaned records can exist; for example, a message cannot be created without an associated conversation. Key relationships enforced in this schema include:
 
 \begin{itemize}
     \item \textbf{User to Conversations:} The \texttt{user\_id} column in the \texttt{conversations} table is a foreign key that references the \texttt{users} table. This establishes a one-to-many relationship, ensuring every conversation is owned by a single, valid user.
@@ -660,7 +819,7 @@ Based on the insights gathered from the user personas and scenarios, the followi
 
 \section{User Interface (UI) Design}
 
-The User Interface (UI) design translates the principles and user stories from the UX research phase into a tangible, visual blueprint for the UGM-AICare application. The design of both the Admin Dashboard and the User Portal is guided by the core principles of clarity, privacy, and actionability. The following mockups represent the key screens of the application, designed to meet the specific needs of the personas—Dr. Astuti and Budi.
+The User Interface (UI) design translates the principles and user stories from the UX research phase into a tangible, visual blueprint for the UGM-AICare application. The design of both the Admin Dashboard and the User Portal is guided by the core principles of clarity, privacy, and actionability. The following mockups represent the key screens of the application, designed to meet the specific needs of the personas: Dr. Astuti and Budi.
 
 \subsection{The Admin Dashboard: An Interface for Proactive Oversight}
 
@@ -674,13 +833,35 @@ As shown in Figure \ref{fig:ui_admin_dashboard}, the main dashboard is the centr
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: Admin Dashboard - Main View} \\ \vspace{1cm} This mockup should show a professional dashboard interface with: \\
-    1. A navigation bar on the left. \\
-    2. A header with "Analytics Dashboard". \\
-    3. Top-level KPI cards: "Overall Sentiment: -0.2 (Down 5%)", "New Cases This Week: 12". \\
-    4. A large central chart titled "Weekly Trending Topics" showing a bar chart with topics like "Exam Stress", "Social Anxiety", etc. \\
-    5. A table on the right titled "Recent Critical Alerts" with entries for flagged conversations.}}
-    \caption{High-fidelity mockup of the Admin Dashboard's main analytics view.}
+    \begin{tikzpicture}[
+        screen/.style={rectangle, draw=ugmBlue, very thick, rounded corners=8pt, fill=ugmBlue!5, minimum width=12cm, minimum height=7cm},
+        nav/.style={rectangle, draw=ugmBlue!70, fill=ugmBlue!15, align=left, minimum width=1.6cm, minimum height=6.2cm, rounded corners=6pt, font=\scriptsize},
+        header/.style={rectangle, draw=ugmBlue!80, fill=white, rounded corners=5pt, minimum width=9.4cm, minimum height=0.9cm, font=\footnotesize\bfseries, text=ugmBlue, align=left},
+        card/.style={rectangle, draw=ugmBlue!70, fill=white, rounded corners=5pt, minimum width=2.8cm, minimum height=1.2cm, align=left, font=\scriptsize},
+        chart/.style={rectangle, draw=ugmBlue!60, fill=white, rounded corners=5pt, minimum width=6.0cm, minimum height=3.4cm, align=left},
+        table/.style={rectangle, draw=ugmBlue!60, fill=white, rounded corners=5pt, minimum width=2.8cm, minimum height=3.4cm, align=left, font=\scriptsize}
+    ]
+        \node[screen] (frame) {};
+        \node[nav, anchor=west] at ([xshift=-4.7cm]frame.west) {\textbf{Menu}\newline\small Analytics\newline Cases\newline Alerts\newline Settings};
+        \node[header, anchor=north west] at ([xshift=0.5cm,yshift=-0.4cm]frame.north west) {Analytics Dashboard};
+
+        \node[card, anchor=north west] (kpi1) at ([xshift=0.5cm,yshift=-1.4cm]frame.north west) {Overall Sentiment:\newline\textbf{-0.20} \textcolor{ugmBlue!70}{( 5\,pt)}};
+        \node[card, anchor=north west] (kpi2) at ([xshift=3.5cm,yshift=-1.4cm]frame.north west) {New Cases This Week:\newline\textbf{12}};
+        \node[card, anchor=north west] (kpi3) at ([xshift=6.5cm,yshift=-1.4cm]frame.north west) {Active Alerts:\newline\textbf{4}};
+
+        \node[chart, anchor=north west] (topicchart) at ([xshift=0.5cm,yshift=-3.1cm]frame.north west) {};
+        \node[font=\scriptsize\bfseries, text=ugmBlue, anchor=north west] at ([xshift=0.2cm,yshift=-0.2cm]topicchart.north west) {Weekly Trending Topics};
+        \begin{scope}[shift={(topicchart.south west)}]
+            \draw[ugmBlue!40, line width=0.6pt] (0.4,0.2) -- (0.4,2.5);
+            \foreach \y/\label in {0.6/Exam Stress,1.3/Social Anxiety,2.0/Financial Pressure} {
+                \draw[fill=ugmBlue!60] (0.6,\y) rectangle (2.8,\y+0.3);
+                \node[font=\scriptsize] at (1.7,\y+0.15) {\label};
+            }
+        \end{scope}
+
+        \node[table, anchor=north west] (alerttable) at ([xshift=7.0cm,yshift=-3.1cm]frame.north west) {\textbf{Recent Critical Alerts}\newline\rule{2.4cm}{0.2pt}\newline 14 Oct -- Conv. 1294 -- Self-harm\newline 14 Oct -- Conv. 1301 -- Panic\newline 13 Oct -- Conv. 1187 -- Abuse};
+    \end{tikzpicture}
+    \caption{Admin dashboard main view highlighting KPIs, trending topics, and the most recent critical alerts surfaced by the agents.}
     \label{fig:ui_admin_dashboard}
 \end{figure}
 
@@ -692,10 +873,28 @@ When a conversation is flagged by the STA, it appears in the case management vie
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: Admin Dashboard - Case Management} \\ \vspace{1cm} This mockup should show a two-panel layout: \\
-    1. A table on the left listing cases with columns for "Case ID", "Status", "Severity", and "Assigned To". \\
-    2. A detailed view on the right showing the selected case, including the anonymized chat transcript and a section for counselors to add notes.}}
-    \caption{Mockup of the case management interface for counselors.}
+    \begin{tikzpicture}[
+        frame/.style={rectangle, draw=ugmBlue, very thick, rounded corners=8pt, fill=ugmBlue!5, minimum width=12cm, minimum height=6.5cm},
+        panel/.style={rectangle, draw=ugmBlue!70, thick, rounded corners=5pt, fill=white, minimum height=5.4cm},
+        title/.style={font=\scriptsize\bfseries, text=ugmBlue},
+        celltext/.style={font=\scriptsize, align=left}
+    ]
+        \node[frame] (frame) {};
+        \node[panel, minimum width=4.8cm] (list) at ([xshift=-2.1cm]frame.center) {};
+        \node[panel, minimum width=6.6cm, right=0.6cm of list] (detail) {};
+
+        \node[title, anchor=north west] at ([xshift=0.2cm,yshift=-0.2cm]list.north west) {Active Cases};
+        \node[celltext, anchor=north west] at ([xshift=0.2cm,yshift=-0.7cm]list.north west) {Case ID \hspace{0.3cm} Status \hspace{0.2cm} Severity \hspace{0.2cm} Assigned};
+        \foreach \y/\case/\status/\sev/\assignee in {4.4/C-1294/Open/Critical/Dr. Hana,3.6/C-1301/Assigned/High/Dr. Raka,2.8/C-1187/Open/Moderate/--,2.0/C-1150/Closed/Low/Dr. Hana}
+            \node[celltext] at ([xshift=0.25cm,yshift=-\y mm]list.north west) {\case\hspace{0.6cm}\status\hspace{0.3cm}\sev\hspace{0.3cm}\assignee};
+
+        \node[title, anchor=north west] at ([xshift=0.3cm,yshift=-0.2cm]detail.north west) {Case C-1294 \textbullet\ Self-harm keywords detected};
+        \node[celltext, anchor=north west, align=left] at ([xshift=0.3cm,yshift=-0.8cm]detail.north west) {	extbf{Risk Level:} Critical \quad \textbf{Assigned To:} Pending};
+        \node[celltext, anchor=north west, align=left] at ([xshift=0.3cm,yshift=-1.4cm]detail.north west) {	extbf{Chat Excerpt}\newline [Student] ``I feel overwhelmed...''\newline [Aika] ``I'm here with you. Would you like grounding tips?''};
+        \node[celltext, anchor=north west, align=left] at ([xshift=0.3cm,yshift=-3.2cm]detail.north west) {	extbf{Counselor Notes}\newline -- schedule immediate outreach\newline -- provide emergency contacts};
+        \node[celltext, anchor=south east] at ([xshift=-0.3cm,yshift=0.3cm]detail.south east) {Buttons: Assign \quad Mark Resolved};
+    \end{tikzpicture}
+    \caption{Case management interface showing the triaged case list alongside the selected conversation context and follow-up actions.}
     \label{fig:ui_case_management}
 \end{figure}
 
@@ -711,28 +910,47 @@ The core of the student experience is the chat interface, shown in Figure \ref{f
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: User Portal - Chat Interface} \\ \vspace{1cm} This mockup should show a clean, simple chat window. \\
-    1. A header with "Aika - Your UGM-AICare Companion". \\
-    2. A chat history area with bubbles for the user's messages and Aika's responses. \\
-    3. A text input box at the bottom. The design should be calming, using a soft color palette.}}
-    \caption{Mockup of the main conversational interface for students.}
+    \begin{tikzpicture}[
+        phone/.style={rectangle, draw=ugmBlue, very thick, rounded corners=12pt, fill=ugmBlue!5, minimum width=6.5cm, minimum height=11cm},
+        header/.style={rectangle, draw=none, rounded corners=0pt, fill=ugmBlue, minimum width=5.5cm, minimum height=0.9cm, font=\scriptsize\bfseries, text=white},
+        bubbleUser/.style={rectangle, rounded corners=8pt, fill=ugmGold!40, draw=none, font=\scriptsize, align=left, text=black},
+        bubbleAgent/.style={rectangle, rounded corners=8pt, fill=white, draw=ugmBlue!40, font=\scriptsize, align=left, text=ugmBlue!80},
+        inputbox/.style={rectangle, draw=ugmBlue!50, rounded corners=8pt, fill=white, minimum width=5.5cm, minimum height=0.9cm}
+    ]
+        \node[phone] (screen) {};
+        \node[header] at ([yshift=-0.5cm]screen.north) {Aika -- Your UGM-AICare Companion};
+        \node[bubbleAgent, anchor=north west] at ([xshift=-2.6cm,yshift=-2.0cm]screen.north) {Hi Budi, it's good to see you.\newline How are you feeling today?};
+        \node[bubbleUser, anchor=north east] at ([xshift=2.6cm,yshift=-3.4cm]screen.north) {Honestly, a bit overwhelmed.\newline Exams are piling up.};
+        \node[bubbleAgent, anchor=north west] at ([xshift=-2.6cm,yshift=-5.0cm]screen.north) {Thanks for sharing that.\newline Would it help to practice a 3-minute\newline breathing exercise together?};
+        \node[bubbleUser, anchor=north east] at ([xshift=2.6cm,yshift=-6.6cm]screen.north) {Yes, please. I think that could help.};
+        \node[inputbox] at ([yshift=1.2cm]screen.south) {};
+        \node[font=\scriptsize, text=ugmBlue!80] at ([yshift=1.25cm]screen.south) {Type your message...};
+    \end{tikzpicture}
+    \caption{Minimalist chat interface designed to keep the student's attention on the conversation with Aika.}
     \label{fig:ui_chat}
 \end{figure}
 
-\subsubsection{The User Dashboard and Gamification}
+\subsubsection{The User Dashboard and Progress Tracking}
 To foster engagement and a sense of progress, the user dashboard (Figure \ref{fig:ui_user_dashboard}) visualizes the student's journey.
 \begin{itemize}
-    \item \textbf{Design Justification:} This screen directly supports Budi's goal of feeling a sense of accomplishment. It includes a section for "My Progress" that shows completed modules and a gallery for "My Achievements" where the earned NFT badges are displayed. This visual feedback, based on the design principle of "Foster a Sense of Progress," reinforces positive behavior and encourages continued engagement with the platform's coaching features.
+    \item \textbf{Design Justification:} This screen directly supports Budi's goal of feeling a sense of accomplishment. It includes a section for "My Progress" that shows completed modules, highlights recommended next steps, and surfaces gentle reminders for upcoming check-ins. This visual feedback, based on the design principle of "Foster a Sense of Progress," reinforces positive behavior and encourages continued engagement with the platform's coaching features.
 \end{itemize}
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Mockup: User Portal - Dashboard} \\ \vspace{1cm} This mockup should show a personalized dashboard for the student. \\
-    1. A welcoming message like "Welcome back, Budi!". \\
-    2. A section titled "My Progress" with a list of completed CBT modules (e.g., "Mindful Breathing - Completed"). \\
-    3. A visually appealing section titled "My Achievements" displaying the icons for the earned NFT badges. \\
-    4. A clear call-to-action button: "Continue Chat with Aika".}}
-    \caption{Mockup of the student's personal dashboard, showing progress and gamification elements.}
+    \begin{tikzpicture}[
+        card/.style={rectangle, draw=ugmBlue, very thick, rounded corners=10pt, fill=ugmBlue!5, minimum width=10.5cm, minimum height=6.5cm},
+        section/.style={rectangle, draw=ugmBlue!70, thick, rounded corners=6pt, fill=white, minimum height=1.6cm, align=left, font=\scriptsize},
+        heading/.style={font=\bfseries\small, text=ugmBlue}
+    ]
+        \node[card] (dash) {};
+        \node[heading, anchor=north west] at ([xshift=0.6cm,yshift=-0.5cm]dash.north west) {Welcome back, Budi!};
+        \node[section, minimum width=4.6cm, anchor=north west] (progress) at ([xshift=0.6cm,yshift=-1.2cm]dash.north west) {	extbf{My Progress}\newline Mindful Breathing -- Completed 12 Oct\newline Journaling -- Completed 11 Oct\newline Sleep Check-in -- Completed 10 Oct};
+        \node[section, minimum width=4.6cm, anchor=north west] (nextup) at ([xshift=0.6cm,yshift=-4.3cm]dash.north west) {	extbf{Next Up}\newline Guided reflection on support network\newline Schedule peer meet-up reminder (due Fri)};
+        \node[section, minimum width=4.6cm, anchor=north west] (reminder) at ([xshift=5.7cm,yshift=-1.2cm]dash.north west) {	extbf{Gentle Reminders}\newline Check-in with Aika tomorrow\newline Stretch break at 16:00\newline Drink water tracker};
+        \node[rectangle, draw=ugmBlue, rounded corners=5pt, fill=ugmBlue, text=white, minimum width=4.6cm, minimum height=1cm, anchor=north west] at ([xshift=5.7cm,yshift=-4.3cm]dash.north west) {Continue Chat with Aika};
+    \end{tikzpicture}
+    \caption{Personal dashboard emphasising completed activities, recommended follow-ups, and a clear path back into the coaching conversation.}
     \label{fig:ui_user_dashboard}
 \end{figure}
 
@@ -751,8 +969,30 @@ This journey is designed to be as frictionless as possible, directly addressing 
 
 \begin{figure}[h]
     \centering
-    \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Flowchart: Appointment Booking Journey} \\ \vspace{1cm} This flowchart should illustrate the steps from initiation (either via chat or a dedicated UI) to the final confirmation, showing the roles of the SCA and SDA.}}
-    \caption{User journey for booking a counselor appointment.}
+    \begin{tikzpicture}[
+        flowstep/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, align=center, fill=ugmBlue!6, minimum width=3.6cm, minimum height=1.1cm, font=\scriptsize},
+        flowdecision/.style={diamond, draw=ugmGold!80!black, thick, fill=ugmGold!20, align=center, aspect=2, font=\scriptsize},
+        arrow/.style={-Latex, thick, ugmBlue}
+    ]
+        \node[flowstep] (start) {Student opens booking page\newline or requests help in chat};
+        \node[flowdecision, below=1.3cm of start] (viachat) {Initiated via chat?};
+        \node[flowstep, below=1.4cm of viachat] (sca) {SCA detects scheduling intent\newline and summarises request};
+        \node[flowstep, below=1.2cm of sca] (sda) {SDA checks counselor availability\newline (\texttt{check\_calendar\_availability})};
+        \node[flowstep, below=1.2cm of sda] (select) {Student selects preferred slot};
+        \node[flowstep, below=1.2cm of select] (confirm) {SDA books appointment\newline (\texttt{book\_appointment})};
+        \node[flowstep, below=1.2cm of confirm] (notify) {Confirmations sent to student\newline and assigned counselor};
+
+        \draw[arrow] (start) -- (viachat);
+        \draw[arrow] (viachat) -- node[right, font=\scriptsize]{Yes} (sca);
+        \draw[arrow] (sca) -- (sda);
+        \draw[arrow] (sda) -- (select);
+        \draw[arrow] (select) -- (confirm);
+        \draw[arrow] (confirm) -- (notify);
+        \node[flowstep, right=4.0cm of viachat] (form) {Student fills booking form};
+        \draw[arrow] (viachat.east) -- node[above, font=\scriptsize]{No} (form.west);
+        \draw[arrow] (form.south) |- (sda.east);
+    \end{tikzpicture}
+    \caption{Appointment booking journey showing both chat-triggered and self-initiated flows converging on the Service Desk Agent for scheduling and confirmation.}
     \label{fig:journey_appointment}
 \end{figure}
 
@@ -775,7 +1015,7 @@ This journey illustrates the system's core safety protocol.
             \item Sends a high-priority alert to the Admin Dashboard.
             \item Instructs the Service Desk Agent (SDA) to create a new case, linking it to the conversation.
         \end{itemize}
-    \item \textbf{Human Intervention:} A counselor (Dr. Astuti) sees the alert on the dashboard, reviews the case created by the SDA, and assigns it to a staff member for immediate follow-up. The counselor uses the case management interface to document all actions taken.
+    \item \textbf{Human Intervention:} A counselor (Dr. Astuti) sees the alert on the dashboard, reviews the newly created case, and initiates follow-up. The counselor uses the case management interface to document all actions taken.
 \end{enumerate}
 
 \begin{figure}[h]
@@ -878,3 +1118,7 @@ This study, as a work of Design Science Research focused on the creation and eva
     \item \textbf{Technical Limitation: Inherent Risks of LLMs:} The framework relies on the Google Gemini 2.5 API. Like all LLMs, it is subject to inherent limitations. These include the potential for the model to reflect biases present in its vast training data and the possibility of generating factually incorrect or nonsensical responses ("hallucinations"). While the system's use of structured tools and prompts is designed to mitigate these risks, they cannot be eliminated entirely.
     \item \textbf{Data Limitation: Use of Simulated Data:} The evaluation of the Insights Agent (IA) will be conducted using anonymized, pre-existing chat logs or simulated data. While this is necessary to protect user privacy during the development phase, it means that the agent's performance has not been validated on the specific linguistic patterns and diversity of a live, campus-wide user base. The effectiveness of the topic modeling and sentiment analysis in a real-world context would require further validation post-deployment.
 \end{itemize}
+
+
+
+
