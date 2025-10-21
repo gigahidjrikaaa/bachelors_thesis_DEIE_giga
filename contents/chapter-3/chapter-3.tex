@@ -76,6 +76,21 @@ The system's primary entities and their designated interaction points are illust
     \item \textbf{The Agentic AI Backend:} This is the core computational engine of the framework. It hosts the four agents of the Safety Agent Suite, manages their stateful interactions via LangGraph, and serves as the central hub for all data processing, logic execution, and communication with external services and databases.
 \end{itemize}
 
+\begin{table}[h]
+    \centering
+    \caption{Comparison of representative university well-being platforms.}
+    \label{tab:wellbeing_comparison}
+    \begin{tabular}{p{3.4cm}p{3.6cm}p{3.6cm}p{3.6cm}}
+        \toprule
+        \textbf{Platform} & \textbf{Primary Modality} & \textbf{Safety/Privacy Posture} & \textbf{Contrast with Safety Agent Suite} \\
+        \midrule
+        Woebot Campus Programme\cite{FIND_CITATION_PLACEHOLDER} & Daily CBT-aligned chatbot sessions with journaling prompts. & Crisis disclaimers and human referral prompts, but escalation remains manual and analytics are limited. & Lacks dedicated triage agent or orchestration guardrails; actionable insights are not automated, restricting proactive interventions. \\
+        Togetherall Peer Community\cite{FIND_CITATION_PLACEHOLDER} & Moderated peer-to-peer forums with clinician oversight and resource hubs. & Strong anonymity policies and moderator workflows, yet response time depends on human moderators. & Provides community support but no automated coaching, triage, or strategic analytics loop as offered by the Safety Agent Suite. \\
+        Kognito ``At-Risk'' Simulations\cite{FIND_CITATION_PLACEHOLDER} & Scenario-based training to help faculty/students identify and refer distressed peers. & Focuses on awareness; no live data capture or privacy-sensitive storage since it is a training tool. & Educates stakeholders but does not deliver operational support, automated escalation, or continuous monitoring of student well-being. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
 Conceptually, the framework's architecture is best understood as two distinct but integrated operational loops:
 
 \begin{enumerate}
@@ -173,6 +188,10 @@ Based on the classification result $R_t$, the STA's action is to update the syst
     \item \textbf{Trigger Escalation (if $R_t$ = Critical):} If a critical risk is detected, the agent's action triggers a conditional edge in the graph that invokes the \texttt{escalate\_crisis} tool. This tool flags the conversation on the Admin Dashboard, logs the event, and instructs the Service Desk Agent (SDA) to create a high-priority case. It also immediately presents the user with pre-defined emergency resources.
 \end{itemize}
 
+\begin{itemize}
+    \item \textbf{Design Rationale:} Assumes each incoming $M_t$ is UTF-8 text already filtered for profanity/noise; applies a calibrated confidence threshold (LLM softmax score $\geq0.6$) before labelling critical risk, otherwise defers to a human counselor; prompt template and \texttt{escalate\_crisis} schema were validated on the synthetic crisis corpus and scenario metrics reported in Chapter~\ref{sec:rq1}.\cite{FIND_CITATION_PLACEHOLDER}
+\end{itemize}
+
 \subsection{The Support Coach Agent (SCA): The Empathetic Mentor}
 
 \subsubsection{Goal}
@@ -198,6 +217,10 @@ This agent has access to a toolset that allows it to retrieve and present struct
     \item \textbf{Tool Call (Progress Logging):} Upon completion of a module, the SCA can call the \texttt{record\_module\_completion} tool to update the student's progress log in the shared state and database.
 \end{itemize}
 
+\begin{itemize}
+    \item \textbf{Design Rationale:} Assumes the STA has sanitised $M_t$ and that $H_{t-1}$ retains fewer than 50 dialogue turns to bound context length; enforces refusal policies for out-of-scope clinical topics and escalates administrative intents to the SDA; prompts and tool schemas were peer-reviewed with counselling staff and evaluated via the rubric-based assessment in Chapter~\ref{sec:rq2}.\cite{FIND_CITATION_PLACEHOLDER}
+\end{itemize}
+
 \subsection{The Service Desk Agent (SDA): The Administrative Orchestrator}
 
 \subsubsection{Goal}
@@ -221,6 +244,10 @@ The SDA's logic is procedural and tool-based. It does not engage in open-ended c
     \item \textbf{Notifications:} It sends automated email or dashboard notifications to counselors when a new case is assigned to them or when a student books an appointment.
 \end{itemize}
 
+\begin{itemize}
+    \item \textbf{Design Rationale:} Assumes structured events carry validated UUIDs, ISO-8601 timestamps, and pass schema validation upstream; enforces idempotent tool execution with exponential backoff and escalates to human staff after three failed retries; tool schemas were exercised in integration tests summarised in Chapter~\ref{sec:rq2}.\cite{FIND_CITATION_PLACEHOLDER}
+\end{itemize}
+
 \subsection{The Insights Agent (IA): The Strategic Analyst}
 
 \subsubsection{Goal}
@@ -229,7 +256,7 @@ The IA is designed to function as the institution's automated well-being analyst
 \subsubsection{Perception (Inputs)}
 The IA is activated by a time-based trigger (e.g., a weekly Cron job) and its primary input is the entire corpus of anonymized conversation logs.
 \begin{itemize}
-    \item \textbf{Time-Based Trigger:} A signal from the n8n orchestration layer to begin its analysis.
+    \item \textbf{Time-Based Trigger:} A signal from the APScheduler to begin its analysis.
     \item \textbf{Anonymized Database Access:} Read-only access to the \texttt{conversation\_logs} table, from which all personally identifiable information (PII) has been redacted.
 \end{itemize}
 
@@ -246,6 +273,10 @@ The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks pe
     \item \textbf{Structured Report Generation:} The final output is a structured report (e.g., in JSON or PDF format) containing visualizations (e.g., charts of topic frequency over time) and the generated summaries.
     \item \textbf{Dashboard Update:} The agent pushes this report to the Admin Dashboard, updating the analytics view for university staff.
     \item \textbf{Email Notification:} It can be configured to automatically email the report to a list of stakeholders, such as the head of counseling services.
+\end{itemize}
+
+\begin{itemize}
+    \item \textbf{Design Rationale:} Assumes access to anonymised logs aggregated with $k\geq50$ users and retained for no longer than 90 days; enforces differential privacy noise addition (placeholder $\epsilon=1.0$) and suppresses outputs below the threshold; analytical prompts and pipelines were stress-tested via the stability checks in Chapter~\ref{sec:rq4}.\cite{FIND_CITATION_PLACEHOLDER}
 \end{itemize}
 
 \begin{figure}[h]
@@ -288,6 +319,32 @@ The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks pe
 \end{figure}
 
 
+\section{Security and Privacy Threat Model}
+\label{sec:threat_model}
+
+Protecting student data and maintaining institutional trust require an explicit articulation of adversaries, assets, and mitigations. Table~\ref{tab:threat_model} summarises the threat model adopted for the Safety Agent Suite, drawing on STRIDE/LINDDUN heuristics and privacy-by-design obligations.\cite{FIND_CITATION_PLACEHOLDER}
+
+\begin{table}[h]
+    \centering
+    \caption{Threat model overview.}
+    \label{tab:threat_model}
+    \begin{tabular}{p{3.0cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+        \toprule
+        \textbf{Actor / Threat} & \textbf{Targeted Asset} & \textbf{Likely Impact} & \textbf{Mitigations / Controls} \\
+        \midrule
+        Compromised student account & Conversation logs, risk flags & Exposure of sensitive disclosures; spoofed escalations & MFA and device attestation (frontend); STA confidence thresholds with human verification; audit trail review (Chapter~\ref{sec:rq1}). \\
+        Malicious insider (staff) & Case notes, progress logs & Unauthorised browsing or data exfiltration & Role-based access control, immutable audit logs, case access alerts, quarterly review. \\
+        External attacker (API abuse) & Backend endpoints, tooling & Prompt injection, denial of service, data tampering & API gateway with rate limiting, input sanitation, LangGraph guardrails, automated anomaly detection on latency/tool-failure metrics. \\
+        Analytics linkage attack & Aggregated insights & Re-identification through small cohorts & Minimum cohort size $k\geq50$, differential privacy noise (placeholder $\epsilon=1.0$), suppression of rare categories (Chapter~\ref{sec:rq4}). \\
+        Model supply-chain risks & LLM outputs / prompts & Hallucinated or unsafe responses & Structured prompts, refusal and escalation policies, prompt/response logging with red-team testing cadence. \\
+        Infrastructure failure & Agent orchestration state & Service outage, message loss & Stateless frontend, checkpointed LangGraph state, automated failover for database replicas, latency SLOs monitored (Section~\ref{chap:technical_architecture}). \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+These mitigations align with institutional policies and inform the evaluation metrics in Chapter~IV (e.g., STA sensitivity to avoid under- or over-escalation) and the privacy discussion in Chapter~V. Residual risks---such as novel jailbreak prompts or emergent privacy attacks---are addressed through scheduled red-team exercises, update audits for commercial APIs, and continuous monitoring of anomaly indicators.
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SECTION 3.4 - TECHNICAL ARCHITECTURE %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -311,6 +368,16 @@ The overall technical architecture is visualized in Figure \ref{fig:system_archi
     \item \textbf{Backend Service (The Agentic Core):} This service is the "brain" of the entire operation, built using the \textbf{FastAPI} Python framework. It exposes a \textbf{REST API} through which the unified Next.js frontend communicates. The backend is responsible for handling all business logic, including processing incoming chat messages from the User Portal, orchestrating the agents within the LangGraph state machine, making calls to the Google Gemini API, and interacting with the database. The asynchronous capabilities of FastAPI are critical for efficiently managing multiple concurrent conversations and long-running agentic tasks.
     \item \textbf{Data Persistence Service:} A \textbf{PostgreSQL} relational database serves as the single source of truth for the system. It is responsible for storing all persistent data, including user information (anonymized), conversation logs, clinical case data, and generated reports.
 \end{enumerate}
+
+\subsubsection{Capacity Planning and Performance Targets}
+
+To ensure the architecture meets the safety and responsiveness requirements evaluated in Chapter~\ref{sec:rq1}, we define the following planning assumptions:
+\begin{itemize}
+    \item \textbf{Latency budgets:} STA classification must complete within 250~ms p95 and 500~ms p99, while end-to-end conversational responses (STA~+~SCA) target 1.5~s p95 under nominal load. Scenario results in Chapter~\ref{sec:rq1} and Chapter~\ref{sec:rq2} will be benchmarked against these SLOs.
+    \item \textbf{Concurrency expectations:} The system is sized for 500 concurrent student sessions (peak exam season) with headroom to burst to 1,000. Each FastAPI worker handles approximately 20 concurrent conversations; horizontal scaling of backend pods maintains SLA compliance.
+    \item \textbf{Horizontal scaling strategy:} Stateless Next.js frontend instances auto-scale behind a CDN; the FastAPI+LangGraph service scales via container orchestration (e.g., Kubernetes HPA) using CPU and latency metrics; PostgreSQL employs read replicas for analytics workloads while the primary instance handles transactional writes. Queueing (e.g., Redis streams) buffers asynchronous Insights Agent jobs to decouple heavy analytics from real-time triage.
+    \item \textbf{Resilience and monitoring:} Service-level indicators (SLIs) include STA false-negative rate, tool-call success percentage, queue depth, and database replication lag. Alert thresholds align with risk tolerances captured in the threat model (Table~\ref{tab:threat_model}).\cite{FIND_CITATION_PLACEHOLDER}
+\end{itemize}
 
 Communication between the unified frontend and the backend is exclusively handled via a secure, stateless REST API. The backend service is the only component with direct access to the database, ensuring a clear and secure data access pattern. This architecture allows for a cohesive user experience while maintaining a strong separation between presentation logic (frontend) and business logic (backend).
 
@@ -1118,6 +1185,10 @@ This study, as a work of Design Science Research focused on the creation and eva
     \item \textbf{Technical Limitation: Inherent Risks of LLMs:} The framework relies on the Google Gemini 2.5 API. Like all LLMs, it is subject to inherent limitations. These include the potential for the model to reflect biases present in its vast training data and the possibility of generating factually incorrect or nonsensical responses ("hallucinations"). While the system's use of structured tools and prompts is designed to mitigate these risks, they cannot be eliminated entirely.
     \item \textbf{Data Limitation: Use of Simulated Data:} The evaluation of the Insights Agent (IA) will be conducted using anonymized, pre-existing chat logs or simulated data. While this is necessary to protect user privacy during the development phase, it means that the agent's performance has not been validated on the specific linguistic patterns and diversity of a live, campus-wide user base. The effectiveness of the topic modeling and sentiment analysis in a real-world context would require further validation post-deployment.
 \end{itemize}
+
+
+
+
 
 
 
