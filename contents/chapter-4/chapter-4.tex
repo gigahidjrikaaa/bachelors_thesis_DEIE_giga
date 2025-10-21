@@ -1,30 +1,59 @@
-\chapter{Hasil dan Pembahasan}
+\chapter{Implementation and Evaluation (Hasil dan Pembahasan)}
 
-Berikut ini adalah yang perlu diperhatikan untuk mengisi bab hasil dan pembahasan:
+This chapter reports how the prototype was exercised and what we learned from it. The focus is on the agents and their behavior in safety‑relevant scenarios. We keep the scope practical and transparent so results can be reproduced and audited.
 
-\begin{enumerate}
-	\item Setiap rumusan masalah boleh memiliki lebih dari 1 tujuan.
-	\item Setiap subbab harus spesifik menjawab setiap tujuan yang dituliskan.
-	\item Setiap rumusan masalah boleh dijawab dengan 1 subbab atau lebih.
-\end{enumerate}
+\section{Setup and Test Design (Rancangan Pengujian)}
+\label{sec:setup}
 
-Berikut ini adalah contoh sub bab untuk menjelaskan tujuan penelitian.
+\begin{itemize}
+  \item \textbf{Agen dan Orkestrasi}: Safety Triage Agent (STA), Support Coach Agent (SCA), Service Desk Agent (SDA), Insights Agent (IA); diorkestrasi dengan pengendali berbasis graf dan pemanggilan alat terstruktur.
+  \item \textbf{Data Uji}: \textit{Synthetic} untuk skenario krisis (indikasi self‑harm, bunuh diri, kekerasan), set percakapan untuk coaching (N prompt), dan data log teranonymisasi/sintetik untuk agregasi.
+  \item \textbf{Metrik Utama}: sensitivitas/spesifisitas triase, waktu ke eskalasi, tingkat keberhasilan pemanggilan fungsi dan \textit{workflow}, latensi p50/p95, ketahanan terhadap \textit{prompt injection}, dan skor kualitas coaching (rubrik CBT).
+  \item \textbf{Pengawasan Manusia}: semua eskalasi berisiko tinggi ditinjau oleh manusia; audit log diaktifkan.
+\end{itemize}
 
-\section{Pembahasan Tujuan 1 dengan Hasil Penelitian 1 (Ubah Judul Sesuai dengan Hal yang Hendak dibahas)}
+\section{RQ1 — Safety: Can STA detect crises promptly?}
+\label{sec:rq1}
 
-Sub bab pertama adalah membahas tujuan penelitian pertama dengan hasil penelitian ke-1. 
-Dapat ditambahkan beberapa sub bab jika diperlukan.
+\textbf{Desain}. Uji pada set krisis sintetis dengan label. Ukur sensitivitas, spesifisitas, dan waktu ke eskalasi dari deteksi awal hingga pembuatan tiket/alert. Analisis khusus pada kegagalan berisiko (\textit{false negatives}).
 
-\section{Pembahasan Tujuan 1 dengan Hasil Penelitian 2 (Ubah Judul Sesuai dengan Hal yang Hendak dibahas)}
+\textbf{Hasil}. Ringkas angka utama (mis. sensitivitas, spesifisitas, p50/p95 latensi). Tampilkan contoh sukses dan kegagalan yang representatif.
 
-Sub bab kedua adalah membahas tujuan penelitian pertama dengan hasil penelitian ke-2. Sub bab ini merupakan contoh tambahan sub bab pertama.
+\textbf{Bahasan}. Kompromi antara kecepatan dan kehati‑hatian; peran \textit{guardrail} dan \textit{fallback} manusia.
 
-\section{Pembahasan Tujuan 2 dengan Hasil Penelitian 3 (Ubah Judul Sesuai dengan Hal yang Hendak dibahas)}
+\section{RQ2 — Reliability: Does orchestration run reliably?}
+\label{sec:rq2}
 
-Sub bab ketiga adalah membahas tujuan penelitian kedua. Dapat ditambahkan beberapa sub bab jika diperlukan.
+\textbf{Desain}. Telusuri rasio keberhasilan pemanggilan fungsi, validasi skema, \textit{retry/backoff}, dan penyelesaian \textit{workflow} ujung‑ke‑ujung.
 
-\section{Perbandingan Hasil Penelitian dengan Hasil Terdahulu}
+\textbf{Hasil}. Laporkan tingkat keberhasilan, tingkat kegagalan yang pulih, dan kasus terhenti (jika ada). Sertakan latensi p50/p95 per langkah.
 
-Pembahasan penutup dapat menjelaskan mengenai kelebihan hasil pengembangan / 
-penelitian dan kekurangan dibandingkan dengan skripsi atau penelitian terdahulu atau
-perbandingan terhadap produk lain yang ada di pasaran. Penulis dapat menggunakan tabel untuk membandingkan secara gamblang dan menjelaskannya.
+\textbf{Bahasan}. Pola kegagalan yang paling sering dan perbaikan yang mudah diterapkan.
+
+\section{RQ3 — Quality: Are SCA responses reasonable and CBT‑informed?}
+\label{sec:rq3}
+
+\textbf{Desain}. Penilaian buta oleh evaluator pada sampel percakapan (kecil namun beragam). Rubrik menilai kepatuhan CBT dasar, keamanan saran, dan empati.
+
+\textbf{Hasil}. Skor ringkas dan contoh tanggapan baik/kurang baik. Catat penolakan yang tepat pada topik di luar batas.
+
+\textbf{Bahasan}. Pola perbaikan prompt/alat yang berdampak nyata.
+
+\section{RQ4 — Insights (minimal): Can IA produce safe aggregate views?}
+\label{sec:rq4}
+
+\textbf{Desain}. Jalur agregasi sederhana: ambang privasi (mis. k‑anonymity) dan cek kestabilan jumlah/topik. Tidak ada klaim level individu.
+
+\textbf{Hasil}. Laporkan hanya \textit{sanity check} agregat (mis. stabil/variatif) dan kepatuhan terhadap ambang privasi.
+
+\textbf{Bahasan}. Keterbatasan desain saat ini dan langkah aman untuk perluasan.
+
+\section{Discussion and Limitations (Diskusi dan Keterbatasan)}
+\label{sec:discussion}
+
+\begin{itemize}
+  \item \textbf{Temuan utama}. Soroti apa yang berjalan baik (mis. orkestrasi stabil, latensi terkendali) dan apa yang perlu diperkuat (mis. penanganan tepi kasus tertentu).
+  \item \textbf{Batasan}. Prototipe, data sintetis/anonym, tidak ada klaim efek klinis; model dapat bias/\textit{hallucinate} meski ada \textit{guardrail}.
+  \item \textbf{Implikasi}. Perbaikan sederhana yang memberi dampak besar; rencana evaluasi lanjutan (\textit{field} kecil) dengan pengawasan etik yang memadai.
+\end{itemize}
+

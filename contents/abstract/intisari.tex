@@ -1,46 +1,9 @@
-Intisari ditulis menggunakan bahasa Indonesia dengan jarak antar baris 1 spasi dan maksimal 1 halaman. Intisari sekurang-kurangnya berisi tentang latar belakang dan tujuan penelitian, metodologi yang digunakan, hasil penelitian, kesimpulan dan implikasi, dan Kata kunci yang berhubungan dengan penelitian.
+% Intisari
+\noindent
+Layanan kesejahteraan mahasiswa di perguruan tinggi masih banyak bersifat reaktif dan sering terlambat menjangkau mereka yang membutuhkan. Skripsi ini merancang dan mempraktikkan sebuah kerangka \textit{agentic AI} yang berorientasi keselamatan untuk mendukung layanan yang lebih proaktif dan terukur dengan tetap melibatkan manusia. Artifak inti, \textit{Safety Agent Suite}, terdiri dari empat agen yang saling melengkapi: (i) \textbf{Safety Triage Agent} untuk penyaringan risiko dan eskalasi, (ii) \textbf{Support Coach Agent} yang memberikan intervensi singkat berlandaskan CBT, (iii) \textbf{Service Desk Agent} untuk tindak lanjut operasional, dan (iv) \textbf{Insights Agent} untuk analitik agregat yang menjaga privasi guna perbaikan layanan.
 
-Kata Kunci ditulis maksimal 5 kata yang paling berhubungan dengan isi skripsi. Silakan mengacu pada ACM / IEEE \textit{Computing classification} jika Anda adalah mahasiswa Sarjana TI \textcolor{blue}{http://www.acm.org/about/class/} atau mengacu kepada IEEE keywords \textcolor{blue}{http://www.ieee.org/documents/taxonomy\_v101.pdf} jika Anda berasal dari Prodi Sarjana TE.
+\noindent
+Kami membangun prototipe fungsional dan melakukan evaluasi berbasis skenario yang menitikberatkan pada kinerja agen dan aspek keselamatan: sensitivitas/spesifisitas triase pada prompt krisis sintetis serta waktu ke eskalasi; keandalan orkestrasi melalui tingkat keberhasilan pemanggilan fungsi dan pola \textit{retry}; latensi ujung-ke-ujung; ketahanan terhadap \textit{prompt injection}; serta kualitas coaching yang dinilai buta menggunakan rubrik kepatuhan CBT dan kewajaran respons. Untuk \textit{Insights Agent}, kami hanya melaporkan pemeriksaan agregat yang sederhana (misalnya kestabilan jumlah topik di atas ambang privasi) tanpa klaim pada level individu. Hasil menunjukkan orkestrasi agen yang layak dengan latensi terkendali dan moda kegagalan yang dapat dipantau di bawah pengawasan manusia. Kami juga membahas pertimbangan etis, rancangan privasi untuk analitik agregat, keterbatasan, dan kebutuhan studi lanjutan.
 
-\noindent{Kata kunci} : Kata kunci 1, Kata kunci 2, Kata kunci 3, Kata kunci 4, Kata kunci 5
+\noindent\textbf{Kata kunci}: AI agentik; sistem multiagen; triase keselamatan; coaching CBT; human-in-the-loop; analitik agregat; LangGraph
 
-\vspace{1cm}
-
-%HAPUS YANG TIDAK PERLU
-%-------------------------------------------------
-\noindent\fbox{%
-	\parbox{\textwidth}{%
-\textbf{Contoh Abstrak Teknik Elektro:} \\
-
-\hspace{1cm} "Penelitian ini bertujuan untuk mengembangkan sistem pengendalian suhu ruangan dengan menggunakan microcontroller. Metodologi yang digunakan adalah desain sirkuit, implementasi sistem pengendalian, dan pengujian performa. Hasil penelitian menunjukkan 
-bahwa sistem pengendalian suhu ruangan yang dikembangkan mampu mengendalikan suhu ruangan dengan akurasi sebesar ±0,5°C. Kesimpulan dari penelitian ini adalah sistem pengendalian suhu ruangan yang dikembangkan efektif dan efisien. \\
-
-Kata kunci: microcontroller, sistem pengendalian suhu, akurasi."
-\vspace{5mm}
-
-\textbf{Contoh Abstrak Teknik Biomedis:} \\
-
-\hspace{1cm} "Penelitian ini bertujuan untuk mengevaluasi keefektifan prototipe alat pemantau denyut jantung berbasis elektrokardiogram (ECG) untuk pasien jantung. Metodologi yang digunakan meliputi desain dan pembuatan prototipe, pengujian dengan pasien, dan analisis data. Hasil penelitian menunjukkan bahwa prototipe alat pemantau denyut jantung berbasis ECG memiliki 
-akurasi yang baik dan mampu memantau denyut jantung pasien secara efektif. Kesimpulan dari penelitian ini adalah prototipe alat pemantau denyut jantung berbasis ECG merupakan solusi 
-yang efektif dan efisien untuk memantau pasien jantung. \\
-
-Kata kunci: elektrokardiogram, alat pemantau denyut jantung, akurasi."
-\vspace{5mm}
-
-	}%
-}
-
-%-------------------------------------------------
-
-\noindent\fbox{%
-	\parbox{\textwidth}{%
-		\textbf{Contoh Abstrak Teknologi Informasi:} \\
-		
-\hspace{1cm} "Penelitian ini bertujuan untuk mengevaluasi keamanan dan privasi pengguna aplikasi media sosial terpopuler. Metodologi yang digunakan meliputi analisis kebijakan privasi dan pengaturan keamanan, pengujian penetrasi, dan survei pengguna. Hasil penelitian 
-menunjukkan bahwa beberapa aplikasi media sosial memiliki kebijakan privasi yang kurang jelas dan rendahnya tingkat keamanan. Kesimpulan dari penelitian ini adalah pentingnya meningkatkan kebijakan privasi dan tingkat keamanan pada aplikasi media sosial untuk melindungi privasi dan data pengguna. \\
-		
-Kata kunci: media sosial, keamanan, privasi, pengguna."
-\vspace{5mm}
-		
-	}%
-}

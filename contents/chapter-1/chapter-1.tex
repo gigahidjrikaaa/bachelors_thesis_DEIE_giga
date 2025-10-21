@@ -33,7 +33,7 @@ The inefficiency and reactive nature of current university mental health support
     \item The methodological challenge of \textbf{validating the framework's functional capabilities and potential for impact in the absence of a full-scale clinical trial}. This requires developing meaningful, scenario-based testing protocols that can effectively demonstrate the agentic workflows and their advantages over static systems.
 \end{enumerate}
 
-To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Support Coach Agent (SCA)}, a \textbf{Service Desk Agent (SDA)}, and an \textbf{Isingts Agent (IA)}.
+To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Support Coach Agent (SCA)}, a \textbf{Service Desk Agent (SDA)}, and an \textbf{Insights Agent (IA)}.
 
 %-------------------------------------------------	
 
@@ -46,6 +46,22 @@ The primary objectives of this thesis are:
     \item To implement a functional proof-of-concept prototype, the 'Safety Agent Suite,' demonstrating the orchestration of specialized agents (triage, coaching, service desk, insights) using LangGraph.
     \item To evaluate the prototype's core agentic workflows through scenario-based testing, validating its capacity for proactive intervention and automated administrative action.
 \end{enumerate}
+
+%-------------------------------------------------
+
+\section{Research Questions}
+\label{sec:research_questions}
+
+To keep the scope concrete and measurable, this thesis addresses the following research questions (RQs):
+
+\begin{enumerate}
+    \item \textbf{RQ1 (Safety):} Can the Safety Triage Agent detect crisis intent with high sensitivity while keeping false negatives minimal, and escalate within an acceptable time budget?
+    \item \textbf{RQ2 (Reliability):} How reliably does the multi-agent orchestration execute tool calls and complete end-to-end workflows under schema validation, retries, and timeouts?
+    \item \textbf{RQ3 (Quality):} Do Support Coach responses meet a basic standard of CBT-informed guidance and appropriateness as rated by human evaluators on a small, blinded set?
+    \item \textbf{RQ4 (Insights, minimal):} Can the Insights Agent produce stable, aggregate-only summaries under privacy thresholds without exposing individual data?
+\end{enumerate}
+
+These questions directly inform the evaluation in Chapter IV through scenario-based tests and simple, transparent metrics (e.g., sensitivity/specificity, tool-call success rate, latency percentiles, rubric scores), with human oversight preserved for safety-critical cases.
 
 %-------------------------------------------------	
 
