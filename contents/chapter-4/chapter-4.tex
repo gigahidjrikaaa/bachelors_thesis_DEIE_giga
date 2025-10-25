@@ -5,14 +5,73 @@ This chapter reports how the prototype was exercised and what we learned from it
 \section{Setup and Test Design (Rancangan Pengujian)}
 \label{sec:setup}
 
+This section documents the evaluation protocol that links the Design Science stages in Chapter~\ref{chap:system_design} to the research questions in Chapter~\ref{sec:research_questions}. Figure~\ref{fig:evaluation_pipeline} and Table~\ref{tab:evaluation_plan} provide a visual and tabular overview of the assets, metrics, and acceptance thresholds used throughout the chapter.
+
+\subsection*{Evaluation Environment}
+
 \begin{itemize}
-  \item \textbf{Agen dan Orkestrasi}: Safety Triage Agent (STA), Support Coach Agent (SCA), Service Desk Agent (SDA), Insights Agent (IA); diorkestrasi dengan pengendali berbasis graf dan pemanggilan alat terstruktur.
-  \item \textbf{Data Uji}: \textit{Synthetic} untuk skenario krisis (indikasi self‑harm, bunuh diri, kekerasan), set percakapan untuk coaching (N prompt), dan data log teranonymisasi/sintetik untuk agregasi.
-  \item \textbf{Metrik Utama}: sensitivitas/spesifisitas triase, waktu ke eskalasi, tingkat keberhasilan pemanggilan fungsi dan \textit{workflow}, latensi p50/p95, ketahanan terhadap \textit{prompt injection}, dan skor kualitas coaching (rubrik CBT).
-  \item \textbf{Pengawasan Manusia}: semua eskalasi berisiko tinggi ditinjau oleh manusia; audit log diaktifkan.
+    \item \textbf{Agents under test}: Safety Triage Agent (STA), Support Coach Agent (SCA), Service Desk Agent (SDA), and Insights Agent (IA) running inside the LangGraph orchestration described in Chapter~\ref{chap:system_design}. All tool invocations are captured through structured logs to enable replay and auditing.
+    \item \textbf{Execution platform}: FastAPI backend deployed in a containerised environment (Python~3.11, Uvicorn workers $=8$) with Redis for task queues and PostgreSQL~15 for persistence. Tests are executed on a machine equivalent to 8~vCPU/32~GB RAM to mirror expected production sizing.
+    \item \textbf{Instrumentation}: OpenTelemetry traces capture latency, tool-call success, and retries; custom middleware records human hand-offs, while differential privacy parameters are logged for the IA.
 \end{itemize}
 
-\section{RQ1 — Safety: Can STA detect crises promptly?}
+\subsection*{Datasets and Scenario Assets}
+
+\begin{itemize}
+    \item \textbf{Crisis corpus}: 500 labelled prompts covering self-harm, violence, and acute distress, augmented with 300 non-crisis but emotionally charged messages to measure false positives. Labels are authored by two mental-health practitioners (Cohen's $\kappa$ target $\geq 0.8$).
+    \item \textbf{Coaching prompts}: 120 conversation snippets spanning stress management, motivation, academic planning, and administrative queries. Responses include canonical “out-of-scope” triggers to exercise refusal and escalation behaviour.
+    \item \textbf{Operational events}: Synthetic scheduling and case-management payloads to drive SDA workflows, and a 12-week anonymised log (synthetic) to test IA stability and privacy thresholds (minimum cohort size $k=50$, placeholder $\epsilon=1.0$).
+\end{itemize}
+
+\subsection*{Human Oversight and Quality Control}
+
+\begin{itemize}
+    \item \textbf{Safety reviews}: All STA critical detections are double-checked by counsellors within 30~seconds; disagreements trigger post-mortems logged for Chapter~\ref{sec:discussion}.
+    \item \textbf{Coaching rubric}: Three raters score SCA responses on CBT adherence, empathy, and appropriateness (1--5 Likert). Inter-rater reliability is reported alongside mean scores.
+    \item \textbf{Analytics verification}: IA outputs are inspected for k-anonymity compliance; any aggregate below the threshold is expected to be suppressed automatically.
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    \resizebox{0.85\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=2.6cm,
+        stage/.style={rectangle, rounded corners=6pt, draw=ugmBlue, very thick, fill=ugmBlue!7, align=center, minimum width=3.5cm, minimum height=1.1cm},
+        data/.style={rectangle, draw=ugmGold!80!black, thick, rounded corners=6pt, fill=ugmGold!25, align=center, minimum width=3.3cm, minimum height=1.1cm},
+        arrow/.style={-Latex, thick, ugmBlue}
+    ]
+        \node[data] (datasets) {Scenario Assets\\Crisis corpus\\Coaching prompts\\Synthetic logs};
+        \node[stage, right=of datasets] (agents) {Agents Under Test\\STA, SCA, SDA, IA\\LangGraph orchestration};
+        \node[stage, right=of agents] (metrics) {Instrumentation\\Latency, accuracy, retries\\Privacy counters};
+        \node[stage, right=of metrics] (oversight) {Human Oversight\\Counsellor review\\CBT raters};
+        \node[stage, right=of oversight] (reporting) {Reporting\\RQ-specific dashboards\\Chapter~IV sections};
+
+        \draw[arrow] (datasets) -- (agents);
+        \draw[arrow] (agents) -- (metrics);
+        \draw[arrow] (metrics) -- (oversight);
+        \draw[arrow] (oversight) -- (reporting);
+    \end{tikzpicture}}
+    \caption{Evaluation workflow linking scenario assets, instrumentation, and human oversight to the reporting structure in Chapter~IV.}
+    \label{fig:evaluation_pipeline}
+\end{figure}
+
+\begin{table}[h]
+    \centering
+    \caption{Evaluation plan mapped to research questions and acceptance thresholds.}
+    \label{tab:evaluation_plan}
+    \begin{tabular}{p{1.9cm}p{3.2cm}p{3.4cm}p{3.2cm}p{2.3cm}}
+        \toprule
+        \textbf{RQ} & \textbf{Test Scenarios / Data} & \textbf{Primary Metrics} & \textbf{Success Criteria (Target)} & \textbf{Related Section} \\
+        \midrule
+        RQ1 (Safety) & 500 crisis/non-crisis prompts; end-to-end escalation drills & Sensitivity, specificity, precision, FNR, detection latency p95/p99 & Sensitivity $\geq 0.95$, FNR $< 0.02$, escalation $<30$~s, p95 latency $<0.25$~s & \S\ref{sec:rq1} \\
+        RQ2 (Reliability) & Conversational stress test (500 concurrent sessions); failure injection (API outage, malformed payload) & Tool-call success rate, mean retries per call, workflow completion \%, latency p50/p95 & Success rate $\geq 0.98$, average retries $\leq 0.3$, workflow completion $\geq 0.97$, p95 latency $<1.5$~s & \S\ref{sec:rq2} \\
+        RQ3 (Quality) & 120 coaching prompts scored by 3 raters & \multicolumn{1}{p{3.4cm}}{CBT adherence score, empathy, refusal accuracy, inter-rater $\kappa$} & Mean scores $\geq 4$ (out of 5), $\kappa \geq 0.75$, correct refusal $\geq 0.9$ & \S\ref{sec:rq3} \\
+        RQ4 (Insights) & 12-week synthetic log with known topic distribution; privacy stress test & Topic stability (Jensen-Shannon divergence), sentiment drift, suppression rate, DP noise magnitude & Divergence $\leq 0.1$, all aggregates respect $k\geq 50$, suppression rate $\leq 5\%$, DP noise within planned bounds & \S\ref{sec:rq4} \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{RQ1 - Safety: Can STA detect crises promptly?}
 \label{sec:rq1}
 
 \textbf{Desain}. Uji pada set krisis sintetis dengan label. Ukur sensitivitas, spesifisitas, dan waktu ke eskalasi dari deteksi awal hingga pembuatan tiket/alert. Analisis khusus pada kegagalan berisiko (\textit{false negatives}).
@@ -56,4 +115,3 @@ This chapter reports how the prototype was exercised and what we learned from it
   \item \textbf{Batasan}. Prototipe, data sintetis/anonym, tidak ada klaim efek klinis; model dapat bias/\textit{hallucinate} meski ada \textit{guardrail}.
   \item \textbf{Implikasi}. Perbaikan sederhana yang memberi dampak besar; rencana evaluasi lanjutan (\textit{field} kecil) dengan pengawasan etik yang memadai.
 \end{itemize}
-

@@ -35,29 +35,31 @@ The complete workflow of this research, following the DSR methodology, is visual
 
 \begin{figure}[h]
     \centering
-    \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
-        node distance=2.4cm,
-        process/.style={rectangle, rounded corners=4pt, draw=ugmBlue, very thick, minimum width=4.0cm, minimum height=1.1cm, align=center, fill=ugmBlue!6},
+        x=5.2cm, y=2.2cm,
+        process/.style={rectangle, rounded corners=5pt, draw=ugmBlue, very thick, minimum width=4.0cm, minimum height=1.2cm, align=center, fill=ugmBlue!6, font=\footnotesize},
         arrow/.style={-Latex, thick, ugmBlue},
         looparrow/.style={-Latex, thick, ugmGold}
     ]
-        \node[process] (problem) {Problem Identification\\\footnotesize (Chapter~\ref{chap:introduction})};
-        \node[process, right=of problem] (literature) {Objectives \& Knowledge Base\\\footnotesize (Ch.~\ref{chap:introduction},~\ref{sec:literature_review})};
-        \node[process, right=of literature] (design) {Artifact Design \& Development\\\footnotesize (Chapter~\ref{chap:system_design})};
-        \node[process, right=of design] (implementation) {Prototype Demonstration\\\footnotesize (Chapter~IV, Sec.~\ref{sec:setup})};
-        \node[process, right=of implementation] (evaluation) {Scenario Evaluation\\\footnotesize (Chapter~IV, Secs.~\ref{sec:rq1}--\ref{sec:discussion})};
-        \node[process, right=of evaluation] (conclusion) {Communication of Results\\\footnotesize (Chapter~V)};
+        \node[process] (problem) at (0,1) {Problem Identification\\(Chapter~\ref{chap:introduction})};
+        \node[process] (literature) at (1,1) {Objectives \& Knowledge Base\\(Ch.~\ref{chap:introduction},~\ref{sec:literature_review})};
+        \node[process] (design) at (2,1) {Artifact Design \& Development\\(Chapter~\ref{chap:system_design})};
+
+        \node[process] (implementation) at (0,0) {Prototype Demonstration\\(Chapter~IV, Sec.~\ref{sec:setup})};
+        \node[process] (evaluation) at (1,0) {Scenario Evaluation\\(Chapter~IV, Secs.~\ref{sec:rq1}--\ref{sec:discussion})};
+        \node[process] (conclusion) at (2,0) {Communication of Results\\(Chapter~V)};
 
         \draw[arrow] (problem) -- (literature);
         \draw[arrow] (literature) -- (design);
-        \draw[arrow] (design) -- (implementation);
         \draw[arrow] (implementation) -- (evaluation);
         \draw[arrow] (evaluation) -- (conclusion);
-        \draw[looparrow, looseness=1.1] (evaluation.south) to[out=-90, in=-90] (design.south);
-        \draw[looparrow, looseness=1.2] (implementation.north) to[out=90, in=90] (literature.north);
-    \end{tikzpicture}}
-    \caption{The Design Science Research (DSR) process model as applied in this thesis. Iterative loops capture how evaluation informs redesign and how implementation insights update the knowledge base.}
+        \draw[arrow] (design) -- node[right, font=\footnotesize]{prototype assets} (implementation);
+        \draw[arrow] (literature) -- node[right, font=\footnotesize]{metrics \& RQs} (implementation);
+        \draw[looparrow, looseness=0.9] (evaluation.north) to[out=110, in=-110] (design.south);
+        \draw[looparrow, looseness=0.9] (implementation.north east) to[out=45, in=225] (literature.south west);
+        \draw[looparrow, looseness=1.0] (conclusion.east) to[out=0, in=0] (problem.east);
+    \end{tikzpicture}
+    \caption{The Design Science Research (DSR) process model as applied in this thesis. The two-row layout shows how objectives inform design and how demonstration/evaluation feed back into earlier stages.}
     \label{fig:dsr_flowchart}
 \end{figure}
 
