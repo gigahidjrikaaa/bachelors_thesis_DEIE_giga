@@ -80,6 +80,27 @@ Beyond the technical architecture, the proposed framework is grounded in several
 \subsubsection{Proactive vs. Reactive Support Models}
 The traditional approach to institutional support, particularly in mental health, is predominantly \textbf{reactive}. This model, common in service design, operates on a "break-fix" basis, where the service delivery is initiated only after a user (in this case, a student) self-identifies a problem and actively seeks a solution \cite{freeman2025competitionalgorithms}. This places the onus of initiation entirely on the individual, creating significant barriers to access such as stigma, lack of awareness, or the inability to act during a crisis. In contrast, a \textbf{proactive support model} aims to anticipate needs and intervene before a problem escalates. Drawing from principles in preventative healthcare and proactive customer relationship management, this model uses data to identify patterns and risk factors, enabling the institution to offer timely, relevant support to at-risk cohorts \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. This thesis is an explicit attempt to architect a system that facilitates this strategic shift from a reactive to a proactive support paradigm.
 
+\paragraph{Formalization of Support Models}
+To formalize this distinction, a reactive support system operates conditionally based on user initiation:
+\begin{equation}
+\text{Support}(t) = \begin{cases}
+f(\text{request}_t) & \text{if student initiates} \\
+\emptyset & \text{otherwise}
+\end{cases}
+\end{equation}
+
+In contrast, a proactive system continuously monitors and responds to indicators of need:
+\begin{equation}
+\text{Support}(t) = g(\text{risk}(t), H_{t-\Delta t:t}, \text{trends}_t)
+\end{equation}
+where $H_{t-\Delta t:t}$ represents recent interaction history and $\text{trends}_t$ captures population-level signals from analytics.
+
+The help-seeking barrier can be modeled as:
+\begin{equation}
+P(\text{seek help}) = f(\text{severity}) - \beta(\text{stigma}, \text{awareness}, \text{fatigue})
+\end{equation}
+where $\beta$ captures systemic barriers such as stigma, lack of awareness, and decision fatigue. When $P(\text{seek help}) < 0$, students in crisis remain silent—justifying the need for proactive intervention that does not depend on self-initiation.
+
 \subsubsection{Data-Driven Decision-Making in Higher Education}
 The concept of \textbf{Data-Driven Decision-Making (DDDM)} posits that strategic decisions should be based on objective data analysis and interpretation rather than solely on intuition or tradition \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. In higher education, this has manifested as the field of learning analytics, where student data is used to improve learning outcomes and retention. This framework extends that principle to student well-being. The \textbf{Insights Agent} is the core enabler of DDDM for the university's support services. By autonomously processing anonymized interaction data to identify trends, sentiment shifts, and emerging topics of concern, it provides administrators with actionable, empirical evidence. This allows the institution to move beyond anecdotal evidence and allocate resources, such as workshops, counselors, or targeted information campaigns, to where they are most needed, thereby optimizing the efficiency and impact of its support ecosystem \cite{popoola2025privacyawareframework}.
 
@@ -118,84 +139,108 @@ The BDI framework allows for the design of agents that are not merely reactive b
 To formally ground the proposed framework in this established model, the roles and logic of each of the four agents are mapped to the BDI components in Table \ref{tab:bdi_mapping}. This mapping clarifies how each agent perceives its environment, formulates its objectives, and decides on a concrete course of action, allowing for the design of agents that are not merely reactive but are proactive and deliberative, capable of reasoning about how to best achieve their goals given their current beliefs about the world.
 
 % This table maps the proposed intelligent agents to the Belief-Desire-Intention (BDI) model of rational agency.
-\begin{table}[H] % Using [H] from the 'float' package to place the table HERE
+\begin{table}[htbp]
     \centering
     \caption{Mapping of the Agentic Framework to the BDI Model.}
     \label{tab:bdi_mapping}
-    \small % Reducing font size to make the table more compact
-    \renewcommand{\arraystretch}{1.4} % Adjusting row spacing
-    \begin{tabular}{lp{0.3\textwidth}p{0.25\textwidth}p{0.25\textwidth}}
+    \footnotesize % Smaller font for better fit
+    \renewcommand{\arraystretch}{1.3} % Adjusting row spacing
+    \setlength{\tabcolsep}{4pt} % Reduce column separation
+    \begin{tabular}{p{0.13\textwidth}p{0.27\textwidth}p{0.25\textwidth}p{0.27\textwidth}}
         \toprule
         \textbf{Agent} & 
-        \textbf{Beliefs} \textit{(Informational State)} & 
-        \textbf{Desires} \textit{(Motivational Goals)} & 
-        \textbf{Intentions} \textit{(Committed Plans)} \\
+        \textbf{Beliefs} \newline \textit{(Informational State)} & 
+        \textbf{Desires} \newline \textit{(Motivational Goals)} & 
+        \textbf{Intentions} \newline \textit{(Committed Plans)} \\
         \midrule
 
-        \textbf{Safety Triage Agent (STA)} &
-        \begin{itemize} \itemsep0em
-            \item The user's live conversation history.
-            \item A classification model for conversation severity.
-            \item A directory of emergency resources.
+        \textbf{STA} &
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item User's conversation history
+            \item Severity classification model
+            \item Emergency resources directory
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item To assess a user's immediate risk level accurately.
-            \item To provide the most appropriate support for the user's current state.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Assess immediate risk level
+            \item Provide appropriate support
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item Upon detecting a high-severity utterance, form an intention to immediately escalate.
-            \item To retrieve and display emergency contact information without delay.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Escalate high-severity cases
+            \item Display emergency contacts
         \end{itemize} \\
         \midrule
 
-        \textbf{Support Coach Agent (SCA)} &
-        \begin{itemize} \itemsep0em
-             \item User's stated goals and conversation history.
-             \item A library of evidence-based interventions (e.g., CBT exercises).
+        \textbf{SCA} &
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item User goals \& history
+            \item Evidence-based intervention library (CBT)
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item To deliver personalized coaching.
-            \item To guide the user through therapeutic exercises.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Deliver personalized coaching
+            \item Guide through exercises
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item Based on user input, form an intention to deliver a specific CBT exercise.
-            \item To provide empathetic and supportive responses.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Deliver specific CBT exercise
+            \item Provide empathetic responses
         \end{itemize} \\
         \midrule
 
-        \textbf{Service Desk Agent (SDA)} &
-        \begin{itemize} \itemsep0em
-            \item Status of clinical cases.
-            \item Availability of counselors.
-            \item User requests for appointments.
+        \textbf{SDA} &
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Clinical case status
+            \item Counselor availability
+            \item User appointment requests
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item To manage clinical case workflows.
-            \item To schedule appointments efficiently.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Manage case workflows
+            \item Schedule appointments
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item Upon a user request, form an intention to find an available appointment slot.
-            \item To create and update case notes.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Find available appointment slots
+            \item Create and update case notes
         \end{itemize} \\
         \midrule
         
-        \textbf{Insights Agent (IA)} & 
-        \begin{itemize} \itemsep0em
-            \item Access to the anonymized conversation log database.
-            \item The timestamp of the last generated report.
-            \item A model of known topics.
+        \textbf{IA} & 
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Anonymized conversation database
+            \item Last report timestamp
+            \item Known topic models
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item To identify emerging trends in student concerns.
-            \item To quantify shifts in overall student sentiment.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Identify emerging trends
+            \item Quantify sentiment shifts
         \end{itemize} &
-        \begin{itemize} \itemsep0em
-            \item Upon its weekly trigger, form an intention to generate a new summary report.
-            \item To formulate and execute a database query for the past week's data.
+        \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
+            \item Generate weekly summary reports
+            \item Execute database queries
         \end{itemize} \\
         \bottomrule
     \end{tabular}
 \end{table}
+
+\paragraph{Formalization of the BDI Cycle}
+The BDI model operates through continuous state updates that govern how agents perceive, deliberate, and act. The cycle can be formalized as:
+
+\textbf{Belief Update:} An agent's beliefs are updated as new information is perceived:
+\begin{equation}
+Bel_{t+1} = Bel_t \cup \{\text{percept}_t\} \setminus \{\text{expired beliefs}\}
+\end{equation}
+where $\text{percept}_t$ represents new observations from the environment, and expired beliefs are those that are no longer valid or relevant.
+
+\textbf{Desire Selection:} The agent filters potential goals based on its current beliefs:
+\begin{equation}
+Des_t = \text{filter}(\text{Options}_t, Bel_t)
+\end{equation}
+where $\text{Options}_t$ represents all possible goals the agent could pursue, and the filter function selects those that are feasible given current beliefs.
+
+\textbf{Intention Formation:} The agent commits to a specific plan of action through deliberation:
+\begin{equation}
+Int_t = \text{deliberate}(Des_t, Bel_t, Int_{t-1})
+\end{equation}
+where the deliberation process considers current desires, beliefs, and previous intentions to form a committed plan.
+
+For example, in the \textbf{Safety Triage Agent (STA)}, $\text{percept}_t$ is the incoming student message $M_t$, beliefs include prior conversation context and crisis patterns, desires map to intervention goals (de-escalation, resource connection), and intentions become the selected action (escalate to SDA, provide coping strategy, or direct to emergency resources).
 
 When multiple agents, each with its own goals and capabilities, co-exist and interact within a shared environment, they form a \textbf{Multi-Agent System (MAS)}. An MAS is a system in which the overall intelligent behavior and functionality are a product of the collective, emergent dynamics of its constituent agents \cite{burguillo2017multiagentsystems, petrova2025agenticweb}. The power of an MAS lies in its ability to solve problems that would be difficult or impossible for a monolithic system or a single agent to handle. This is achieved through social interaction, primarily:
 
@@ -207,6 +252,47 @@ When multiple agents, each with its own goals and capabilities, co-exist and int
 
 Therefore, this thesis leverages the MAS paradigm by designing a framework composed of four specialized, collaborative agents. Their individual, goal-directed behaviors, orchestrated within a hybrid architecture, work in concert to achieve the overarching systemic objective: transforming institutional mental health support from a reactive model to a proactive, data-driven ecosystem.
 
+\subsubsection{Mathematical Formalization of Agent Decision Functions}
+\label{subsubsec:agent_decision_functions}
+
+To operationalize the BDI model for the Safety Agent Suite, each agent's core decision-making process is formalized as a mathematical function mapping inputs to outputs. This formalization bridges the theoretical BDI framework to the practical implementation described in Chapter 3.
+
+\paragraph{Safety Triage Agent (STA)} The STA assesses risk level $R_t \in \{0, 1, 2, 3\}$ from student message $M_t$:
+\begin{equation}
+R_t = f_{STA}(M_t; \theta_{LLM}, \mathcal{C})
+\end{equation}
+where $\theta_{LLM}$ represents the LLM parameters (Gemini 2.5 Flash) and $\mathcal{C}$ is the crisis pattern corpus used for contextual understanding. The discrete risk level maps to severity categories:
+\begin{equation}
+\text{severity}(R_t) = \begin{cases}
+\text{low} & R_t = 0 \\
+\text{moderate} & R_t = 1 \\
+\text{high} & R_t = 2 \\
+\text{critical} & R_t = 3
+\end{cases}
+\end{equation}
+
+This classification determines subsequent routing: moderate risk ($R_t = 1$) triggers supportive coaching via SCA, while high or critical risk ($R_t \geq 2$) initiates immediate escalation to the Service Desk Agent for clinical case management.
+
+\paragraph{Support Coach Agent (SCA)} The SCA generates therapeutic response $A_t$ given the current message and conversation history:
+\begin{equation}
+A_t = f_{SCA}(M_t, H_{t-1}; \theta_{LLM}, \mathcal{I})
+\end{equation}
+where $H_{t-1} = \{(M_0, A_0), \ldots, (M_{t-1}, A_{t-1})\}$ is the conversation history capturing previous exchanges, and $\mathcal{I}$ represents the intervention library containing evidence-based therapeutic frameworks (CBT, Motivational Interviewing). The history dependency enables the agent to maintain therapeutic continuity and adapt interventions based on student progress.
+
+\paragraph{Insights Agent (IA)} The IA computes aggregate metric $\mu$ from anonymized message set $\mathcal{M}$:
+\begin{equation}
+\mu = f_{IA}(\mathcal{M}, q; \mathcal{K})
+\end{equation}
+where $q$ represents the analytical query (e.g., crisis trend analysis, topic modeling, sentiment aggregation) and $\mathcal{K}$ enforces privacy constraints such as k-anonymity and query result suppression. The IA's output informs institutional decision-making by quantifying population-level trends while preserving individual privacy.
+
+\paragraph{Service Desk Agent (SDA)} The SDA determines administrative action $\alpha_t$ based on case state and available resources:
+\begin{equation}
+\alpha_t = f_{SDA}(C_t, R_{avail}; \theta_{LLM})
+\end{equation}
+where $C_t$ represents the current case state (severity, student information, appointment history) and $R_{avail}$ denotes available resources (counselor schedules, emergency contact protocols). Actions include appointment scheduling, case note creation, and resource allocation.
+
+These formalizations establish the mathematical foundation for the multi-agent coordination described in subsequent sections and implemented in Chapter 3.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Large Language Models (LLMs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -214,6 +300,21 @@ Therefore, this thesis leverages the MAS paradigm by designing a framework compo
 \label{subsec:llms}
 
 Large Language Models (LLMs) are a class of deep learning models that have demonstrated remarkable capabilities in understanding and generating human-like text. The architectural foundation for virtually all modern LLMs, including the Gemini models used in this research, is the \textbf{Transformer architecture}, first introduced by Vaswani et al. \cite{vaswani2017attention}. The Transformer's key innovation is the \textbf{self-attention mechanism}, which allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors, such as Recurrent Neural Networks (RNNs) \cite{liu2023transformersurvey, vaswani2017comparisonrnn}.
+
+\paragraph{The Self-Attention Mechanism}
+The self-attention mechanism computes contextual representations by relating different positions in a sequence to each other. Given an input sequence, the mechanism computes three matrices: Query ($Q$), Key ($K$), and Value ($V$), each derived through learned linear projections of the input embeddings. The attention operation is then defined as:
+\begin{equation}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+where $d_k$ is the dimension of the key vectors. The scaling factor $\sqrt{d_k}$ prevents the dot products from growing too large, which would push the softmax function into regions with extremely small gradients.
+
+The attention weights, computed by the softmax of the scaled dot products between queries and keys, determine how much each position in the sequence should attend to every other position. These weights are then used to compute a weighted sum of the value vectors, producing contextually-aware representations.
+
+Modern Transformers employ \textbf{multi-head attention}, which applies multiple attention operations in parallel, each with different learned projections:
+\begin{equation}
+\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O
+\end{equation}
+where $\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$ and $W^O$ is an output projection matrix. This allows the model to attend to information from different representation subspaces simultaneously. For instance, Gemini 2.5 employs 32 attention heads per layer, enabling it to capture diverse linguistic patterns and semantic relationships concurrently.
 
 The core operation of a Transformer-based model involves processing input text through a series of encoding and/or decoding layers. The process can be conceptualized as follows:
 \begin{enumerate}
@@ -226,9 +327,84 @@ The core operation of a Transformer-based model involves processing input text t
 
 \begin{figure}[htbp]
   \centering
-  % \includegraphics[width=\textwidth]{placeholder_diagram_transformer.png} % Ganti dengan file gambar Anda
-  \fbox{\parbox[c][8cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Diagram: Simplified Transformer Architecture for Generative LLMs} \\ \vspace{1cm} This diagram should illustrate the flow of information: \\ 1. Input Text -> Tokenizer \\ 2. Tokens -> Embedding Layer + Positional Encoding \\ 3. Embedded Tokens -> A stack of 'N' Decoder Blocks \\ 4. Inside a Decoder Block: Multi-Head Self-Attention -> Feed-Forward Network \\ 5. Final Output -> Linear Layer -> Softmax -> Probability of Next Token}}
-  \caption{A simplified view of the decoder-only Transformer architecture used in generative LLMs. The model processes input embeddings through multiple layers of self-attention and feed-forward networks to predict the next token in a sequence.}
+  \begin{tikzpicture}[
+    node distance=0.8cm,
+    block/.style={rectangle, draw=blue!60, fill=blue!10, thick, minimum width=5cm, minimum height=0.8cm, align=center, rounded corners=2pt},
+    blockwide/.style={rectangle, draw=blue!60, fill=blue!10, thick, minimum width=5cm, minimum height=1.2cm, align=center, rounded corners=2pt},
+    attention/.style={rectangle, draw=orange!70, fill=orange!15, thick, minimum width=4.5cm, minimum height=0.7cm, align=center, rounded corners=2pt},
+    ffn/.style={rectangle, draw=green!60, fill=green!10, thick, minimum width=4.5cm, minimum height=0.7cm, align=center, rounded corners=2pt},
+    output/.style={rectangle, draw=purple!60, fill=purple!10, thick, minimum width=5cm, minimum height=0.8cm, align=center, rounded corners=2pt},
+    arrow/.style={->, >=stealth, thick, draw=gray!70},
+    dashedarrow/.style={->, >=stealth, thick, draw=gray!70, dashed},
+    label/.style={font=\small}
+    ]
+    
+    % Input Layer
+    \node[block] (input) {\textbf{Input Text}};
+    
+    % Tokenization
+    \node[block, below=of input] (tokenizer) {\textbf{Tokenizer} \\ (Byte-Pair Encoding)};
+    
+    % Embedding + Positional Encoding
+    \node[blockwide, below=of tokenizer] (embedding) {\textbf{Token Embedding} \\ + \\ \textbf{Positional Encoding}};
+    
+    % Decoder Block N (first shown)
+    \node[block, below=1.2cm of embedding, fill=gray!5] (decoder_n) {\textbf{Decoder Block N}};
+    
+    % Multi-Head Self-Attention
+    \node[attention, below=0.4cm of decoder_n] (attention_n) {\footnotesize Multi-Head Self-Attention};
+    
+    % Add & Norm 1
+    \node[block, below=0.3cm of attention_n, minimum height=0.5cm, fill=blue!5] (addnorm1_n) {\footnotesize Add \& Norm};
+    
+    % Feed-Forward Network
+    \node[ffn, below=0.3cm of addnorm1_n] (ffn_n) {\footnotesize Feed-Forward Network};
+    
+    % Add & Norm 2
+    \node[block, below=0.3cm of ffn_n, minimum height=0.5cm, fill=blue!5] (addnorm2_n) {\footnotesize Add \& Norm};
+    
+    % Ellipsis for stacked blocks
+    \node[below=0.6cm of addnorm2_n, font=\Large] (ellipsis) {$\vdots$};
+    \node[right=0.1cm of ellipsis, font=\small, text=gray] {(Repeat for N layers)};
+    
+    % Decoder Block 1 (last shown)
+    \node[block, below=0.6cm of ellipsis, fill=gray!5] (decoder_1) {\textbf{Decoder Block 1}};
+    
+    % Output Layers
+    \node[output, below=1.0cm of decoder_1] (linear) {\textbf{Linear Layer}};
+    \node[output, below=of linear] (softmax) {\textbf{Softmax}};
+    \node[block, below=of softmax] (output_token) {\textbf{Next Token Probability}};
+    
+    % Arrows - Main flow
+    \draw[arrow] (input) -- (tokenizer);
+    \draw[arrow] (tokenizer) -- (embedding);
+    \draw[arrow] (embedding) -- (decoder_n);
+    \draw[arrow] (decoder_n) -- (attention_n);
+    \draw[arrow] (attention_n) -- (addnorm1_n);
+    \draw[arrow] (addnorm1_n) -- (ffn_n);
+    \draw[arrow] (ffn_n) -- (addnorm2_n);
+    \draw[arrow] (addnorm2_n) -- (ellipsis);
+    \draw[arrow] (ellipsis) -- (decoder_1);
+    \draw[arrow] (decoder_1) -- (linear);
+    \draw[arrow] (linear) -- (softmax);
+    \draw[arrow] (softmax) -- (output_token);
+    
+    % Residual connections (dashed)
+    \draw[dashedarrow] (decoder_n.west) to[out=180, in=180] (addnorm1_n.west);
+    \draw[dashedarrow] (addnorm1_n.west) to[out=180, in=180] (addnorm2_n.west);
+    
+    % Side annotation for decoder block
+    \node[right=1.5cm of attention_n, text width=2.5cm, font=\footnotesize, align=left] (annotation) {
+      \textbf{Decoder Block:}\\
+      • Masked Self-Attention\\
+      • Residual Connections\\
+      • Layer Normalization
+    };
+    
+    \draw[->, >=stealth, thick, draw=gray!50, dashed] (attention_n.east) -- (annotation.west);
+    
+  \end{tikzpicture}
+  \caption{A simplified view of the decoder-only Transformer architecture used in generative LLMs. The model processes input embeddings through multiple layers (blocks) of masked multi-head self-attention and feed-forward networks with residual connections to predict the next token in a sequence.}
   \label{fig:transformer_architecture}
 \end{figure}
 
@@ -307,6 +483,30 @@ A LangGraph workflow can be defined by the following components:
     \item \textbf{Edges:} Edges connect the nodes and control the flow of the application. LangGraph supports \textbf{conditional edges}, which are crucial for agentic behavior. After a node executes, a routing function is called to inspect the current state and decide which node to move to next \cite{yu2025agentworkflow,pospech2025metagraph}. For example, after the `Safety Triage Agent` runs, a conditional edge might route the workflow to the `Service Desk Agent` if the risk is moderate, or directly to an "escalate" tool if the risk is critical.
 \end{itemize}
 
+\paragraph{State Transition Semantics}
+The stateful execution of a LangGraph workflow is governed by formal state update rules. Each node in the graph transforms the shared state through a state update function:
+\begin{equation}
+S_{t+1} = \text{node}_i(S_t) = S_t \oplus \Delta S_i
+\end{equation}
+where $S_t$ represents the current state at time step $t$, $\Delta S_i$ is the update produced by node $i$, and $\oplus$ denotes the state merging operation (where new fields override existing values while preserving unmodified fields).
+
+Conditional edges implement routing logic via predicate functions that inspect the current state. For the Safety Agent Suite, the routing after risk assessment can be formalized as:
+\begin{equation}
+\text{next}(S_t) = \begin{cases}
+\text{escalate\_to\_sda} & \text{if } S_t.\text{risk\_level} \geq 2 \\
+\text{provide\_coaching} & \text{if } S_t.\text{risk\_level} = 1 \\
+\text{END} & \text{if } S_t.\text{risk\_level} = 0
+\end{cases}
+\end{equation}
+
+This formalization enables dynamic multi-agent orchestration where the STA's risk assessment ($R_t$) determines subsequent workflow paths: moderate risk routes to the SCA for therapeutic intervention, high or critical risk escalates to the SDA for clinical case creation, and low risk concludes the interaction. The explicit state management ensures that all downstream agents have access to the complete conversation context, enabling informed decision-making throughout the workflow.
+
+More generally, for any conditional routing decision, the next node is determined by a routing function $\rho$:
+\begin{equation}
+\text{next\_node} = \rho(S_t) \in N \cup \{\text{END}\}
+\end{equation}
+where $\rho$ maps the current state to either another node in the graph or a terminal state, enabling arbitrary workflow complexity including loops, parallel execution, and human-in-the-loop interventions.
+
 This cyclical, stateful approach provides several key advantages for this framework:
 \begin{enumerate}
     \item \textbf{Explicit Multi-Agent Collaboration:} LangGraph allows for the explicit definition of workflows where different agents are called in sequence or in parallel, and their outputs are used to inform the next step \cite{tran2025multiagentcollaboration, mathew2025largelanguagemodelagents}. This is essential for the \textbf{Safety Agent Suite}, where the `Insights Agent`'s output must trigger the `Support Coach Agent`.
@@ -315,6 +515,54 @@ This cyclical, stateful approach provides several key advantages for this framew
 \end{enumerate}
 
 By using LangGraph to orchestrate the \textbf{Safety Agent Suite}, this framework moves beyond simple, linear agentic loops and implements a true multi-agent system capable of complex, stateful, and collaborative problem-solving \cite{yang2025aiagentprotocols, tran2025multiagentcollaboration}.
+
+\subsubsection{Real-Time Performance Requirements for Safety-Critical Applications}
+\label{subsubsec:performance_requirements}
+
+For mental health support systems, response latency directly impacts user experience and, critically, the effectiveness of crisis intervention. To formalize these requirements, Service Level Objectives (SLOs) define the maximum acceptable latency for each agent operation.
+
+Let $T_{agent}$ denote the response time random variable for an agent. The p95 SLO (95th percentile) ensures that 95\% of requests are handled within the target latency:
+\begin{equation}
+\Pr[T_{agent} \leq T_{target}] \geq 0.95
+\end{equation}
+
+\paragraph{Agent-Specific Latency Targets}
+Different agents have different latency requirements based on their role:
+
+\textbf{Safety Triage Agent (STA):} As the first-line crisis detection system, the STA requires near-instantaneous response:
+\begin{equation}
+T_{STA} \leq 250\text{ms} \quad (p95)
+\end{equation}
+This target ensures crisis indicators are identified within human perceptual thresholds, enabling immediate escalation when necessary.
+
+\textbf{End-to-End User Experience:} The complete interaction flow from user message to final response must maintain acceptable responsiveness:
+\begin{equation}
+T_{E2E} = T_{STA} + T_{routing} + T_{SCA} + T_{network} \leq 1500\text{ms} \quad (p95)
+\end{equation}
+where $T_{routing}$ represents orchestration overhead, $T_{SCA}$ is the Support Coach Agent's response generation time, and $T_{network}$ accounts for transmission delays.
+
+\paragraph{Performance Monitoring and Alerting}
+Node-level latency is continuously monitored through execution tracking:
+\begin{equation}
+T_{node}(i) = t_{complete}(i) - t_{start}(i)
+\end{equation}
+where $t_{start}(i)$ and $t_{complete}(i)$ are timestamps for node initiation and completion, respectively.
+
+Critical alerts are triggered when latency exceeds threshold values:
+\begin{equation}
+\text{alert}(i) = \begin{cases}
+\text{WARNING} & \text{if } T_{node}(i) > \theta_{warning} \\
+\text{CRITICAL} & \text{if } T_{node}(i) > \theta_{critical}
+\end{cases}
+\end{equation}
+where typical thresholds are $\theta_{warning} = 30\text{s}$ and $\theta_{critical} = 2\text{min}$ for backend operations.
+
+\paragraph{Capacity Planning}
+The system must maintain performance under load. Throughput requirements specify the range of concurrent sessions the system must handle:
+\begin{equation}
+\lambda_{concurrent} \in [500, 1000] \text{ sessions}
+\end{equation}
+This capacity ensures the system scales to institutional needs while maintaining the latency targets defined above. Capacity testing validates these requirements through simulated load scenarios, as detailed in Chapter 3.
 
 % ============================================================
 % ============================================================

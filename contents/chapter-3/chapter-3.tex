@@ -10,6 +10,37 @@
 
 The research presented in this thesis is constructive in nature, aimed not merely at describing or explaining a phenomenon, but at creating a novel and useful artifact to solve a real-world problem. To provide a rigorous and systematic structure for this endeavor, this study adopts the \textbf{Design Science Research (DSR)} methodology. DSR is a well-established paradigm in Information Systems research focused on the creation and evaluation of innovative IT artifacts intended to solve identified organizational problems \cite{dsr_methodology_hevner_2004}. The primary goal of DSR is to generate prescriptive design knowledge through the building and evaluation of these artifacts.
 
+\subsection{Rationale for Design Science Research}
+
+The selection of DSR as the methodological framework for this research is justified by several key considerations that align with the nature of the problem and the objectives of this study. Table~\ref{tab:dsr_rationale} summarizes the primary justifications for adopting DSR over alternative research methodologies.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Justifications for adopting Design Science Research methodology.}
+    \label{tab:dsr_rationale}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.5cm}p{5.0cm}p{4.5cm}}
+        \toprule
+        \textbf{DSR Characteristic} & \textbf{Relevance to This Research} & \textbf{Contrast with Alternative Methodologies} \\
+        \midrule
+        Artifact-centric problem solving & The core contribution is the Safety Agent Suite framework itself---a novel multi-agent system architecture. DSR provides the appropriate epistemological stance for research where the primary output is a designed artifact \cite{dsr_methodology_hevner_2004}. & Descriptive research methodologies focus on understanding phenomena; purely experimental approaches test hypotheses in controlled settings but do not emphasize artifact creation as the primary contribution. \\
+        \midrule
+        Practical relevance and real-world impact & The reactive mental health support problem identified in Chapter~\ref{chap:introduction} is a genuine organizational challenge in Higher Education Institutions worldwide. DSR bridges academic rigor and practical utility by requiring artifacts address real problems \cite{dsr_methodology_peers_2006}. & A purely theoretical approach fails to deliver actionable solutions; a purely engineering approach lacks systematic evaluation rigor. DSR offers a middle ground ensuring both practical applicability and scholarly rigor. \\
+        \midrule
+        Iterative development and refinement & The DSR process explicitly incorporates feedback loops between design, demonstration, and evaluation stages, aligning naturally with agentic AI development where agent behaviors must be iteratively refined based on testing results. & Waterfall-style experimental research and ethnographic studies do not accommodate this iterative, build-evaluate-refine cycle as seamlessly. The cyclic nature of DSR is essential for complex system development. \\
+        \midrule
+        Compatibility with evaluation constraints & DSR accommodates scenario-based evaluation using synthetic or controlled test cases---essential when working with sensitive mental health data where live human trials require extensive ethical approvals and pose potential risks. Detailed in Chapter~IV. & Traditional empirical methodologies typically require access to real subjects and naturalistic data, which are infeasible given ethical constraints and undergraduate thesis scope. \\
+        \midrule
+        Knowledge contribution through design & DSR explicitly recognizes that designing, building, and evaluating artifacts generates generalizable design knowledge beyond specific instantiation \cite{dsr_methodology_hevner_2004}. This thesis contributes design principles, architectural patterns (dual-loop proactive-reactive model), and evaluation criteria. & Alternative methodologies may produce case-specific findings without explicit mechanisms for abstracting generalizable design knowledge applicable to future systems in the same problem domain. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+These justifications collectively establish DSR as the most appropriate methodological framework for this research, balancing the need for rigorous academic inquiry with the practical imperative of delivering a functional artifact that addresses a real-world problem.
+
+\subsection{The DSR Process Model}
+
 The DSR process model, as outlined by Peffers et al., provides an iterative framework that guides the research from problem identification to the communication of results \cite{dsr_methodology_peers_2006}. This thesis follows these stages, mapping them directly to its structure to ensure a logical and transparent research process:
 
 \begin{enumerate}
@@ -28,13 +59,127 @@ The DSR process model, as outlined by Peffers et al., provides an iterative fram
 
 Stages 4-6 therefore operationalize the empirical programme for the research questions defined in Chapter \ref{sec:research_questions}. The demonstration assets in Chapter~IV (Sections~\ref{sec:setup} and \ref{sec:rq1}) instantiate the scenarios for RQ1--RQ4, while the evaluation stage reports the quantitative indicators detailed in Chapter~IV: STA sensitivity/specificity for safety (RQ1), orchestration reliability metrics such as tool-call success and latency for resilience (RQ2), rubric-based CBT quality scores for coaching (RQ3), and stability of aggregate analytics for the Insights Agent (RQ4). The communication stage synthesizes these findings in Chapter~V so that institutional stakeholders can interpret the metrics and translate them into policy and operational decisions. Together, the paragraph-level traceability between stages and metrics makes the DSR cycle a roadmap for the scenario-based evaluation that follows.
 
+\subsection{Evaluation Strategy and Data Generation Approach}
+
+Given the sensitive nature of mental health support and the ethical constraints inherent in this domain, this research adopts a scenario-based evaluation methodology using carefully designed synthetic test cases rather than live human trials. This section presents the methodological decisions governing data generation, metric selection, and instrumentation.
+
+\subsubsection{Rationale for Synthetic Data}
+
+The decision to employ synthetic test data rather than authentic student conversations is driven by ethical, practical, and methodological considerations. Table~\ref{tab:synthetic_data_rationale} summarizes the primary justifications for this approach.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Rationale for synthetic data in evaluation.}
+    \label{tab:synthetic_data_rationale}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.5cm}p{4.0cm}p{5.0cm}}
+        \toprule
+        \textbf{Consideration} & \textbf{Constraint with Real Data} & \textbf{Advantage of Synthetic Data} \\
+        \midrule
+        Ethical approval & Collecting genuine mental health crisis conversations from students requires extensive ethical review board (ERB) approval, informed consent processes, and participant safeguarding mechanisms beyond the scope of an undergraduate thesis. & Eliminates need for ERB approval as no human participants are involved; allows research to proceed within feasible timeline. \\
+        Privacy and safety risks & Even anonymized mental health disclosures carry re-identification risks and potential psychological harm to participants if data is breached or mishandled. & Removes risk of harm to real individuals; no sensitive personal data is collected or stored. \\
+        Systematic coverage & Real conversational data is opportunistic and may not include rare but critical crisis scenarios (e.g., explicit self-harm statements, acute distress patterns). & Enables controlled, systematic testing of edge cases and boundary conditions essential for safety validation \cite{FIND_CITATION_PLACEHOLDER}. \\
+        Reproducibility & Access to real student data is typically restricted and cannot be shared for replication purposes. & Synthetic datasets can be documented, versioned, and shared with evaluators, enhancing reproducibility and transparency. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+This approach aligns with established practices in safety-critical AI system evaluation, where controlled test scenarios provide more comprehensive coverage than naturalistic data collection, particularly when evaluating rare high-stakes events \cite{FIND_CITATION_PLACEHOLDER}.
+
+\subsubsection{Test Corpus Design}
+
+The evaluation employs three carefully constructed test datasets, each designed to exercise specific agent functionalities and stress-test system boundaries. Table~\ref{tab:test_corpus} details the composition and purpose of each corpus.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Test corpus design and coverage.}
+    \label{tab:test_corpus}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.2cm}p{2.5cm}p{3.5cm}p{3.3cm}}
+        \toprule
+        \textbf{Corpus} & \textbf{Size} & \textbf{Content Coverage} & \textbf{Primary Evaluation Target} \\
+        \midrule
+        Crisis detection corpus & 500 labeled prompts & Self-harm ideation, violence indicators, acute distress scenarios, plus emotionally charged non-crisis messages (to test specificity). & Safety Triage Agent (STA): sensitivity, specificity, false positive/negative rates. \\
+        Coaching dialogue corpus & 120 conversation snippets & Common student concerns (exam stress, social isolation, relationship difficulties, sleep issues, motivation). & Support Coach Agent (SCA): response quality, empathy, CBT alignment, engagement. \\
+        Synthetic operational logs & 12 weeks of simulated activity & Multi-user interaction patterns, temporal trends, cohort-level sentiment and topic distributions. & Insights Agent (IA): analytics stability, trend detection, aggregation correctness. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+These datasets systematically exercise each agent's intended functionality and provide controlled conditions for measuring performance against pre-defined acceptance criteria.
+
+\subsubsection{Metric Selection Principles}
+
+Evaluation metrics are selected according to three guiding principles to ensure methodological rigor and practical relevance:
+
+\begin{enumerate}
+    \item \textbf{Alignment with research questions and safety objectives:} Each metric directly addresses a specific research question or system requirement, ensuring that evaluation outcomes inform the research goals.
+    \item \textbf{Measurability through automated instrumentation:} Metrics must be objectively quantifiable through automated data collection to minimize measurement bias and enable continuous monitoring.
+    \item \textbf{Interpretability for institutional stakeholders:} Metrics are selected for their clarity and relevance to non-technical decision-makers (e.g., counseling administrators) who will assess system suitability for deployment.
+\end{enumerate}
+
+Each research question maps to specific quantitative metrics with pre-defined acceptance thresholds derived from system requirements and relevant literature. The complete evaluation plan, including metric definitions and acceptance criteria, is detailed in Chapter~IV, Table~\ref{tab:evaluation_plan}.
+
+\subsubsection{Instrumentation and Reproducibility}
+
+To ensure evaluation reproducibility and enable multi-level behavioral analysis, the prototype implements comprehensive instrumentation. Table~\ref{tab:instrumentation} summarizes the instrumentation strategy.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Instrumentation strategy for evaluation reproducibility.}
+    \label{tab:instrumentation}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.0cm}p{4.5cm}p{5.0cm}}
+        \toprule
+        \textbf{Instrumentation Type} & \textbf{Implementation} & \textbf{Purpose} \\
+        \midrule
+        Distributed tracing & OpenTelemetry spans across all agent operations, capturing request-response latency, tool invocation timing, and inter-agent handoffs. & Enables latency analysis, bottleneck identification, and performance optimization; supports evaluation of RQ2 (orchestration reliability). \\
+        Structured logging & All agent interactions, state transitions, and decision points logged in JSON format with ISO-8601 timestamps and correlation IDs. & Facilitates replay of evaluation scenarios, supports auditing, and enables post-hoc analysis of agent reasoning chains. \\
+        Metric exporters & Prometheus exporters expose real-time counters (tool call success/failure, classification outcomes) and histograms (latency distributions). & Provides quantitative data for evaluation dashboards; enables statistical analysis of agent performance. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+This multi-layered instrumentation ensures that evaluation results are reproducible, that system behaviors can be analyzed at multiple levels of granularity, and that performance data is available for both real-time monitoring and retrospective analysis.
+
+\subsection{Validity and Limitations}
+
+The evaluation strategy employs multiple validity frameworks to assess the rigor and generalizability of findings. Table~\ref{tab:validity_framework} summarizes the validity considerations and their implications for this research.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Validity and limitations framework for the evaluation methodology.}
+    \label{tab:validity_framework}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{2.8cm}p{5.0cm}p{5.2cm}}
+        \toprule
+        \textbf{Validity Type} & \textbf{Strengths in This Research} & \textbf{Limitations and Mitigation Strategies} \\
+        \midrule
+        Internal validity & High internal validity ensured through: (1) systematically designed test scenarios with controlled variables; (2) standardized execution platform (containerized environment); (3) minimized confounding variables through consistent test harnesses; (4) automated metrics reducing measurement subjectivity. & Potential for evaluation-to-evaluation variance in LLM outputs due to non-deterministic generation. Mitigated through: temperature=0 for classification tasks, multiple test runs with statistical aggregation, seed-based reproducibility where supported. \\
+        \midrule
+        External validity & Limited but explicitly acknowledged. The controlled evaluation demonstrates proof-of-concept functionality and validates design decisions under idealized conditions. & \textbf{Primary limitation}: Synthetic test data, while carefully designed, cannot fully capture the complexity, variability, and cultural nuances of authentic student conversations. Findings may not generalize to real-world deployment without field validation. Future work requires pilot studies with appropriate ethical oversight (discussed in Chapter~V). \\
+        \midrule
+        Construct validity & Strong construct validity: selected metrics (sensitivity, specificity, latency, inter-rater agreement, Jensen-Shannon divergence) are well-established constructs in AI system evaluation and mental health screening literature. Each metric directly measures intended system properties. & Risk of metric misalignment with real-world user experience. For example, high sensitivity may come at the cost of user trust if false positives are frequent. Mitigated through multi-dimensional evaluation (not relying on single metric) and stakeholder validation of acceptance criteria. \\
+        \midrule
+        Reliability & High measurement reliability ensured through: (1) automated instrumentation (OpenTelemetry, structured logging) providing consistent data collection; (2) deterministic evaluation scripts with version-controlled test datasets; (3) multiple independent raters for subjective assessments with inter-rater reliability reporting (Cohen's $\kappa$). & Human rating subjectivity for coaching quality (CBT rubric scores). Mitigated through: rater training, detailed rubric guidelines, inter-rater reliability thresholds ($\kappa \geq 0.8$), and adjudication process for disagreements. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+These validity considerations inform the interpretation of evaluation results in Chapter~IV and the recommendations for future research in Chapter~V. The primary limitation---external validity---is explicitly acknowledged throughout this thesis, and the evaluation is positioned as a necessary first step toward eventual field deployment rather than a conclusive clinical validation.
+
 The complete workflow of this research, following the DSR methodology, is visualized in Figure \ref{fig:dsr_flowchart}. This diagram illustrates the iterative path from problem formulation through to the final conclusions and recommendations.
 
 \definecolor{ugmBlue}{RGB}{0,73,144}
 \definecolor{ugmGold}{RGB}{217,160,33}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
+    \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
         x=5.2cm, y=2.2cm,
         process/.style={rectangle, rounded corners=5pt, draw=ugmBlue, very thick, minimum width=4.0cm, minimum height=1.2cm, align=center, fill=ugmBlue!6, font=\footnotesize},
@@ -58,7 +203,8 @@ The complete workflow of this research, following the DSR methodology, is visual
         \draw[looparrow, looseness=0.9] (evaluation.north) to[out=110, in=-110] (design.south);
         \draw[looparrow, looseness=0.9] (implementation.north east) to[out=45, in=225] (literature.south west);
         \draw[looparrow, looseness=1.0] (conclusion.east) to[out=0, in=0] (problem.east);
-    \end{tikzpicture}
+    \end{tikzpicture}%
+    }% End resizebox
     \caption{The Design Science Research (DSR) process model as applied in this thesis. The two-row layout shows how objectives inform design and how demonstration/evaluation feed back into earlier stages.}
     \label{fig:dsr_flowchart}
 \end{figure}
@@ -78,11 +224,13 @@ The system's primary entities and their designated interaction points are illust
     \item \textbf{The Agentic AI Backend:} This is the core computational engine of the framework. It hosts the four agents of the Safety Agent Suite, manages their stateful interactions via LangGraph, and serves as the central hub for all data processing, logic execution, and communication with external services and databases.
 \end{itemize}
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{Comparison of representative university well-being platforms.}
     \label{tab:wellbeing_comparison}
-    \begin{tabular}{p{3.4cm}p{3.6cm}p{3.6cm}p{3.6cm}}
+    \small % Reduce font size for better fit
+    \setlength{\tabcolsep}{4pt} % Reduce column separation
+    \begin{tabular}{p{3.2cm}p{3.3cm}p{3.3cm}p{3.3cm}}
         \toprule
         \textbf{Platform} & \textbf{Primary Modality} & \textbf{Safety/Privacy Posture} & \textbf{Contrast with Safety Agent Suite} \\
         \midrule
@@ -102,15 +250,19 @@ Conceptually, the framework's architecture is best understood as two distinct bu
 
 The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem.
 
-\subsubsection{Orchestration Alternatives and Rationale}
+\subsection{Orchestration Strategy: Rationale for Graph-Based Agent Coordination}
 
-Classical multi-agent systems literature distinguishes between centralized planners, market-based negotiation schemes, and more recent graph-structured controllers for coordinating autonomous agents \cite{wooldridge1995intelligentagents,wooldridge2009introductionmas}. Contemporary surveys focused on LLM-powered agents show that orchestration frameworks such as LangGraph provide deterministic state persistence, guardrails, and cycle control that are difficult to obtain in purely contract-net or ad-hoc workflow engines \cite{yang2025aiagentprotocols,tran2025multiagentcollaboration,yu2025agentworkflow}. Table~\ref{tab:orchestration_patterns} contrasts these patterns and summarizes why the Safety Agent Suite adopts a graph-based orchestration.
+The selection of an appropriate orchestration mechanism for multi-agent coordination is a critical architectural decision that directly impacts system reliability, maintainability, and performance. Classical multi-agent systems literature distinguishes between centralized planners, market-based negotiation schemes, and more recent graph-structured controllers for coordinating autonomous agents \cite{wooldridge1995intelligentagents,wooldridge2009introductionmas}. Contemporary surveys focused on LLM-powered agents demonstrate that orchestration frameworks such as LangGraph provide deterministic state persistence, guardrails, and cycle control that are difficult to obtain in purely contract-net or ad-hoc workflow engines \cite{yang2025aiagentprotocols,tran2025multiagentcollaboration,yu2025agentworkflow}.
 
-\begin{table}[h]
+Table~\ref{tab:orchestration_patterns} presents a systematic comparison of three primary orchestration approaches, evaluating each against the specific requirements of the Safety Agent Suite. The analysis reveals that while centralized workflows offer simplicity and contract-net approaches provide flexibility, the graph-based stateful orchestrator best aligns with the system's need for deterministic escalation paths, comprehensive auditing capabilities, and robust metric capture infrastructure.
+
+\begin{table}[htbp]
     \centering
     \caption{Comparison of orchestration patterns for the Safety Agent Suite.}
     \label{tab:orchestration_patterns}
-    \begin{tabular}{p{3.4cm}p{4.0cm}p{4.0cm}}
+    \small % Smaller font for better readability
+    \setlength{\tabcolsep}{4pt} % Reduce column separation
+    \begin{tabular}{p{3.2cm}p{3.8cm}p{3.8cm}}
         \toprule
         \textbf{Approach} & \textbf{Coordination Strengths} & \textbf{Limitations and Implications for Safety Agent Suite} \\
         \midrule
@@ -121,9 +273,9 @@ Classical multi-agent systems literature distinguishes between centralized plann
     \end{tabular}
 \end{table}
 
-In practice, LangGraph's stateful edges allow the Safety Triage Agent to enforce risk-score thresholds before delegating to the Support Coach Agent, while still preserving the ability to retry, log, and escalate without bespoke infrastructure. This orchestration choice therefore underpins the evaluation metrics reported later for tool-call reliability, latency, and auditability.
+The adoption of LangGraph's graph-based orchestration provides several concrete advantages for the Safety Agent Suite. The stateful edges enable the Safety Triage Agent to enforce risk-score thresholds before delegating control to the Support Coach Agent, while preserving the ability to retry failed operations, maintain comprehensive logs, and escalate exceptions without requiring bespoke infrastructure. This orchestration choice directly supports the evaluation metrics reported in Chapters~IV and~V, particularly those concerning tool-call reliability, end-to-end latency, and system auditability. The deterministic nature of graph-based workflows also facilitates reproducible testing and debugging, which is essential for safety-critical mental health applications where understanding system behavior under failure conditions is paramount.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
@@ -165,123 +317,109 @@ In practice, LangGraph's stateful edges allow the Safety Triage Agent to enforce
 \section{Functional Architecture: The Agentic Core}
 \label{chap:functional_architecture}
 
-The functional architecture of the framework is designed as a Multi-Agent System (MAS), where the system's overall intelligence and capability emerge from the coordinated actions of its four specialized agents. This section details the "what" of the system by defining the specific role, operational logic, and capabilities of each agent within the \textbf{Safety Agent Suite}. Each agent functions as a distinct component within the LangGraph state machine, perceiving its environment through the shared state, executing its logic, and updating the state with its results.
+The functional architecture of the framework is designed as a Multi-Agent System (MAS), where the system's overall intelligence and capability emerge from the coordinated actions of its four specialized agents. This section details the functional specifications of each agent within the \textbf{Safety Agent Suite}. Each agent functions as a distinct component within the LangGraph state machine, perceiving its environment through the shared state, executing its logic, and updating the state with its results. Table~\ref{tab:agent_specifications} provides a comprehensive comparison of the four agents' roles, inputs, processing logic, and outputs.
 
-\subsection{The Safety Triage Agent (STA): The Real-Time Guardian}
+\subsection{Agent Functional Specifications}
 
-\subsubsection{Goal}
-The primary objective of the STA is to function as a real-time, automated safety monitor for every user interaction. Its goal is to assess the immediate risk level of a user's conversation to detect potential crises and trigger an appropriate escalation protocol without delay, ensuring that safety is the foremost priority of the system.
+\begin{table}[htbp]
+    \centering
+    \caption{Functional specifications of the Safety Agent Suite.}
+    \label{tab:agent_specifications}
+    \tiny
+    \setlength{\tabcolsep}{2pt}
+    \begin{tabular}{p{2.2cm}p{1.8cm}p{2.5cm}p{2.8cm}p{2.5cm}p{2.0cm}}
+        \toprule
+        \textbf{Agent} & \textbf{Primary Role} & \textbf{Inputs (Perception)} & \textbf{Processing Logic} & \textbf{Outputs (Actions)} & \textbf{Performance Target} \\
+        \midrule
+        \textbf{Safety Triage Agent (STA)} & Real-time crisis detection and risk assessment & Current user message $M_t$ (raw text) & High-speed LLM-based classification: $R_t = f_{STA}(M_t; \theta_{LLM})$ where $R_t \in \{\text{Low, Moderate, Critical}\}$. Evaluates indicators of self-harm, severe distress, or urgent help requests. & (1) State graph update with \texttt{risk\_level} = $R_t$; (2) If $R_t$ = Critical: invoke \texttt{escalate\_crisis} tool to flag conversation, create case, present emergency resources. & Latency: <250ms p95; Sensitivity: >90\%; Specificity: >85\% \\
+        \midrule
+        \textbf{Support Coach Agent (SCA)} & Personalized mental health coaching and therapeutic guidance & (1) Conversation history $H_{t-1}$; (2) Safe user message $M_t$; (3) User progress state (completed modules, check-ins) & Context-aware LLM generation: $A_t = f_{SCA}(M_t, H_{t-1}; \theta_{LLM})$. Produces empathetic, CBT-aligned responses. Invokes \texttt{retrieve\_cbt\_module} when specific skills needed. & (1) Conversational response text; (2) Tool calls for content delivery (CBT modules); (3) \texttt{record\_module\_completion} for progress logging. & Response quality: >3.5/5 on CBT rubric; Engagement: session duration >5 min \\
+        \midrule
+        \textbf{Service Desk Agent (SDA)} & Administrative workflow automation (case management, scheduling) & (1) Escalation events from STA (conversation ID, risk level); (2) Scheduling requests from SCA (user ID, desired times); (3) Admin commands (close case, add note) & Procedural, tool-based execution. Sequences pre-defined actions: e.g., \texttt{create\_case} $\rightarrow$ \texttt{assign\_case\_status("New")}. No generative text. & (1) Database mutations (create/update/close cases); (2) External API calls (calendar availability, booking); (3) Notifications (email, dashboard alerts to counselors). & Tool-call success: >95\%; Idempotent retries: max 3 attempts \\
+        \midrule
+        \textbf{Insights Agent (IA)} & Population-level analytics and trend identification & (1) Time-based trigger (weekly Cron); (2) Read-only access to anonymized \texttt{conversation\_logs} table & NLP pipeline: (1) Topic modeling (LDA/transformer clustering); (2) Sentiment analysis (population score over time); (3) LLM-based summarization of findings. & (1) Structured report (JSON/PDF with visualizations); (2) Admin Dashboard update; (3) Optional email notification to stakeholders. & Topic stability: JS divergence <0.15 week-over-week; Report latency: <60s \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
-\subsubsection{Perception (Inputs)}
-The STA perceives the conversational environment by intercepting each user message before it is processed by other agents. Its primary input is the raw text of the user's current utterance. Let $M_t$ be the user's message at time $t$. The STA's perception is solely focused on this message:
-\begin{itemize}
-    \item \textbf{Current User Message ($M_t$):} A string containing the user's latest input.
-\end{itemize}
+\subsection{Agent Design Rationale and Assumptions}
 
-\subsubsection{Processing Logic}
-The core logic of the STA is a high-speed classification task. Upon receiving the message $M_t$, the agent invokes a specialized function, powered by the Gemini 2.5 Pro model, to classify the message into one of several predefined risk categories. The classification function, $f_{STA}$, can be represented as:
-$$ R_t = f_{STA}(M_t; \theta_{LLM}) $$
-where $\theta_{LLM}$ represents the parameters of the underlying Large Language Model, and the output, $R_t$, is an element of the set of possible risk levels, $R \in \{\text{Low, Moderate, Critical}\}$. The prompt for this classification is highly optimized for speed and accuracy, instructing the model to evaluate the text for indicators of self-harm, severe distress, or explicit requests for urgent help.
+Each agent's design incorporates specific assumptions and validation strategies to ensure reliability and safety within the overall system architecture. This subsection details the design constraints, operational assumptions, and validation approaches for each of the four agents.
 
-\subsubsection{Action (Outputs)}
-Based on the classification result $R_t$, the STA's action is to update the system's state, which in turn determines the next step in the LangGraph workflow.
-\begin{itemize}
-    \item \textbf{State Update:} The agent's primary output is an update to the shared state graph, setting the \texttt{risk\_level} variable to the value of $R_t$.
-    \item \textbf{Trigger Escalation (if $R_t$ = Critical):} If a critical risk is detected, the agent's action triggers a conditional edge in the graph that invokes the \texttt{escalate\_crisis} tool. This tool flags the conversation on the Admin Dashboard, logs the event, and instructs the Service Desk Agent (SDA) to create a high-priority case. It also immediately presents the user with pre-defined emergency resources.
-\end{itemize}
+\subsubsection{Safety Triage Agent Design Constraints}
 
-\begin{itemize}
-    \item \textbf{Design Rationale:} Assumes each incoming $M_t$ is UTF-8 text already filtered for profanity/noise; applies a calibrated confidence threshold (LLM softmax score $\geq0.6$) before labelling critical risk, otherwise defers to a human counselor; prompt template and \texttt{escalate\_crisis} schema were validated on the synthetic crisis corpus and scenario metrics reported in Chapter~\ref{sec:rq1}.\cite{FIND_CITATION_PLACEHOLDER}
-\end{itemize}
+The STA operates under the following assumptions and constraints:
 
-\subsection{The Support Coach Agent (SCA): The Empathetic Mentor}
+\begin{enumerate}
+    \item \textbf{Input sanitization}: Incoming messages $M_t$ are assumed to be UTF-8 encoded text that has been pre-filtered for profanity and noise by upstream input validation layers.
+    
+    \item \textbf{Confidence thresholding}: The agent applies a calibrated confidence threshold (LLM softmax score $\geq 0.6$) before assigning critical risk labels. Messages with lower confidence scores are flagged for human counselor review to minimize false positives while maintaining high sensitivity for genuine crises.
+    
+    \item \textbf{Validation methodology}: The prompt template and \texttt{escalate\_crisis} tool schema were validated against the synthetic crisis corpus. Performance characteristics (sensitivity, specificity, latency) are evaluated through scenario-based metrics reported in Chapter~\ref{sec:rq1} \cite{FIND_CITATION_PLACEHOLDER}.
+\end{enumerate}
 
-\subsubsection{Goal}
-The SCA is the primary user-facing conversational agent, designed to provide personalized, evidence-based mental health coaching. Its goal is to engage the student in a supportive, empathetic dialogue, guiding them through structured self-help modules based on established therapeutic principles like Cognitive Behavioral Therapy (CBT), and to sustain engagement through gentle progress tracking and timely check-ins.
+\subsubsection{Support Coach Agent Design Constraints}
 
-\subsubsection{Perception (Inputs)}
-The SCA operates on the history of the conversation and the user's profile. Its key inputs from the state graph are:
-\begin{itemize}
-    \item \textbf{Conversation History ($H_{t-1}$):} The full transcript of the conversation up to the previous turn.
-    \item \textbf{User's Current Message ($M_t$):} The message deemed safe by the STA.
-    \item \textbf{User State:} Information about the user's progress, including completed modules and outstanding check-ins.
-\end{itemize}
+The SCA's design incorporates the following assumptions:
 
-\subsubsection{Processing Logic}
-The SCA's logic is generative and context-aware. It uses the Gemini 2.5 Pro model to generate a conversational response, $A_t$, that is empathetic and relevant to the user's message and history.
-$$ A_t = f_{SCA}(M_t, H_{t-1}; \theta_{LLM}) $$
-This agent has access to a toolset that allows it to retrieve and present structured content. When a user's query or the conversation flow indicates a need for a specific skill (e.g., managing anxiety), the SCA can decide to invoke its \texttt{retrieve\_cbt\_module} tool to fetch and present the relevant exercise.
+\begin{enumerate}
+    \item \textbf{Pre-sanitized input}: The agent assumes that all incoming messages $M_t$ have been vetted by the STA and deemed safe for conversational processing, eliminating the need for redundant crisis detection logic.
+    
+    \item \textbf{Context window management}: Conversation history $H_{t-1}$ is maintained with a maximum of 50 dialogue turns to bound context length and prevent token overflow in the LLM context window. Older messages are summarized or archived when this threshold is reached.
+    
+    \item \textbf{Scope boundaries}: The agent enforces strict refusal policies for out-of-scope clinical topics (e.g., medication advice, diagnosis, emergency medical conditions) and automatically escalates administrative intents (e.g., appointment scheduling) to the Service Desk Agent. These policies prevent scope creep and maintain appropriate boundaries for an AI coaching system.
+    
+    \item \textbf{Quality assurance}: Prompt templates and tool schemas underwent peer review and are evaluated via rubric-based assessment measuring CBT alignment, empathy, and engagement metrics as detailed in Chapter~\ref{sec:rq2} \cite{FIND_CITATION_PLACEHOLDER}.
+\end{enumerate}
 
-\subsubsection{Action (Outputs)}
-\begin{itemize}
-    \item \textbf{Conversational Response:} A human-like text response to be displayed to the user.
-    \item \textbf{Tool Call (Content Delivery):} Invocation of tools to present CBT exercises or other self-help modules.
-    \item \textbf{Tool Call (Progress Logging):} Upon completion of a module, the SCA can call the \texttt{record\_module\_completion} tool to update the student's progress log in the shared state and database.
-\end{itemize}
+\subsubsection{Service Desk Agent Design Constraints}
 
-\begin{itemize}
-    \item \textbf{Design Rationale:} Assumes the STA has sanitised $M_t$ and that $H_{t-1}$ retains fewer than 50 dialogue turns to bound context length; enforces refusal policies for out-of-scope clinical topics and escalates administrative intents to the SDA; prompts and tool schemas were peer-reviewed with counselling staff and evaluated via the rubric-based assessment in Chapter~\ref{sec:rq2}.\cite{FIND_CITATION_PLACEHOLDER}
-\end{itemize}
+The SDA's procedural architecture requires:
 
-\subsection{The Service Desk Agent (SDA): The Administrative Orchestrator}
+\begin{enumerate}
+    \item \textbf{Input validation}: All structured events must carry validated UUIDs, ISO-8601 formatted timestamps, and pass schema validation in upstream components before reaching the agent. This ensures data integrity and prevents malformed requests from disrupting workflow execution.
+    
+    \item \textbf{Idempotency and retry logic}: The agent enforces idempotent tool execution with exponential backoff (delays: 1s, 2s, 4s) to handle transient failures gracefully. After three failed retry attempts, the system escalates to human staff to prevent infinite loops and ensure critical cases receive attention.
+    
+    \item \textbf{Integration testing}: Tool schemas and workflow sequences were exercised through comprehensive integration tests that verify correct database state transitions, external API interactions, and notification delivery as summarized in Chapter~\ref{sec:rq2} \cite{FIND_CITATION_PLACEHOLDER}.
+\end{enumerate}
 
-\subsubsection{Goal}
-The SDA functions as the administrative backbone of the support system. Its primary goal is to automate the operational workflows related to clinical case management and resource scheduling, thereby reducing the manual burden on university staff and ensuring that escalations and requests are handled efficiently and reliably.
+\subsubsection{Insights Agent Design Constraints}
 
-\subsubsection{Perception (Inputs)}
-The SDA is primarily triggered by events from other agents or direct commands from the Admin Dashboard. Its inputs are structured data, not conversational text:
-\begin{itemize}
-    \item \textbf{Escalation Event:} A signal from the STA containing the conversation ID and risk level of a flagged case.
-    \item \textbf{Scheduling Request:} A structured request from the SCA (initiated by a user) containing the user's ID and desired appointment times.
-    \item \textbf{Admin Commands:} Directives from a human administrator via the dashboard (e.g., "close case," "add note").
-\end{itemize}
+The IA operates under strict privacy-preserving constraints:
 
-\subsubsection{Processing Logic}
-The SDA's logic is procedural and tool-based. It does not engage in open-ended conversation but rather executes a sequence of pre-defined actions based on its inputs. For example, upon receiving an escalation event, its logic is to execute the \texttt{create\_case} tool, followed by the \texttt{assign\_case\_status} tool with the "New" parameter.
+\begin{enumerate}
+    \item \textbf{Anonymization requirements}: The agent accesses only anonymized conversation logs that have been aggregated with minimum cohort size thresholds (k $\geq$ 50 to maintain k-anonymity). This prevents re-identification attacks through demographic or temporal correlation.
+    
+    \item \textbf{Data retention limits}: Logs are retained for a maximum of 90 days in accordance with institutional data retention policies, after which they are permanently deleted to minimize privacy risk exposure.
+    
+    \item \textbf{Output suppression}: Analytics outputs for cohorts below the minimum threshold are automatically suppressed to prevent potential re-identification through small sample sizes.
+    
+    \item \textbf{Pipeline validation}: Analytical prompts and NLP pipelines (topic modeling, sentiment analysis) were stress-tested through stability checks that measure consistency across multiple runs and temporal windows, as reported in Chapter~\ref{sec:rq4} \cite{FIND_CITATION_PLACEHOLDER}.
+\end{enumerate}
 
-\subsubsection{Action (Outputs)}
-\begin{itemize}
-    \item \textbf{Database Operations:} The SDA's primary actions are database mutations, such as creating, updating, or closing case records in the clinical management database.
-    \item \textbf{API Calls to External Services:} It can interact with external calendar systems to check for counselor availability and book appointments.
-    \item \textbf{Notifications:} It sends automated email or dashboard notifications to counselors when a new case is assigned to them or when a student books an appointment.
-\end{itemize}
+\subsection{Agent Processing Formalization}
 
-\begin{itemize}
-    \item \textbf{Design Rationale:} Assumes structured events carry validated UUIDs, ISO-8601 timestamps, and pass schema validation upstream; enforces idempotent tool execution with exponential backoff and escalates to human staff after three failed retries; tool schemas were exercised in integration tests summarised in Chapter~\ref{sec:rq2}.\cite{FIND_CITATION_PLACEHOLDER}
-\end{itemize}
+To provide mathematical rigor to the agent specifications, this subsection formalizes the core decision functions employed by each agent. These formalizations ground the qualitative descriptions in Table~\ref{tab:agent_specifications} within a consistent computational framework.
 
-\subsection{The Insights Agent (IA): The Strategic Analyst}
+\subsubsection{Safety Triage Agent Classification Function}
+\label{subsubsec:sta_classification_function}
 
-\subsubsection{Goal}
-The IA is designed to function as the institution's automated well-being analyst. Its goal is to autonomously process anonymized, aggregated conversation data to identify population-level mental health trends, sentiment shifts, and emerging topics of concern. This provides the institution with actionable, data-driven intelligence to inform resource allocation and proactive strategy.
+The STA's classification function maps a user message to a discrete risk level:
+\begin{equation}
+    R_t = f_{STA}(M_t; \theta_{LLM}) : \mathcal{M} \rightarrow \mathcal{R}
+\end{equation}
+where $\mathcal{M}$ is the space of all possible user messages (UTF-8 strings), $\mathcal{R} = \{\text{Low, Moderate, Critical}\}$ is the set of risk levels, and $\theta_{LLM}$ represents the parameters of the Gemini 2.5 Pro model. The function is implemented through a structured prompt that instructs the LLM to evaluate crisis indicators (self-harm ideation, violence, acute distress) and return a classification with confidence score.
 
-\subsubsection{Perception (Inputs)}
-The IA is activated by a time-based trigger (e.g., a weekly Cron job) and its primary input is the entire corpus of anonymized conversation logs.
-\begin{itemize}
-    \item \textbf{Time-Based Trigger:} A signal from the APScheduler to begin its analysis.
-    \item \textbf{Anonymized Database Access:} Read-only access to the \texttt{conversation\_logs} table, from which all personally identifiable information (PII) has been redacted.
-\end{itemize}
+\subsubsection{Support Coach Agent Response Generation}
 
-\subsubsection{Processing Logic}
-The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks performed on the collected data. This includes:
-\begin{itemize}
-    \item \textbf{Topic Modeling:} Using algorithms like Latent Dirichlet Allocation (LDA) or modern transformer-based clustering to identify the most prevalent topics of discussion (e.g., "exam stress," "social isolation").
-    \item \textbf{Sentiment Analysis:} Calculating the overall sentiment score for the student population over the given period and tracking its change over time.
-    \item \textbf{Summarization:} Using the Gemini 2.5 Pro model to generate concise, human-readable summaries of the key findings from the topic and sentiment analysis.
-\end{itemize}
+The SCA's response generation function produces contextually appropriate therapeutic responses:
+\begin{equation}
+    A_t = f_{SCA}(M_t, H_{t-1}; \theta_{LLM}) : \mathcal{M} \times \mathcal{H} \rightarrow \mathcal{A}
+\end{equation}
+where $H_{t-1} = \{M_1, A_1, M_2, A_2, \ldots, M_{t-1}, A_{t-1}\}$ is the conversation history up to turn $t-1$, $\mathcal{H}$ is the space of all possible conversation histories, and $\mathcal{A}$ is the space of agent responses. The function incorporates user progress state implicitly through retrieved context from the database.
 
-\subsubsection{Action (Outputs)}
-\begin{itemize}
-    \item \textbf{Structured Report Generation:} The final output is a structured report (e.g., in JSON or PDF format) containing visualizations (e.g., charts of topic frequency over time) and the generated summaries.
-    \item \textbf{Dashboard Update:} The agent pushes this report to the Admin Dashboard, updating the analytics view for university staff.
-    \item \textbf{Email Notification:} It can be configured to automatically email the report to a list of stakeholders, such as the head of counseling services.
-\end{itemize}
-
-\begin{itemize}
-    \item \textbf{Design Rationale:} Assumes access to anonymised logs aggregated with $k\geq50$ users and retained for no longer than 90 days; enforces differential privacy noise addition (placeholder $\epsilon=1.0$) and suppresses outputs below the threshold; analytical prompts and pipelines were stress-tested via the stability checks in Chapter~\ref{sec:rq4}.\cite{FIND_CITATION_PLACEHOLDER}
-\end{itemize}
-
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
@@ -326,18 +464,20 @@ The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks pe
 
 Protecting student data and maintaining institutional trust require an explicit articulation of adversaries, assets, and mitigations. Table~\ref{tab:threat_model} summarises the threat model adopted for the Safety Agent Suite, drawing on STRIDE/LINDDUN heuristics and privacy-by-design obligations.\cite{FIND_CITATION_PLACEHOLDER}
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{Threat model overview.}
     \label{tab:threat_model}
-    \begin{tabular}{p{3.0cm}p{3.5cm}p{3.5cm}p{3.5cm}}
+    \small % Reduce font size for better fit
+    \setlength{\tabcolsep}{3pt} % Reduce column separation
+    \begin{tabular}{p{2.8cm}p{3.2cm}p{3.2cm}p{3.2cm}}
         \toprule
         \textbf{Actor / Threat} & \textbf{Targeted Asset} & \textbf{Likely Impact} & \textbf{Mitigations / Controls} \\
         \midrule
         Compromised student account & Conversation logs, risk flags & Exposure of sensitive disclosures; spoofed escalations & MFA and device attestation (frontend); STA confidence thresholds with human verification; audit trail review (Chapter~\ref{sec:rq1}). \\
         Malicious insider (staff) & Case notes, progress logs & Unauthorised browsing or data exfiltration & Role-based access control, immutable audit logs, case access alerts, quarterly review. \\
         External attacker (API abuse) & Backend endpoints, tooling & Prompt injection, denial of service, data tampering & API gateway with rate limiting, input sanitation, LangGraph guardrails, automated anomaly detection on latency/tool-failure metrics. \\
-        Analytics linkage attack & Aggregated insights & Re-identification through small cohorts & Minimum cohort size $k\geq50$, differential privacy noise (placeholder $\epsilon=1.0$), suppression of rare categories (Chapter~\ref{sec:rq4}). \\
+        Analytics linkage attack & Aggregated insights & Re-identification through small cohorts & Minimum cohort size thresholds, suppression of rare categories and small sample sizes (Chapter~\ref{sec:rq4}). \\
         Model supply-chain risks & LLM outputs / prompts & Hallucinated or unsafe responses & Structured prompts, refusal and escalation policies, prompt/response logging with red-team testing cadence. \\
         Infrastructure failure & Agent orchestration state & Service outage, message loss & Stateless frontend, checkpointed LangGraph state, automated failover for database replicas, latency SLOs monitored (Section~\ref{chap:technical_architecture}). \\
         \bottomrule
@@ -375,7 +515,7 @@ The overall technical architecture is visualized in Figure \ref{fig:system_archi
 
 To ensure the architecture meets the safety and responsiveness requirements evaluated in Chapter~\ref{sec:rq1}, we define the following planning assumptions:
 \begin{itemize}
-    \item \textbf{Latency budgets:} STA classification must complete within 250~ms p95 and 500~ms p99, while end-to-end conversational responses (STA~+~SCA) target 1.5~s p95 under nominal load. Scenario results in Chapter~\ref{sec:rq1} and Chapter~\ref{sec:rq2} will be benchmarked against these SLOs.
+    \item \textbf{Latency budgets:} STA classification must complete within 250~ms p95 and 500~ms p99, while end-to-end conversational responses (STA~+~SCA) target 1.5~s p95 under nominal load. These targets are theoretically justified by the real-time performance model in Section~\ref{subsubsec:performance_requirements}. Scenario results in Chapter~\ref{sec:rq1} and Chapter~\ref{sec:rq2} will be benchmarked against these SLOs.
     \item \textbf{Concurrency expectations:} The system is sized for 500 concurrent student sessions (peak exam season) with headroom to burst to 1,000. Each FastAPI worker handles approximately 20 concurrent conversations; horizontal scaling of backend pods maintains SLA compliance.
     \item \textbf{Horizontal scaling strategy:} Stateless Next.js frontend instances auto-scale behind a CDN; the FastAPI+LangGraph service scales via container orchestration (e.g., Kubernetes HPA) using CPU and latency metrics; PostgreSQL employs read replicas for analytics workloads while the primary instance handles transactional writes. Queueing (e.g., Redis streams) buffers asynchronous Insights Agent jobs to decouple heavy analytics from real-time triage.
     \item \textbf{Resilience and monitoring:} Service-level indicators (SLIs) include STA false-negative rate, tool-call success percentage, queue depth, and database replication lag. Alert thresholds align with risk tolerances captured in the threat model (Table~\ref{tab:threat_model}).\cite{FIND_CITATION_PLACEHOLDER}
@@ -383,7 +523,7 @@ To ensure the architecture meets the safety and responsiveness requirements eval
 
 Communication between the unified frontend and the backend is exclusively handled via a secure, stateless REST API. The backend service is the only component with direct access to the database, ensuring a clear and secure data access pattern. This architecture allows for a cohesive user experience while maintaining a strong separation between presentation logic (frontend) and business logic (backend).
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         box/.style={rectangle, draw=ugmBlue, very thick, rounded corners=6pt, align=center, fill=ugmBlue!5},
@@ -444,10 +584,11 @@ The foundation of the backend service is the \textbf{FastAPI} framework. This ch
 
 The backend exposes a RESTful API for all communication with the frontend service. The design follows standard REST principles, using conventional HTTP methods to perform operations on resources. A summary of key endpoints is provided in Table \ref{tab:api_endpoints}.
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{Key Endpoints of the Backend REST API.}
     \label{tab:api_endpoints}
+    \small % Ensure good readability
     \begin{tabular}{lll}
         \toprule
         \textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
@@ -474,7 +615,7 @@ The workflow is structured as follows:
 
 This stateful, cyclical approach allows for sophisticated agentic behaviors, such as retrying failed tool calls, handing off tasks between agents, and maintaining a durable memory of the interaction, which are critical for the reliability and safety of the system.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         state/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, align=center, fill=ugmBlue!6, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
@@ -614,8 +755,9 @@ The key entities and their relationships are as follows:
 
 This relational structure ensures that data is logically organized and that complex queries (from retrieving a single conversation's history to aggregating data for the Insights Agent) can be performed efficiently and reliably.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
+    \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
         entity/.style={rectangle, draw=ugmBlue, very thick, rounded corners=4pt, align=left, fill=ugmBlue!5, minimum width=4.2cm, font=\footnotesize},
         relationship/.style={-Latex, thick, ugmBlue}
@@ -639,7 +781,8 @@ This relational structure ensures that data is logically organized and that comp
         \draw[relationship] (cases) -- node[left, font=\scriptsize]{N\,:\,1} (counselors);
         \draw[relationship] (counselors) -- node[above, font=\scriptsize]{1\,:\,N} (appointments);
         \draw[relationship] (users) -- node[above, font=\scriptsize]{1\,:\,N} (appointments);
-    \end{tikzpicture}
+    \end{tikzpicture}%
+    }% End resizebox
     \caption{Entity--relationship diagram summarising the core tables that support conversational history, safety escalation, and progress tracking. Cardinalities indicate the dominant one-to-many relationships.}
     \label{fig:erd}
 \end{figure}
@@ -651,7 +794,7 @@ This subsection provides a detailed specification for the primary tables in the 
 \subsubsection{Users Table}
 The \texttt{users} table serves as the central repository for student information. To adhere to the principle of Privacy by Design, this table is intentionally minimal and uses a non-identifiable primary key.
 
-\begin{longtable}{@{}llll@{}}
+\begin{longtable}{@{}p{3.0cm}p{2.5cm}p{2.0cm}p{5.0cm}@{}}
     \caption{Schema for the \texttt{users} table.} \label{tab:users_schema} \\
     \toprule
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
@@ -672,7 +815,7 @@ The \texttt{users} table serves as the central repository for student informatio
 \subsubsection{Conversation Logs Table}
 The \texttt{conversation\_logs} table is one of the most critical tables in the system. It archives every message from every conversation, serving as the primary data source for the Insights Agent (IA) and providing the necessary context for the real-time agents.
 
-\begin{longtable}{@{}llll@{}}
+\begin{longtable}{@{}p{3.0cm}p{2.5cm}p{2.0cm}p{5.0cm}@{}}
     \caption{Schema for the \texttt{conversation\_logs} table.} \label{tab:conversation_logs_schema} \\
     \toprule
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
@@ -699,7 +842,7 @@ The \texttt{conversation\_logs} table is one of the most critical tables in the 
 \subsubsection{Cases Table}
 The \texttt{cases} table is the core of the case management system, operated primarily by the Service Desk Agent (SDA) and monitored by human counselors. Each record represents an incident that was flagged by the Safety Triage Agent (STA).
 
-\begin{longtable}{@{}llll@{}}
+\begin{longtable}{@{}p{3.0cm}p{2.5cm}p{2.0cm}p{5.0cm}@{}}
     \caption{Schema for the \texttt{cases} table.} \label{tab:cases_schema} \\
     \toprule
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
@@ -725,7 +868,7 @@ The \texttt{cases} table is the core of the case management system, operated pri
 \subsubsection{Progress Logs Table}
 This table captures the module completions and wellness check-ins driven by the Support Coach Agent (SCA), providing a lightweight audit trail of student progress.
 
-\begin{longtable}{@{}llll@{}}
+\begin{longtable}{@{}p{3.0cm}p{2.5cm}p{2.0cm}p{5.0cm}@{}}
     \caption{Schema for the \texttt{progress\_logs} table.} \label{tab:progress_logs_schema} \\
     \toprule
     \textbf{Column Name} & \textbf{Data Type} & \textbf{Constraints} & \textbf{Description} \\
@@ -900,7 +1043,7 @@ As shown in Figure \ref{fig:ui_admin_dashboard}, the main dashboard is the centr
     \item \textbf{Design Justification:} To address Dr. Astuti's goal of gaining a data-driven understanding of student well-being, the dashboard prominently features key performance indicators (KPIs) at the top, such as "Overall Sentiment Trend" and "Active Cases." The main panel is dedicated to a time-series visualization of the "Top Trending Topics" identified by the Insights Agent (IA). This design directly supports her user story of wanting an automated report to plan targeted workshops effectively.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         screen/.style={rectangle, draw=ugmBlue, very thick, rounded corners=8pt, fill=ugmBlue!5, minimum width=12cm, minimum height=7cm},
@@ -940,7 +1083,7 @@ When a conversation is flagged by the STA, it appears in the case management vie
     \item \textbf{Design Justification:} To address Dr. Astuti's pain point of being overwhelmed by administrative tasks and her goal of ensuring no student in crisis is missed, this screen is designed for efficiency. It presents a clean, sortable table of all active cases. When a case is selected, it displays the relevant (anonymized) conversation log, the severity level assigned by the STA, and clear action buttons like "Assign to Counselor" or "Mark as Resolved." This streamlines the workflow from automated detection to human intervention.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         frame/.style={rectangle, draw=ugmBlue, very thick, rounded corners=8pt, fill=ugmBlue!5, minimum width=12cm, minimum height=6.5cm},
@@ -977,7 +1120,7 @@ The core of the student experience is the chat interface, shown in Figure \ref{f
     \item \textbf{Design Justification:} To align with the principle of "Clarity Over Clutter," the interface is intentionally minimalist, resembling modern messaging applications to feel familiar and intuitive. There are no distracting elements; the focus is solely on the conversation between Budi and the Support Coach Agent. This design directly supports his goal of finding a private and focused space to articulate his feelings.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         phone/.style={rectangle, draw=ugmBlue, very thick, rounded corners=12pt, fill=ugmBlue!5, minimum width=6.5cm, minimum height=11cm},
@@ -1005,7 +1148,7 @@ To foster engagement and a sense of progress, the user dashboard (Figure \ref{fi
     \item \textbf{Design Justification:} This screen directly supports Budi's goal of feeling a sense of accomplishment. It includes a section for "My Progress" that shows completed modules, highlights recommended next steps, and surfaces gentle reminders for upcoming check-ins. This visual feedback, based on the design principle of "Foster a Sense of Progress," reinforces positive behavior and encourages continued engagement with the platform's coaching features.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         card/.style={rectangle, draw=ugmBlue, very thick, rounded corners=10pt, fill=ugmBlue!5, minimum width=10.5cm, minimum height=6.5cm},
@@ -1036,7 +1179,7 @@ This journey is designed to be as frictionless as possible, directly addressing 
     \item \textbf{Confirmation:} The user selects a time slot. The SDA then calls its \texttt{book\_appointment} tool, which confirms the appointment in the system and sends a confirmation notification to both the user and the assigned counselor.
 \end{enumerate}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
         flowstep/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, align=center, fill=ugmBlue!6, minimum width=3.6cm, minimum height=1.1cm, font=\scriptsize},
@@ -1087,7 +1230,7 @@ This journey illustrates the system's core safety protocol.
     \item \textbf{Human Intervention:} A counselor (Dr. Astuti) sees the alert on the dashboard, reviews the newly created case, and initiates follow-up. The counselor uses the case management interface to document all actions taken.
 \end{enumerate}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \fbox{\parbox[c][6cm][c]{0.9\textwidth}{\centering \textbf{Placeholder for Flowchart: Crisis Escalation Journey} \\ \vspace{1cm} This flowchart should show the path from STA detection to the SDA creating a case and the final review by a human counselor on the Admin Dashboard.}}
     \caption{The user and system journey during a critical risk escalation.}
