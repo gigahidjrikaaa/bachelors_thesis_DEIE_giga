@@ -24,7 +24,7 @@ This section documents the evaluation protocol that links the Design Science sta
     \item \textbf{Operational events}: 4-week synthetic activity log with controlled topic distribution and sentiment patterns to test IA privacy compliance (minimum cohort size $k=5$ as implemented) and aggregate insight accuracy (see Appendix~\ref{app:synthetic_logs}).
 \end{itemize}
 
-\subsection*{Human Oversight and Quality Control}
+\subsection*{Quality Control and Validation}
 
 \begin{itemize}
     \item \textbf{Safety reviews}: All STA classifications on crisis corpus are validated against ground truth labels; disagreements analyzed for root cause (linguistic ambiguity, cultural context, implicit indicators).
@@ -32,7 +32,7 @@ This section documents the evaluation protocol that links the Design Science sta
     \item \textbf{Analytics verification}: IA outputs inspected for k-anonymity compliance ($k \geq 5$ as implemented); unit tests validate automatic suppression for small cohorts; aggregate accuracy compared against known ground truth distributions.
 \end{itemize}
 
-\begin{figure}[h]
+\begin{figure}[htbp]
     \centering
     \resizebox{0.85\textwidth}{!}{%
     \begin{tikzpicture}[
@@ -52,15 +52,17 @@ This section documents the evaluation protocol that links the Design Science sta
         \draw[arrow] (metrics) -- (oversight);
         \draw[arrow] (oversight) -- (reporting);
     \end{tikzpicture}}
-    \caption{Evaluation workflow linking scenario assets, instrumentation, and human oversight to the reporting structure in Chapter~IV.}
+    \caption{Evaluation workflow linking scenario assets, instrumentation, and quality control validation to the reporting structure in Chapter~IV.}
     \label{fig:evaluation_pipeline}
 \end{figure}
 
-\begin{table}[h]
+\begin{table}[htbp]
     \centering
     \caption{Evaluation plan mapped to research questions and acceptance thresholds.}
     \label{tab:evaluation_plan}
-    \begin{tabular}{p{1.9cm}p{3.2cm}p{3.4cm}p{3.2cm}p{2.3cm}}
+    \small % Reduce font size to fit
+    \setlength{\tabcolsep}{3pt} % Reduce column separation
+    \begin{tabular}{p{1.6cm}p{2.8cm}p{3.0cm}p{2.8cm}p{2.0cm}}
         \toprule
         \textbf{RQ} & \textbf{Test Scenarios / Data} & \textbf{Primary Metrics} & \textbf{Success Criteria (Target)} & \textbf{Related Section} \\
         \midrule
