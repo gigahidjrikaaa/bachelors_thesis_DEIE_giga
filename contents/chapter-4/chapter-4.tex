@@ -12,13 +12,13 @@ This section documents the evaluation protocol that links the Design Science sta
 \begin{itemize}
     \item \textbf{Agents under test}: Safety Triage Agent (STA), Support Coach Agent (SCA), Service Desk Agent (SDA), and Insights Agent (IA) running inside the LangGraph orchestration described in Chapter~\ref{chap:system_design}. All tool invocations are captured through structured logs to enable replay and auditing.
     \item \textbf{Execution platform}: FastAPI backend running LangGraph orchestration (Python~3.11) with PostgreSQL persistence for conversation state and case records. Tests are executed in a controlled development environment sufficient to validate agent behavior under conversational scenarios without production infrastructure load.
-    \item \textbf{Instrumentation}: Langfuse observability platform provides trace-level monitoring for agent execution with span-level detail; execution state tracker (ExecutionStateTracker class) persists node timing, state transitions, and retry attempts to database; Prometheus metrics expose latency distributions (p50/p95/p99), escalation decisions, and error rates; processing time measured via Python's \texttt{perf\_counter} with millisecond precision.
+    \item \textbf{Instrumentation}: Langfuse observability platform provides trace-level monitoring for agent execution with span-level detail; execution state tracker (ExecutionStateTracker class) persists node timing, state transitions, and retry attempts to database; Prometheus metrics expose latency distributions (p50/p95/p99), escalation decisions, and error rates; processing time measured via Python's \lstinline{perf\_counter} with millisecond precision.
 \end{itemize}
 
 \subsection*{Datasets and Scenario Assets}
 
 \begin{itemize}
-    \item \textbf{Crisis corpus}: 150 labelled prompts—75 crisis scenarios (self-harm, violence, acute distress with explicit and implicit indicators) and 75 non-crisis but emotionally charged messages—designed to measure classification accuracy and false positive/negative rates. Labels authored by primary researcher with secondary peer validation to ensure consistency (see Appendix~\ref{app:crisis_corpus}).
+    \item \textbf{Crisis corpus}: 150 labelled prompts which are made up of 75 crisis scenarios (self-harm, violence, acute distress with explicit and implicit indicators) and 75 non-crisis but emotionally charged messages—designed to measure classification accuracy and false positive/negative rates. Labels authored by primary researcher with secondary peer validation to ensure consistency (see Appendix~\ref{app:crisis_corpus}).
     \item \textbf{Coaching prompts}: 25 conversation snippets spanning stress management, motivation issues, academic planning, and boundary-testing scenarios requiring refusal or escalation. Selected to cover emotional intensity spectrum and common student concerns (see Appendix~\ref{app:coaching_prompts}).
     \item \textbf{Orchestration test suite}: 40 conversation flows exercising all agent types (STA, SCA, SDA, IA) and workflow patterns, including simulated tool failures to validate retry logic and state management correctness.
     \item \textbf{Operational events}: 4-week synthetic activity log with controlled topic distribution and sentiment patterns to test IA privacy compliance (minimum cohort size $k=5$ as implemented) and aggregate insight accuracy (see Appendix~\ref{app:synthetic_logs}).
@@ -101,12 +101,12 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 
 \textbf{Calculation Procedure:}
 \begin{enumerate}
-    \item Feed each of the 150 prompts to STA via \texttt{/api/v1/aika} endpoint
-    \item Extract classification from response metadata: \texttt{risk\_level} field
+    \item Feed each of the 150 prompts to STA via \lstinline {/api/v1/aika} endpoint
+    \item Extract classification from response metadata: \lstinline {risk\_level} field
     \item Map risk levels to binary classification:
     \begin{itemize}
-        \item \texttt{crisis} label → Positive class
-        \item \texttt{low}, \texttt{medium}, \texttt{high} labels → Negative class (non-crisis)
+        \item \lstinline {crisis} label → Positive class
+        \item \lstinline {low}, \lstinline {medium}, \lstinline {high} labels → Negative class (non-crisis)
     \end{itemize}
     \item Compare predicted labels against ground truth labels from Appendix~\ref{app:crisis_corpus}
     \item Count TP, TN, FP, FN occurrences
@@ -115,18 +115,18 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 
 \subsubsection*{Agent Reasoning Latency}
 
-\textbf{Data Source:} \texttt{TriageAssessment} database table, \texttt{processing\_time\_ms} field populated by \texttt{SafetyTriageService.classify()} method using Python's \texttt{time.perf\_counter()}.
+\textbf{Data Source:} \lstinline {TriageAssessment} database table, \lstinline {processing\_time\_ms} field populated by \lstinline {SafetyTriageService.classify()} method using Python's \lstinline {time.perf\_counter()}.
 
 \textbf{Calculation Procedure:}
 \begin{enumerate}
     \item Execute all 150 crisis corpus prompts
-    \item Query database: \texttt{SELECT processing\_time\_ms FROM triage\_assessment WHERE test\_run\_id = <evaluation\_run>}
+    \item Query database: \lstinline {SELECT processing\_time\_ms FROM triage\_assessment WHERE test\_run\_id = <evaluation\_run>}
     \item Extract latency values (in milliseconds)
     \item Compute percentiles using NumPy:
     \begin{itemize}
-        \item $p_{50}$ = \texttt{np.percentile(latencies, 50)}
-        \item $p_{95}$ = \texttt{np.percentile(latencies, 95)}
-        \item $p_{99}$ = \texttt{np.percentile(latencies, 99)}
+        \item $p_{50}$ = \lstinline {np.percentile(latencies, 50)}
+        \item $p_{95}$ = \lstinline {np.percentile(latencies, 95)}
+        \item $p_{99}$ = \lstinline {np.percentile(latencies, 99)}
     \end{itemize}
 \end{enumerate}
 
@@ -136,7 +136,7 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 
 \subsubsection*{Tool Call Success Rate}
 
-\textbf{Data Source:} \texttt{langgraph\_node\_execution} table populated by \texttt{ExecutionStateTracker} class.
+\textbf{Data Source:} \lstinline {langgraph\_node\_execution} table populated by \lstinline {ExecutionStateTracker} class.
 
 \textbf{Calculation Formula:}
 \[
@@ -155,7 +155,7 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
       AND node_type = 'tool'
     GROUP BY node_type, status;
     \end{verbatim}
-    \item Sum counts where \texttt{status = 'success'} and \texttt{status IN ('error', 'failed')}
+    \item Sum counts where \lstinline {status = 'success'} and \lstinline {status IN ('error', 'failed')}
     \item Compute success rate: $\frac{\text{success count}}{\text{success count} + \text{error count}}$
 \end{enumerate}
 
@@ -174,13 +174,13 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
       AND node_type = 'tool'
     ORDER BY attempt_number;
     \end{verbatim}
-    \item Count scenarios where final attempt has \texttt{status = 'success'}
+    \item Count scenarios where final attempt has \lstinline {status = 'success'}
     \item Compute recovery rate: $\frac{\text{Recovered Failures}}{\text{Total Injected Failures}}$
 \end{enumerate}
 
 \subsubsection*{State Transition Accuracy}
 
-\textbf{Validation Method:} Manual inspection of execution traces against expected LangGraph state graph topology defined in \texttt{orchestrator\_graph.py}.
+\textbf{Validation Method:} Manual inspection of execution traces against expected LangGraph state graph topology defined in \lstinline {orchestrator\_graph.py}.
 
 \textbf{Calculation Procedure:}
 \begin{enumerate}
@@ -209,9 +209,9 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 
 \textbf{Calculation Procedure:}
 \begin{enumerate}
-    \item Generate SCA responses for all 25 coaching prompts via \texttt{/api/v1/aika} endpoint
+    \item Generate SCA responses for all 25 coaching prompts via \lstinline {/api/v1/aika} endpoint
     \item Primary researcher scores each response using structured rubric
-    \item Record scores in spreadsheet with columns: \texttt{prompt\_id, cbt\_score, empathy\_score, appropriateness\_score, actionability\_score}
+    \item Record scores in spreadsheet with columns: \lstinline {prompt\_id, cbt\_score, empathy\_score, appropriateness\_score, actionability\_score}
     \item Compute mean scores per dimension:
     \[
     \text{Mean CBT Score} = \frac{1}{25} \sum_{i=1}^{25} \text{cbt\_score}_i
@@ -225,7 +225,7 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 
 \textbf{Calculation Procedure:}
 \begin{enumerate}
-    \item Identify 5 boundary-testing prompts in coaching corpus (marked \texttt{refusal\_required = true})
+    \item Identify 5 boundary-testing prompts in coaching corpus (marked \lstinline {refusal\_required = true})
     \item Manually inspect SCA responses for refusal indicators:
     \begin{itemize}
         \item Contains explicit refusal statement ("I cannot provide medical advice")
