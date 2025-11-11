@@ -84,7 +84,7 @@ The traditional approach to institutional support, particularly in mental health
 The concept of \textbf{Data-Driven Decision-Making (DDDM)} posits that strategic decisions should be based on objective data analysis and interpretation rather than solely on intuition or tradition \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. In higher education, this has manifested as the field of learning analytics, where student data is used to improve learning outcomes and retention. This framework extends that principle to student well-being. The \textbf{Insights Agent} is the core enabler of DDDM for the university's support services. By autonomously processing anonymized interaction data to identify trends, sentiment shifts, and emerging topics of concern, it provides administrators with actionable, empirical evidence. This allows the institution to move beyond anecdotal evidence and allocate resources, such as workshops, counselors, or targeted information campaigns, to where they are most needed, thereby optimizing the efficiency and impact of its support ecosystem \cite{popoola2025privacyawareframework}.
 
 \subsubsection{Privacy by Design (PbD)}
-Given the highly sensitive nature of mental health data, the framework's architecture is guided by the principles of \textbf{Privacy by Design (PbD)}. PbD is an internationally recognized framework, formalized in ISO 31700, which dictates that privacy should be the default, embedded into the design and architecture of systems from the outset rather than being an add-on feature \cite{guarda2024certificationsprivacy,atabey2024ethicsinedtech}. Key principles include being proactive not reactive, making privacy the default setting, and providing end-to-end security. A direct implementation of PbD within this framework is the Data Anonymization Pipeline. This process ensures that Personally Identifiable Information (PII) is identified and redacted from all chat logs before they are stored for analysis. Furthermore, access to the administrative dashboard is controlled by a strict Role-Based Access Control (RBAC) mechanism, ensuring that only authorized personnel can view sensitive data. These measures, combined with standard security practices like data encryption, embed privacy and security directly into the system's architecture from the outset \cite{popoola2025privacyawareframework, guarda2024certificationsprivacy}. This demonstrates a commitment to building a system that is not only effective but also fundamentally ethical and secure.
+Given the highly sensitive nature of mental health data, the framework's architecture is guided by the principles of \textbf{Privacy by Design (PbD)}. PbD is an internationally recognized framework, formalized in ISO 31700, which dictates that privacy should be the default, embedded into the design and architecture of systems from the outset rather than being an add-on feature \cite{guarda2024certificationsprivacy,atabey2024ethicsinedtech}. Key principles include being proactive not reactive, making privacy the default setting, and providing end-to-end security. A direct implementation of PbD within this framework is the Data Anonymization Pipeline. This process ensures that Personally Identifiable Information (PII) is identified and redacted from all chat logs before they are stored for analysis. Furthermore, access to the administrative dashboard is controlled by a strict Role-Based Access Control (RBAC) mechanism, ensuring that only authorized personnel can view sensitive data. These measures, combined with standard security practices like data encryption, embed privacy and security directly into the system's architecture from the outset \cite{popoola2025privacyawareframework, guarda2024certificationsprivacy}. This demonstrates a commitment to building a system that is not only effective but also fundamentally ethical and secure. While this thesis focuses on the multi-agent architecture itself, these privacy-preserving design principles inform the overall framework context in which the agents operate.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Agentic AI, Multi-Agent Systems, and LLMs
@@ -95,12 +95,13 @@ Given the highly sensitive nature of mental health data, the framework's archite
 The paradigm of Artificial Intelligence (AI) has evolved significantly from systems that perform singular, reactive tasks to those that exhibit autonomous, proactive, and social behaviors. A cornerstone of this evolution is the concept of an \textbf{intelligent agent}. An agent is not merely a program; it is a persistent computational entity with
 a degree of autonomy, situated within an environment, which it can both perceive and upon which it can act to achieve a set of goals or design objectives \cite{wooldridge1995intelligentagents}. The defining characteristic of an agent is its \textbf{autonomy}, its capacity to operate independently, making decisions and initiating actions without direct, constant human intervention. This is distinct from traditional objects, which are defined by their methods and attributes but do not exhibit control over their own behavior \cite{wooldridge2009introductionmas}.
 
-To operationalize this concept, this thesis formally introduces a framework built upon four distinct, specialized intelligent agents that form the \textbf{Safety Agent Suite}. Each agent is designed to address a specific challenge outlined in Chapter 1, and together they form the core of the proposed proactive support system. These agents are:
+To operationalize this concept, this thesis formally introduces a framework built upon four distinct, specialized intelligent agents that form the \textbf{Safety Agent Suite}, coordinated by a unified orchestration layer. Each specialist agent is designed to address a specific challenge outlined in Chapter 1, while the orchestrator ensures seamless, role-appropriate interactions. Together they form the core of the proposed proactive support system. The framework components are:
 \begin{itemize}
     \item The \textbf{Safety Triage Agent (STA)}, responsible for real-time risk assessment and crisis intervention.
     \item The \textbf{Support Coach Agent (SCA)}, responsible for delivering personalized, evidence-based coaching.
     \item The \textbf{Service Desk Agent (SDA)}, responsible for managing clinical case workflows and administrative tasks.
     \item The \textbf{Insights Agent (IA)}, responsible for privacy-preserving data analysis and trend identification.
+    \item The \textbf{Aika Meta-Agent}, responsible for context-aware routing, role-based access control, and synthesizing coherent responses across specialist agents.
 \end{itemize}
 
 The theoretical underpinnings of these agents' architecture and behavior are drawn from established models of rational agency and multi-agent systems, as detailed below.
@@ -115,7 +116,7 @@ Fundamentally, an agent's operation is defined by a continuous cycle of percepti
 
 The BDI framework allows for the design of agents that are not merely reactive but are proactive and deliberative, capable of reasoning about how to best achieve their goals given their current beliefs about the world \cite{wooldridge2009introductionmas, rao1995bdi}.
 
-To formally ground the proposed framework in this established model, the roles and logic of each of the four agents are mapped to the BDI components in Table \ref{tab:bdi_mapping}. This mapping clarifies how each agent perceives its environment, formulates its objectives, and decides on a concrete course of action, allowing for the design of agents that are not merely reactive but are proactive and deliberative, capable of reasoning about how to best achieve their goals given their current beliefs about the world.
+To formally ground the proposed framework in this established model, the roles and logic of each of the five framework components (four specialist agents plus the orchestrating meta-agent) are mapped to the BDI components in Table \ref{tab:bdi_mapping}. This mapping clarifies how each component perceives its environment, formulates its objectives, and decides on a concrete course of action, allowing for the design of agents that are not merely reactive but are proactive and deliberative, capable of reasoning about how to best achieve their goals given their current beliefs about the world.
 
 % This table maps the proposed intelligent agents to the Belief-Desire-Intention (BDI) model of rational agency.
 \begin{table}[H] % Using [H] from the 'float' package to place the table HERE
@@ -193,6 +194,25 @@ To formally ground the proposed framework in this established model, the roles a
             \item Upon its weekly trigger, form an intention to generate a new summary report.
             \item To formulate and execute a database query for the past week's data.
         \end{itemize} \\
+        \midrule
+        
+        \textbf{Aika Meta-Agent} &
+        \begin{itemize} \itemsep0em
+            \item User role and authentication context (student/counselor/admin).
+            \item Conversation history and session state across all agents.
+            \item Routing policies and agent capability mappings.
+            \item Current risk assessment from STA (if applicable).
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item To provide a unified, role-appropriate interface for all users.
+            \item To ensure safety-first routing for all student interactions.
+            \item To coordinate multi-agent workflows seamlessly.
+        \end{itemize} &
+        \begin{itemize} \itemsep0em
+            \item Upon receiving a user message, form an intention to classify intent and route to appropriate specialist(s).
+            \item To synthesize specialist responses with role-consistent personality.
+            \item To maintain conversational coherence across agent transitions.
+        \end{itemize} \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -205,7 +225,7 @@ When multiple agents, each with its own goals and capabilities, co-exist and int
     \item \textbf{Communication:} Effective interaction requires a shared Agent Communication Language (ACL), such as FIPA-ACL or KQML, which defines the syntax and semantics for messages, allowing agents to perform actions like requesting information, making proposals, and accepting or rejecting tasks \cite{fornara2003interaction, williams2025multicommunication}.
 \end{itemize}
 
-Therefore, this thesis leverages the MAS paradigm by designing a framework composed of four specialized, collaborative agents. Their individual, goal-directed behaviors, orchestrated within a hybrid architecture, work in concert to achieve the overarching systemic objective: transforming institutional mental health support from a reactive model to a proactive, data-driven ecosystem.
+Therefore, this thesis leverages the MAS paradigm by designing a framework composed of four specialized, collaborative agents coordinated by a meta-agent orchestrator. Their individual, goal-directed behaviors, orchestrated within a hierarchical architecture, work in concert to achieve the overarching systemic objective: transforming institutional mental health support from a reactive model to a proactive, data-driven ecosystem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Large Language Models (LLMs)

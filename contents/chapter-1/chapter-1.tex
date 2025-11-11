@@ -33,7 +33,7 @@ The inefficiency and reactive nature of current university mental health support
     \item The methodological challenge of \textbf{validating the framework's functional capabilities and potential for impact in the absence of a full-scale clinical trial}. This requires developing meaningful, scenario-based testing protocols that can effectively demonstrate the agentic workflows and their advantages over static systems.
 \end{enumerate}
 
-To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Support Coach Agent (SCA)}, a \textbf{Service Desk Agent (SDA)}, and an \textbf{Insights Agent (IA)}.
+To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents—a \textbf{Safety Triage Agent (STA)}, a \textbf{Support Coach Agent (SCA)}, a \textbf{Service Desk Agent (SDA)}, and an \textbf{Insights Agent (IA)}—coordinated through an \textbf{Aika Meta-Agent} that provides unified, role-based orchestration and ensures coherent, safety-first interactions across all user roles.
 
 %-------------------------------------------------	
 
@@ -43,7 +43,7 @@ To address these challenges, this thesis proposes and details the \textbf{Safety
 The primary objectives of this thesis are:
 \begin{enumerate}
     \item To design an agentic AI framework, grounded in the BDI model of rational agency, that systematically bridges the 'insight-to-action' gap in institutional mental health support.
-    \item To implement a functional proof-of-concept prototype, the 'Safety Agent Suite,' demonstrating the orchestration of specialized agents (triage, coaching, service desk, insights) using LangGraph.
+    \item To implement a functional proof-of-concept prototype, the 'Safety Agent Suite,' demonstrating the orchestration of specialized agents (triage, coaching, service desk, insights) and a meta-agent coordinator using LangGraph.
     \item To evaluate the prototype's core agentic workflows through scenario-based testing, validating its capacity for proactive intervention and automated administrative action.
 \end{enumerate}
 
@@ -56,7 +56,7 @@ To keep the scope concrete and measurable, this thesis addresses the following r
 
 \begin{enumerate}
     \item \textbf{RQ1 (Safety):} Can the Safety Triage Agent detect crisis intent with high sensitivity while keeping false negatives minimal, and escalate within an acceptable time budget?
-    \item \textbf{RQ2 (Reliability):} How reliably does the multi-agent orchestration execute tool calls and complete end-to-end workflows under schema validation, retries, and timeouts?
+    \item \textbf{RQ2 (Orchestration Correctness):} How reliably does the LangGraph orchestration execute agent reasoning loops, validate tool-call schemas, and handle transient failures through retry and fallback logic?
     \item \textbf{RQ3 (Quality):} Do Support Coach responses meet a basic standard of CBT-informed guidance and appropriateness as rated by human evaluators on a small, blinded set?
     \item \textbf{RQ4 (Insights, minimal):} Can the Insights Agent produce stable, aggregate-only summaries under privacy thresholds without exposing individual data?
 \end{enumerate}
@@ -68,16 +68,18 @@ These questions directly inform the evaluation in Chapter IV through scenario-ba
 \section{Scope and Limitations}
 \label{sec:scope_and_limitations}
 
-To ensure the feasibility and focus of this research, the following boundaries are established:
+To ensure the feasibility and focus of this bachelor's thesis, the following boundaries are explicitly established:
 
 \begin{enumerate}
-    \item This research is focused on the \textbf{design and prototype implementation of the agentic AI framework} (the Safety Agent Suite). Supporting content such as CBT-informed prompts is limited to curated scripts; broader engagement mechanics (e.g., badges, external loyalty systems) are out of scope.
+    \item \textbf{Focus on Multi-Agent Architecture Only:} This research is focused exclusively on the \textbf{design, implementation, and evaluation of the multi-agent AI framework itself}—the Safety Agent Suite's BDI-based specialist agents, the Aika Meta-Agent orchestration layer, and their collective behavior in safety-critical conversational scenarios. The full UGM-AICare implementation includes database schema design, user interface components, blockchain token systems, and deployment infrastructure; however, \textbf{these system components are documented as implementation context but are not subjects of formal evaluation in this work}.
 
-    \item The evaluation of the framework is based on \textbf{functional, scenario-based testing} of the prototype's agentic workflows. It does not measure the long-term psychological impact on students or the real-world operational savings for the institution.
+    \item \textbf{Scenario-Based Evaluation, Not Clinical Trial:} The evaluation of the framework is based on \textbf{controlled, scenario-based testing} using synthetic conversational data representing maternal health crisis situations. This approach validates the technical feasibility of agent workflows and architectural integrity. It does \textbf{not} measure long-term psychological outcomes, therapeutic efficacy on real users, or operational cost savings—such claims would require extensive ethics approval, medical supervision, and longitudinal clinical studies that exceed the timeline and scope of bachelor's-level research.
 
-    \item The data utilized for testing the analytics agent will consist of \textbf{anonymized, pre-existing chat logs or simulated data} to ensure user privacy and controlled testing conditions.
+    \item \textbf{Simulated Data for Privacy and Feasibility:} All testing utilizes \textbf{synthetically generated crisis scenarios and simulated conversation patterns}, not real user data. This approach is necessary to protect privacy during development and to enable controlled evaluation without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population.
 
-    \item This research does not pursue full differential privacy proofs or external ledger integrations. Instead, it implements a lightweight privacy pipeline with PII redaction and aggregate-only reporting thresholds to demonstrate \textbf{privacy-aware insights} within the prototype.
+    \item \textbf{Privacy-Aware Design Without Formal Proofs:} This research does not pursue full differential privacy proofs or cryptographic verification. Instead, it implements a practical privacy pipeline with PII redaction, UUID-based anonymization, and aggregate-only reporting thresholds to demonstrate \textbf{privacy-aware agent behavior} within the prototype context.
+
+    \item \textbf{Proof-of-Concept Scope:} The UGM-AICare platform serves as the implementation vehicle for the Safety Agent Suite, providing necessary backend services and API infrastructure. The prototype demonstrates technical feasibility and serves as a foundation for future production deployment, but is not itself a clinically validated, production-ready system for deployment with real pregnant women without further extensive validation.
 \end{enumerate}
 
 \section{Contributions}
@@ -100,7 +102,7 @@ The structure of this thesis is outlined as follows:
 
 \textbf{Chapter II: Literature Review and Theoretical Framework.} This chapter surveys prior work on agentic and conversational AI for mental health, safety-critical triage systems, human-in-the-loop design, and privacy-aware analytics. It establishes the theoretical foundation that underpins the core concepts and technologies utilized in this research.
 
-\textbf{Chapter III: System Design and Architecture.} This chapter outlines the methodology and technical blueprint for the system. It explains the adoption of Design Science Research and presents the system's high-level conceptual architecture, focusing on the four components of the \textbf{Safety Agent Suite}. It details the underlying cloud-native technical architecture, justifying the chosen technology stack, including the use of \textbf{LangGraph} for agent orchestration and a \textbf{FastAPI} backend for the core application logic. It also describes the database structure, user interface design, and integrated security and privacy measures like differential privacy.
+\textbf{Chapter III: System Design and Architecture.} This chapter outlines the methodology and technical blueprint for the system. It explains the adoption of Design Science Research and presents the system's high-level conceptual architecture, focusing on the five components of the \textbf{Safety Agent Suite}: four specialized agents (STA, SCA, SDA, IA) and the Aika Meta-Agent orchestrator. It details the underlying cloud-native technical architecture, justifying the chosen technology stack, including the use of \textbf{LangGraph} for agent orchestration and a \textbf{FastAPI} backend for the core application logic. It also describes the database structure, user interface design, and integrated security and privacy measures like differential privacy.
 
 \textbf{Chapter IV: Implementation and Evaluation.} This chapter describes the development and testing of the system prototype. This chapter details the technical environment used for implementation and demonstrates the functional prototype that was built. It then explains the testing process used to evaluate the system's performance against its design requirements. The chapter concludes by presenting the results from these tests and providing an analysis of the findings.
 
