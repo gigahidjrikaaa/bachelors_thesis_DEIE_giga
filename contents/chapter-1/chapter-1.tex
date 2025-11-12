@@ -17,6 +17,39 @@ This research therefore moves beyond conventional AI applications by proposing t
 
 This framework is prototyped within the \textbf{UGM-AICare Project}, a collaborative university research initiative focused on developing AI-driven mental health and well-being tools for the Universitas Gadjah Mada (UGM) community. The project serves as the practical testbed for validating the proposed agentic system in a real institutional context.
 
+To clarify the paradigm shift this research proposes, Table~\ref{tab:support_paradigms} presents a systematic comparison of three mental health support models: traditional in-person counseling, reactive AI chatbots, and the proposed proactive multi-agent framework. This comparison reveals that both traditional and chatbot-based approaches share a fundamental limitation—they are \textbf{reactive systems that depend on student-initiated help-seeking behavior}. The proposed framework addresses this limitation through continuous monitoring, automated risk detection, and proactive intervention while maintaining human oversight for safety-critical decisions.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Comparison of mental health support paradigms: Traditional, chatbot, and proposed proactive multi-agent systems.}
+    \label{tab:support_paradigms}
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{p{2.3cm}p{3.2cm}p{3.2cm}p{3.8cm}}
+        \toprule
+        \textbf{Characteristic} & \textbf{Traditional In-Person Counseling} & \textbf{Reactive AI Chatbots} & \textbf{Proposed Multi-Agent Framework (UGM-AICare)} \\
+        \midrule
+        \textbf{Initiation Model} & Student must self-refer and schedule appointment & Student must open app and initiate conversation & Continuous monitoring with automated outreach capability; system-initiated intervention \\
+        \midrule
+        \textbf{Availability} & Limited office hours (typically 9am-5pm); multi-week waitlists common & 24/7 availability; instant response & 24/7 availability with proactive intervention triggers; automated escalation protocols \\
+        \midrule
+        \textbf{Scalability} & Constrained by counselor-to-student ratio (1:1500 average); unsustainable at scale & Scales to unlimited concurrent users & Scales through automated triage and routing; human oversight reserved for critical cases \\
+        \midrule
+        \textbf{Data Utilization} & Manual case notes; no population-level trend analysis & Individual conversation logs; limited cross-user insights & Population-level analytics with privacy-preserving aggregation; automated intervention routing based on trends \\
+        \midrule
+        \textbf{Intervention Timing} & \textbf{After crisis escalates} (reactive: student seeks help post-crisis) & \textbf{After student reaches out} (reactive: depends on user initiation) & \textbf{Before crisis peaks} (proactive: automated risk detection triggers early intervention) \\
+        \midrule
+        \textbf{Administrative Integration} & Manual case management; human-dependent scheduling and follow-up workflows & No administrative integration; standalone conversational interface & Automated case creation, appointment scheduling, resource allocation, and counselor notification \\
+        \midrule
+        \textbf{Key Limitation} & \textbf{Relies entirely on student help-seeking behavior}; barriers include stigma, lack of awareness, symptom-induced apathy & \textbf{Still requires student to initiate contact}; does not reach students who avoid seeking help & Requires validation through controlled testing before clinical deployment; performance not yet validated on live student populations \\
+        \midrule
+        \textbf{Human Oversight} & Direct human delivery of all services & Minimal oversight; no clinical escalation path & Human-in-the-loop for all critical decisions; automated triage with mandatory counselor review \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The critical insight from this comparison is that technological advancement alone (moving from in-person to chatbot) does not address the fundamental barrier: \textbf{vulnerable students who need help most are precisely those least likely to initiate contact} \cite{PLACEHOLDER_CITE_help_seeking_barriers, PLACEHOLDER_CITE_mental_health_stigma}. This research hypothesizes that closing this gap requires a paradigm shift from reactive to proactive support, operationalized through autonomous agent-based monitoring and intervention.
+
 
 %-------------------------------------------------
 
@@ -73,13 +106,15 @@ To ensure the feasibility and focus of this bachelor's thesis, the following bou
 \begin{enumerate}
     \item \textbf{Focus on Multi-Agent Architecture Only:} This research is focused exclusively on the \textbf{design, implementation, and evaluation of the multi-agent AI framework itself}—the Safety Agent Suite's BDI-based specialist agents, the Aika Meta-Agent orchestration layer, and their collective behavior in safety-critical conversational scenarios. The full UGM-AICare implementation includes database schema design, user interface components, blockchain token systems, and deployment infrastructure; however, \textbf{these system components are documented as implementation context but are not subjects of formal evaluation in this work}.
 
-    \item \textbf{Scenario-Based Evaluation, Not Clinical Trial:} The evaluation of the framework is based on \textbf{controlled, scenario-based testing} using synthetic conversational data representing maternal health crisis situations. This approach validates the technical feasibility of agent workflows and architectural integrity. It does \textbf{not} measure long-term psychological outcomes, therapeutic efficacy on real users, or operational cost savings—such claims would require extensive ethics approval, medical supervision, and longitudinal clinical studies that exceed the timeline and scope of bachelor's-level research.
+    \item \textbf{Proof-of-Concept Evaluation Scope:} The evaluation adopts a \textbf{proof-of-concept validation approach} appropriate for bachelor's-level Design Science Research. The objective is to demonstrate \textbf{technical feasibility}—that the Safety Agent Suite can execute core workflows correctly under controlled conditions. Evaluation uses modest sample sizes: 50 crisis scenarios for safety triage (RQ1), 10 conversation flows for orchestration (RQ2), 10 coaching scenarios for response quality (RQ3), and code review with unit tests for privacy validation (RQ4). This approach validates architectural correctness without requiring extensive data collection infrastructure, consistent with DSR artifact evaluation conventions where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
 
-    \item \textbf{Simulated Data for Privacy and Feasibility:} All testing utilizes \textbf{synthetically generated crisis scenarios and simulated conversation patterns}, not real user data. This approach is necessary to protect privacy during development and to enable controlled evaluation without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population.
+    \item \textbf{Simulated Data for Privacy and Feasibility:} All testing utilizes \textbf{synthetically generated student mental health crisis scenarios and simulated conversation patterns} created using GPT-4 and Claude 3.5 Sonnet, not real user data. This approach is necessary to protect privacy during development and to enable controlled evaluation without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population. Ground truth labels for synthetic scenarios are provided by the primary researcher with peer validation, acknowledging that clinical expert validation remains future work.
 
-    \item \textbf{Privacy-Aware Design Without Formal Proofs:} This research does not pursue full differential privacy proofs or cryptographic verification. Instead, it implements a practical privacy pipeline with PII redaction, UUID-based anonymization, and aggregate-only reporting thresholds to demonstrate \textbf{privacy-aware agent behavior} within the prototype context.
+    \item \textbf{Single-Rater Assessment with AI Validation:} Response quality evaluation (RQ3) is conducted by the primary researcher using a structured rubric, with GPT-4 performing independent validation on the same responses to provide a reference point for consistency. This pragmatic approach demonstrates the evaluation methodology while acknowledging that inter-rater reliability analysis with multiple clinical experts and formal therapeutic quality assessment using validated instruments (e.g., Cognitive Therapy Scale) remain future work appropriate for clinical validation studies.
 
-    \item \textbf{Proof-of-Concept Scope:} The UGM-AICare platform serves as the implementation vehicle for the Safety Agent Suite, providing necessary backend services and API infrastructure. The prototype demonstrates technical feasibility and serves as a foundation for future production deployment, but is not itself a clinically validated, production-ready system for deployment with real pregnant women without further extensive validation.
+    \item \textbf{Privacy-Aware Design Without Formal Proofs:} This research implements k-anonymity enforcement ($k \geq 5$) with code-level verification and unit testing to validate privacy safeguards function as designed. This demonstrates \textbf{privacy-aware agent behavior} and implementation correctness within the prototype context. However, it does not pursue full differential privacy proofs, formal threat modeling using frameworks like LINDDUN, or cryptographic verification—activities appropriate for production security audits but beyond bachelor's thesis scope.
+
+    \item \textbf{Technical Feasibility, Not Clinical Efficacy:} This evaluation demonstrates that the proposed multi-agent architecture is \textit{technically feasible}—the agents can classify crises, orchestrate workflows, generate appropriate responses, and enforce privacy thresholds under controlled conditions. It does \textbf{not} claim to have validated clinical efficacy (long-term mental health outcome improvement), cultural appropriateness for Indonesian students, operational sustainability, or production-readiness for deployment without further testing. Such claims would require ethics approval, multi-rater expert evaluation, field pilots with real users, longitudinal outcome measurement, and cost-benefit analysis—activities beyond bachelor's thesis scope but identified as critical future work in Chapter IV, Section~\ref{sec:discussion}.
 \end{enumerate}
 
 \section{Contributions}

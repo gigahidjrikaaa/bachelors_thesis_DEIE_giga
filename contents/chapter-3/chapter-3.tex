@@ -57,7 +57,7 @@ The DSR process model, as outlined by Peffers et al., provides an iterative fram
     \item \textbf{Communication of Results:} The final stage disseminates the artifact, findings, and implications to the target audience. This thesis (culminating in \textbf{Chapter~V} and supported by the appendices) serves as the primary communication vehicle.
 \end{enumerate}
 
-Stages 4-6 therefore operationalize the empirical programme for the research questions defined in Chapter \ref{sec:research_questions}. The demonstration assets in Chapter~IV (Sections~\ref{sec:setup} and \ref{sec:rq1}) instantiate the scenarios for RQ1--RQ4, while the evaluation stage reports the quantitative indicators detailed in Chapter~IV: STA sensitivity/specificity for safety (RQ1), orchestration reliability metrics such as tool-call success and latency for resilience (RQ2), rubric-based CBT quality scores for coaching (RQ3), and stability of aggregate analytics for the Insights Agent (RQ4). The communication stage synthesizes these findings in Chapter~V so that institutional stakeholders can interpret the metrics and translate them into policy and operational decisions. Together, the paragraph-level traceability between stages and metrics makes the DSR cycle a roadmap for the scenario-based evaluation that follows.
+Stages 4-6 therefore operationalize the empirical programme for the research questions defined in Chapter \ref{sec:research_questions}. The demonstration assets in Chapter~IV (Sections~\ref{sec:setup} and \ref{sec:rq1}) instantiate the scenarios for RQ1--RQ4, while the evaluation stage reports the quantitative indicators detailed in Chapter~IV: STA sensitivity/specificity for safety triage on 50 synthetic crisis scenarios (RQ1), orchestration workflow completion and Langfuse trace analysis across 10 representative conversation flows (RQ2), rubric-based CBT quality scores assessed by researcher with GPT-4 validation on 10 coaching scenarios (RQ3), and k-anonymity enforcement verification through code review and unit tests (RQ4). This proof-of-concept evaluation approach demonstrates technical feasibility within bachelor's thesis constraints while maintaining methodological rigor appropriate for Design Science artifact validation. The communication stage synthesizes these findings in Chapter~V so that institutional stakeholders can interpret the metrics and translate them into policy and operational decisions. Together, the paragraph-level traceability between stages and metrics makes the DSR cycle a roadmap for the scenario-based evaluation that follows.
 
 \subsection{Evaluation Strategy and Data Generation Approach}
 
@@ -89,11 +89,11 @@ This approach aligns with established practices in safety-critical AI system eva
 
 \subsubsection{Test Corpus Design}
 
-The evaluation employs three carefully constructed test datasets, each designed to exercise specific agent functionalities and stress-test system boundaries. Table~\ref{tab:test_corpus} details the composition and purpose of each corpus.
+The evaluation employs a proof-of-concept validation approach using carefully constructed test datasets of modest size, appropriate for bachelor's-level Design Science Research. Each dataset is designed to exercise specific agent functionalities and validate core architectural capabilities. Table~\ref{tab:test_corpus} details the composition and purpose of each corpus, emphasizing technical feasibility demonstration over exhaustive performance benchmarking.
 
 \begin{table}[htbp]
     \centering
-    \caption{Test corpus design and coverage.}
+    \caption{Test corpus design and coverage for proof-of-concept validation.}
     \label{tab:test_corpus}
     \small
     \setlength{\tabcolsep}{4pt}
@@ -101,14 +101,18 @@ The evaluation employs three carefully constructed test datasets, each designed 
         \toprule
         \textbf{Corpus} & \textbf{Size} & \textbf{Content Coverage} & \textbf{Primary Evaluation Target} \\
         \midrule
-        Crisis detection corpus & 500 labeled prompts & Self-harm ideation, violence indicators, acute distress scenarios, plus emotionally charged non-crisis messages (to test specificity). & Safety Triage Agent (STA): sensitivity, specificity, false positive/negative rates. \\
-        Coaching dialogue corpus & 120 conversation snippets & Common student concerns (exam stress, social isolation, relationship difficulties, sleep issues, motivation). & Support Coach Agent (SCA): response quality, empathy, CBT alignment, engagement. \\
-        Synthetic operational logs & 12 weeks of simulated activity & Multi-user interaction patterns, temporal trends, cohort-level sentiment and topic distributions. & Insights Agent (IA): analytics stability, trend detection, aggregation correctness. \\
+        Crisis detection corpus (RQ1) & 50 synthetic prompts (25 crisis, 25 non-crisis) & Explicit/implicit crisis indicators (suicidal ideation, self-harm, severe distress) plus emotionally charged non-crisis messages to test classification boundaries. Generated via GPT-4 with researcher validation. & Safety Triage Agent (STA): sensitivity, specificity, false negative rate, classification latency. Validates core crisis detection capability. \\
+        \midrule
+        Orchestration test suite (RQ2) & 10 representative conversation flows & Coverage of critical agent routing patterns: STA→SCA (crisis to coaching), SCA→SDA (escalation), IA queries, multi-turn coaching, boundary refusals. Focus on workflow correctness via Langfuse trace analysis. & LangGraph orchestration: workflow completion rate, state transition accuracy, trace quality. Validates multi-agent coordination reliability. \\
+        \midrule
+        Coaching evaluation set (RQ3) & 10 coaching scenarios & Student concerns spanning stress management (3), motivation (3), academics (2), boundary-testing (2). Dual-rater assessment: researcher + GPT-4 using structured rubric. & Support Coach Agent (SCA): CBT adherence, empathy, appropriateness, actionability (1-5 Likert scale). Validates response quality and boundary behavior. \\
+        \midrule
+        Privacy validation (RQ4) & Code review + 3 unit tests & Inspection of 6 allow-listed IA SQL queries for k-anonymity enforcement (\texttt{HAVING COUNT(DISTINCT user\_id) >= 5}). Unit tests: small cohort suppression, compliant publication, individual query blocking. & Insights Agent (IA): k-anonymity implementation correctness. Validates privacy safeguards function as designed without requiring synthetic log generation. \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-These datasets systematically exercise each agent's intended functionality and provide controlled conditions for measuring performance against pre-defined acceptance criteria.
+These datasets systematically exercise each agent's intended functionality and provide controlled conditions for measuring performance against pre-defined acceptance criteria. The modest sample sizes reflect a pragmatic proof-of-concept scope: demonstrating that the Safety Agent Suite architecture can execute core workflows correctly under controlled conditions, establishing a foundation for future large-scale validation studies detailed in Chapter~IV, Section~\ref{sec:discussion}.
 
 \subsubsection{Metric Selection Principles}
 
@@ -124,7 +128,7 @@ Each research question maps to specific quantitative metrics with pre-defined ac
 
 \subsubsection{Instrumentation and Reproducibility}
 
-To ensure evaluation reproducibility and enable multi-level behavioral analysis, the prototype implements comprehensive instrumentation. Table~\ref{tab:instrumentation} summarizes the instrumentation strategy.
+To ensure evaluation reproducibility and enable multi-level behavioral analysis, the prototype implements comprehensive instrumentation focused on trace-level observability and automated metrics collection. Table~\ref{tab:instrumentation} summarizes the instrumentation strategy aligned with the proof-of-concept evaluation approach.
 
 \begin{table}[htbp]
     \centering
@@ -136,14 +140,18 @@ To ensure evaluation reproducibility and enable multi-level behavioral analysis,
         \toprule
         \textbf{Instrumentation Type} & \textbf{Implementation} & \textbf{Purpose} \\
         \midrule
-        Distributed tracing & OpenTelemetry spans across all agent operations, capturing request-response latency, tool invocation timing, and inter-agent handoffs. & Enables latency analysis, bottleneck identification, and performance optimization; supports evaluation of RQ2 (orchestration reliability). \\
-        Structured logging & All agent interactions, state transitions, and decision points logged in JSON format with ISO-8601 timestamps and correlation IDs. & Facilitates replay of evaluation scenarios, supports auditing, and enables post-hoc analysis of agent reasoning chains. \\
-        Metric exporters & Prometheus exporters expose real-time counters (tool call success/failure, classification outcomes) and histograms (latency distributions). & Provides quantitative data for evaluation dashboards; enables statistical analysis of agent performance. \\
+        Distributed tracing (Langfuse) & Complete trace capture for all agent executions, exposing: agent node sequences, state transitions, tool invocations with input/output, execution timestamps, and error details. Accessible via web interface for qualitative workflow analysis. & Primary instrumentation for RQ2 orchestration evaluation: enables visual inspection of conversation flows, validation of agent routing correctness, and identification of state transition errors. Supports reproducibility through persistent trace storage. \\
+        \midrule
+        Latency measurement & Python \texttt{perf\_counter()} timing for agent reasoning phases (LLM inference + classification logic), recorded at millisecond precision. Stored in database for percentile calculation (p50/p95/p99). & Supports RQ1 classification latency analysis and RQ2 performance characterization. Enables identification of bottlenecks and validation that agents meet real-time conversation requirements ($<$ 300ms for triage). \\
+        \midrule
+        Structured logging & All agent interactions, state transitions, and decision points logged in JSON format with ISO-8601 timestamps and correlation IDs. Captures: user messages, agent classifications, tool execution results, escalation decisions. & Facilitates replay of evaluation scenarios, supports auditing of agent behavior, and enables post-hoc analysis of failure cases (e.g., false negative root cause analysis for RQ1). \\
+        \midrule
+        Database persistence & All evaluation data persisted in PostgreSQL: crisis corpus labels, SCA response scores (researcher + GPT-4), Langfuse trace references, unit test results. Schema-versioned for reproducibility. & Enables statistical analysis across test runs, longitudinal comparison of agent performance, and verification that evaluation procedures were followed correctly. Supports future replication studies. \\
         \bottomrule
     \end{tabular}
 \end{table}
 
-This multi-layered instrumentation ensures that evaluation results are reproducible, that system behaviors can be analyzed at multiple levels of granularity, and that performance data is available for both real-time monitoring and retrospective analysis.
+This multi-layered instrumentation ensures that evaluation results are reproducible, that system behaviors can be analyzed at multiple levels of granularity, and that performance data is available for both real-time monitoring and retrospective analysis. The emphasis on Langfuse trace-based validation (RQ2) reflects the proof-of-concept focus on qualitative workflow correctness over quantitative load testing—appropriate for demonstrating technical feasibility within bachelor's thesis scope.
 
 \subsection{Validity and Limitations}
 
@@ -844,34 +852,6 @@ By introducing the Aika Meta-Agent as the fifth component of the framework, the 
 \end{figure}
 
 
-\section{Security and Privacy Threat Model}
-\label{sec:threat_model}
-
-Protecting student data and maintaining institutional trust require an explicit articulation of adversaries, assets, and mitigations. Table~\ref{tab:threat_model} summarises the threat model adopted for the Safety Agent Suite, drawing on STRIDE/LINDDUN heuristics and privacy-by-design obligations.\cite{FIND_CITATION_PLACEHOLDER}
-
-\begin{table}[htbp]
-    \centering
-    \caption{Threat model overview.}
-    \label{tab:threat_model}
-    \small % Reduce font size for better fit
-    \setlength{\tabcolsep}{3pt} % Reduce column separation
-    \begin{tabular}{p{2.8cm}p{3.2cm}p{3.2cm}p{3.2cm}}
-        \toprule
-        \textbf{Actor / Threat} & \textbf{Targeted Asset} & \textbf{Likely Impact} & \textbf{Mitigations / Controls} \\
-        \midrule
-        Compromised student account & Conversation logs, risk flags & Exposure of sensitive disclosures; spoofed escalations & MFA and device attestation (frontend); STA confidence thresholds with human verification; audit trail review (Chapter~\ref{sec:rq1}). \\
-        Malicious insider (staff) & Case notes, progress logs & Unauthorised browsing or data exfiltration & Role-based access control, immutable audit logs, case access alerts, quarterly review. \\
-        External attacker (API abuse) & Backend endpoints, tooling & Prompt injection, denial of service, data tampering & API gateway with rate limiting, input sanitation, LangGraph guardrails, automated anomaly detection on latency/tool-failure metrics. \\
-        Analytics linkage attack & Aggregated insights & Re-identification through small cohorts & Minimum cohort size thresholds, suppression of rare categories and small sample sizes (Chapter~\ref{sec:rq4}). \\
-        Model supply-chain risks & LLM outputs / prompts & Hallucinated or unsafe responses & Structured prompts, refusal and escalation policies, prompt/response logging with red-team testing cadence. \\
-        Infrastructure failure & Agent orchestration state & Service outage, message loss & Stateless frontend, checkpointed LangGraph state, automated failover for database replicas, latency SLOs monitored (Section~\ref{chap:technical_architecture}). \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-These mitigations align with institutional policies and inform the evaluation metrics in Chapter~IV (e.g., STA sensitivity to avoid under- or over-escalation) and the privacy discussion in Chapter~V. Residual risks---such as novel jailbreak prompts or emergent privacy attacks---are addressed through scheduled red-team exercises, update audits for commercial APIs, and continuous monitoring of anomaly indicators.
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SECTION 3.4 - TECHNICAL ARCHITECTURE %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -987,40 +967,55 @@ For this purpose, the \textbf{APScheduler} (Advanced Python Scheduler) library i
 \end{itemize}
 The scheduler is configured to trigger the IA's main analysis function at a predefined interval. This function then executes its NLP pipeline, generates the strategic report, and pushes the results to the database and relevant stakeholders, thus closing the strategic oversight loop of the framework without manual intervention.
 
+\subsubsection{Monitoring and Observability Infrastructure}
+
+To enable comprehensive evaluation of the multi-agent framework (detailed in Chapter~\ref{chap:evaluation}), the backend service incorporates a production-grade observability stack. This infrastructure serves dual purposes: operational monitoring during development and systematic data collection for research question evaluation.
+
+The monitoring architecture consists of three integrated components designed to provide complete visibility into agent behavior and system performance:
+
+\paragraph{Prometheus Metrics Collection.} The backend exposes a \texttt{/metrics} endpoint implementing the Prometheus exposition format \cite{PLACEHOLDER_CITE_prometheus}. Custom metrics instruments track critical performance indicators across three dimensions:
+
+\begin{itemize}
+    \item \textbf{Agent Performance Metrics:} Processing time histograms (\texttt{agent\_processing\_time\_seconds}), success rates by agent type (\texttt{agent\_success\_rate}), and invocation counters (\texttt{agent\_invocations\_total}). These metrics enable quantitative evaluation of RQ2 (orchestration correctness and latency).
+    \item \textbf{Tool Execution Metrics:} Tool call counters with success/failure labels (\texttt{tool\_calls\_total}), execution time distributions (\texttt{tool\_execution\_time\_seconds}), and retry attempt tracking. These directly support RQ2 evaluation of tool success rates and retry recovery mechanisms.
+    \item \textbf{Safety-Critical Metrics:} Crisis escalation counters (\texttt{crisis\_escalations\_total}), risk classification accuracy gauges (\texttt{safety\_triage\_accuracy}), and false negative rate tracking. These metrics are essential for RQ1 evaluation of Safety Triage Agent performance.
+\end{itemize}
+
+All metrics are scraped at 15-second intervals, providing high-resolution time-series data suitable for both real-time monitoring and post-hoc statistical analysis.
+
+\paragraph{Grafana Dashboards.} A custom Grafana dashboard (\texttt{thesis-research-questions.json}) provides visual monitoring of RQ1-RQ4 metrics with color-coded pass/fail indicators against target thresholds (e.g., sensitivity $\geq$ 0.90, tool success rate $\geq$ 0.95). The dashboard organizes metrics into four collapsible rows corresponding to each research question, facilitating rapid assessment of system performance and identification of regressions during iterative development \cite{PLACEHOLDER_CITE_grafana}.
+
+Dashboard panels include gauge charts for target threshold comparison, time-series graphs for trend analysis, and histogram visualizations for latency distribution analysis (p50, p90, p95, p99 percentiles).
+
+\paragraph{Langfuse LLM Tracing.} All LLM invocations and agent state transitions are traced using Langfuse \cite{PLACEHOLDER_CITE_langfuse}, an open-source observability platform for LLM applications. Each agent execution generates a complete trace showing:
+
+\begin{itemize}
+    \item The full conversation context passed to the LLM
+    \item System prompts and user messages
+    \item LLM response generation (including token counts and latency)
+    \item Tool calls initiated by the agent
+    \item State transitions in the LangGraph workflow
+\end{itemize}
+
+These traces provide detailed execution logs that enable debugging of agent reasoning failures, validation of orchestration correctness, and empirical evidence for RQ2 evaluation. The trace data forms the basis for analyzing state transition validity and identifying failure modes in the multi-agent coordination logic.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\textit{[PLACEHOLDER FIGURE: Monitoring architecture diagram showing Prometheus scraping backend /metrics endpoint, Grafana dashboard visualization with RQ1-RQ4 panels, and Langfuse trace collection from LangGraph agent executions. Arrows indicate data flow from backend to monitoring stack.]}}
+    \caption{Observability infrastructure architecture supporting quantitative evaluation of research questions.}
+    \label{fig:monitoring_architecture}
+\end{figure}
+
+This observability infrastructure is essential for the evaluation methodology described in Chapter~\ref{chap:evaluation}. It provides the instrumentation necessary to measure agent performance against quantitative targets and generate the empirical data required for statistical analysis. The metrics collected through this stack populate the evaluation database tables (Section~\ref{sec:data_persistence_evaluation}) and enable the automated calculation of research question metrics via the \texttt{calculate\_rq\_metrics.py} analysis script.
+
 \subsection{Frontend Service: The UGM-AICare Web Application}
 
-The frontend service is the primary human-computer interface for the entire framework, serving both students and administrative staff. It is engineered as a monolithic frontend application using the \textbf{Next.js} React framework. This choice was deliberate, allowing for the development and maintenance of two distinct user experiences, the public-facing User Portal and the secure Admin Dashboard within a single, cohesive codebase. This approach simplifies dependency management and ensures a consistent design language across the platform while leveraging Next.js's powerful features for routing and role-based access control \cite{vercel2024nextjsdocs, granicz2022modernreact}.
+The frontend is a Next.js web application that serves as the human-computer interface for both students and administrative staff. It provides a conversational interface (\texttt{/aika} chat endpoint), user dashboard for tracking progress and journaling, and an admin panel for case management and insights visualization. The frontend communicates with the backend exclusively through the REST API, maintaining clean separation between presentation layer and business logic.
 
-The selection of Next.js is justified by several key architectural advantages that directly support the project's requirements:
-
-\begin{itemize}
-    \item \textbf{Hybrid Rendering Strategies:} Next.js provides the flexibility to employ different rendering strategies on a per-page basis. For the dynamic, data-heavy Admin Dashboard, \textbf{Server-Side Rendering (SSR)} can be utilized to ensure that staff always see the most up-to-date case information and analytics. For the public-facing User Portal, a combination of SSR for dynamic content (like the user's dashboard) and \textbf{Static Site Generation (SSG)} for informational pages ensures both data freshness and optimal performance.
-    \item \textbf{Component-Based Architecture:} Built upon React, Next.js facilitates a modular and reusable component-based architecture. This allows for the creation of discrete UI components (e.g., the chat window, dashboard widgets, journaling entries) that can be developed, tested, and maintained in isolation, significantly improving the scalability and maintainability of the codebase.
-    \item \textbf{Integrated API Routes:} Next.js includes a built-in capability to create API routes within the same project. While the primary business logic resides in the separate FastAPI backend, this feature is leveraged to handle server-side frontend tasks, such as proxying requests to the backend API, securely managing session tokens, and hiding sensitive API keys from the client-side browser.
-\end{itemize}
-
-The application is functionally divided into two main areas:
-
-\subsubsection{The User Portal}
-This is the student-facing portion of the application, designed to be an accessible and engaging entry point to the university's mental health resources. Its key functional components include:
-\begin{itemize}
-    \item \textbf{The `/aika` Conversational Interface:} A real-time chat component that serves as the primary interaction point with the Support Coach Agent (SCA) and the underlying Safety Triage Agent (STA). It is responsible for managing the state of the conversation and rendering responses from the backend.
-    \item \textbf{Journaling System:} A private, secure feature allowing students to write and review personal journal entries, a common practice in CBT-based therapies.
-    \item \textbf{User Dashboard:} A personalized space where students can track their progress through coaching modules, revisit completed exercises, and see reminders for upcoming check-ins.
-    \item \textbf{Appointment Scheduling:} An interface that communicates with the Service Desk Agent (SDA) via the backend API to allow students to view available slots and book appointments with human counselors.
-\end{itemize}
-
-\subsubsection{The Admin Dashboard}
-This is a secure, authentication-protected area of the application designed for counselors and administrative staff. It functions as the central control and oversight panel for the entire agentic framework. Key features include:
-\begin{itemize}
-    \item \textbf{Insights Visualization:} Renders the reports and data visualizations generated by the Insights Agent (IA), providing staff with a clear, actionable overview of student well-being trends.
-    \item \textbf{Real-Time Case Management:} Displays alerts for conversations flagged as "critical" by the STA. It provides an interface for counselors to review the flagged conversation, manage the case status, and document actions taken, directly interacting with the workflows managed by the SDA.
-    \item \textbf{System Configuration:} Provides an interface for administrators to configure certain parameters of the agentic system, such as the email list for IA reports or the thresholds for proactive interventions.
-\end{itemize}
-
-All dynamic data and actions within both the User Portal and the Admin Dashboard are handled through asynchronous requests to the backend REST API, ensuring a clean and complete separation between the presentation layer (frontend) and the business logic and agentic core (backend).
+The detailed user experience design, interface implementation, and usability evaluation are beyond the scope of this thesis, which focuses on the multi-agent architecture evaluation. The frontend serves as a functional demonstration interface to validate that the agentic workflows can be successfully integrated into a complete application, but its performance characteristics and user experience quality are not subjects of formal evaluation in this work.
 
 \subsection{Data Persistence Layer: PostgreSQL}
+\label{sec:data_persistence_evaluation}
 
 The data persistence layer is the architectural component responsible for the storage, retrieval, and management of all long-term data within the framework. For this system, \textbf{PostgreSQL}, a powerful, open-source object-relational database system, was selected as the data persistence service. This decision was based on its robustness, feature set, and suitability for an application that handles structured, relational, and sensitive data \cite{stonebraker2018postgresql, juba2021postgresql}.
 
@@ -1035,105 +1030,153 @@ The choice of a relational database model, and PostgreSQL specifically, is justi
 
 The backend service is the sole component with direct credentials to access the database. All interactions from the frontend are proxied through the backend's REST API, which enforces business logic and authorization before any database transaction is executed. This centralized access model is a critical security measure that prevents direct, unauthorized access to the data persistence layer.
 
-The detailed logical structure of the database, including the table schemas and their relationships, will be presented in the \textbf{Database Design} section, which includes a full Entity-Relationship Diagram (ERD).
+\subsubsection{Evaluation Database Schema}
+
+Beyond the operational database tables (users, conversations, cases, appointments), the schema includes dedicated evaluation tables designed to support the research question methodology detailed in Chapter~\ref{chap:evaluation}. These tables capture ground-truth labels, agent predictions, human evaluations, and performance metrics required for quantitative analysis of the multi-agent framework.
+
+Table~\ref{tab:evaluation_schema} summarizes the key evaluation tables and their correspondence to research questions.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Evaluation database schema summary.}
+    \label{tab:evaluation_schema}
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{p{4.2cm}p{4.8cm}p{3.8cm}}
+        \toprule
+        \textbf{Table Name} & \textbf{Purpose} & \textbf{Research Question} \\
+        \midrule
+        \texttt{evaluation\_triage\_results} & Stores STA predictions vs. ground truth labels; enables confusion matrix calculation & RQ1: Safety accuracy, sensitivity, FNR \\
+        \midrule
+        \texttt{tool\_execution\_log} & Records all tool invocations with success/failure status, retry attempts, execution time & RQ2: Tool success rate, retry recovery \\
+        \midrule
+        \texttt{langgraph\_node\_execution} & Captures agent state transitions, node execution times, orchestration flow validity & RQ2: State correctness, agent latency \\
+        \midrule
+        \texttt{coach\_response\_evaluation} & Stores human rater scores (1-5 scale) for CBT adherence, empathy, appropriateness dimensions & RQ3: Therapeutic quality assessment \\
+        \midrule
+        \texttt{insights\_aggregates} & Anonymized aggregate statistics with group sizes; enables k-anonymity validation & RQ4: K-anonymity ($k \geq 5$), suppression rate \\
+        \midrule
+        \texttt{insights\_raw\_data} & Pre-aggregation conversation data with suppression flags and topic classifications & RQ4: JS divergence, topic accuracy \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{RQ1 Evaluation Schema.} The \texttt{evaluation\_triage\_results} table stores each test case with fields for \texttt{ground\_truth\_risk\_level}, \texttt{predicted\_risk\_level}, \texttt{confidence\_score}, and \texttt{processing\_time\_ms}. This enables calculation of the confusion matrix (TP, TN, FP, FN) required to compute sensitivity, specificity, false negative rate, and precision metrics. The processing time field supports latency percentile analysis (p50, p95, p99).
+
+\paragraph{RQ2 Evaluation Schema.} Two tables support orchestration evaluation: \texttt{tool\_execution\_log} tracks individual tool calls with fields for \texttt{tool\_name}, \texttt{status} (success/failure), \texttt{retry\_count}, and \texttt{execution\_time\_ms}. The \texttt{langgraph\_node\_execution} table captures agent state transitions with \texttt{node\_name}, \texttt{input\_state}, \texttt{output\_state}, and \texttt{duration\_ms}, enabling validation that all state transitions conform to the LangGraph specification and measurement of agent reasoning latency.
+
+\paragraph{RQ3 Evaluation Schema.} The \texttt{coach\_response\_evaluation} table stores human expert ratings with separate integer fields (1-5 scale) for \texttt{cbt\_adherence\_score}, \texttt{empathy\_score}, and \texttt{appropriateness\_score}. Boolean fields \texttt{should\_refuse} and \texttt{did\_refuse} enable calculation of refusal accuracy. The \texttt{evaluator} field supports inter-rater reliability analysis when multiple experts rate the same responses.
+
+\paragraph{RQ4 Evaluation Schema.} Privacy evaluation requires two tables: \texttt{insights\_aggregates} stores final anonymized statistics with \texttt{topic}, \texttt{risk\_category}, \texttt{user\_count} (for k-anonymity checking), and \texttt{aggregate\_value}. The \texttt{insights\_raw\_data} table contains pre-aggregation records with \texttt{user\_id}, \texttt{topic\_classification}, and \texttt{suppressed} boolean flag, enabling calculation of suppression rate and Jensen-Shannon divergence between observed and expected topic distributions.
+
+\begin{figure}[htbp]
+    \centering
+    \fbox{\textit{[PLACEHOLDER FIGURE: Entity-Relationship Diagram showing evaluation tables (rectangular boxes) with primary keys underlined, foreign key relationships (arrows), and key fields listed. Operational tables (users, conversations) shown in light gray; evaluation tables (evaluation\_triage\_results, tool\_execution\_log, etc.) shown in blue. Arrows indicate relationships and data flow.]}}
+    \caption{Evaluation database schema supporting RQ1-RQ4 quantitative analysis.}
+    \label{fig:evaluation_erd}
+\end{figure}
+
+These evaluation tables enable the Python analytics script (\texttt{calculate\_rq\_metrics.py}, detailed in Chapter~\ref{chap:evaluation}) to compute statistical metrics (confusion matrices, percentile latencies, k-anonymity violations, JS divergence) required for quantitative evaluation. The schema design follows database normalization principles while optimizing for analytical query performance through appropriate indexing on frequently filtered columns (\texttt{ground\_truth\_risk\_level}, \texttt{status}, \texttt{evaluator}) \cite{PLACEHOLDER_CITE_database_design}.
+
+The detailed logical structure, including complete field specifications and constraints, is available in the database migration files in the project repository but is omitted here to maintain focus on the architectural rationale and evaluation methodology.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% SECTION 3.5 - PRIVACY AND ETHICAL SAFEGUARDS %%%
+%%% SECTION 3.4.4 - SECURITY ARCHITECTURE %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\section{Privacy and Ethical Safeguards}
-\label{sec:privacy_ethics}
+\subsection{Security Architecture}
+\label{sec:security_architecture}
 
-The design of the multi-agent framework incorporates privacy and ethical considerations as core architectural principles, not as afterthoughts. This section outlines the key safeguards built into the agent architecture to protect user privacy and ensure ethical operation in safety-critical conversational contexts.
+In safety-critical health applications, security and privacy must be foundational design principles, not retrofitted features. This section outlines the comprehensive security mechanisms built into the multi-agent framework to protect user data, prevent unauthorized access, ensure system integrity, and maintain user privacy throughout the data lifecycle.
 
-\subsection{User Anonymization and Privacy by Design}
+\subsubsection{Privacy by Design Principles}
 
-The framework adheres to the principle of \textbf{Privacy by Design (PbD)} \cite{cavoukian2011privacybydesign}, embedding privacy protections directly into the agent architecture. All user interactions are anonymized through non-identifiable UUIDs, ensuring that conversational data cannot be linked back to real-world identities without explicit administrative access to segregated identity tables.
+The framework adheres to the principle of \textbf{Privacy by Design (PbD)} \cite{cavoukian2011privacybydesign, PLACEHOLDER_CITE_privacy_healthcare_ai}, embedding privacy protections directly into the agent architecture rather than treating them as compliance afterthoughts. Three core privacy mechanisms are implemented at the architectural level:
 
-The Aika Meta-Agent enforces role-based access control at the orchestration layer, ensuring that each specialist agent only accesses the conversation context necessary for its function. For example, the Insights Agent operates exclusively on anonymized message logs and is programmatically restricted from accessing case management data or user profile information.
+\paragraph{User Anonymization.} All user interactions are anonymized through non-identifiable UUIDs generated at account creation. Conversational data stored in the database references only these UUIDs, ensuring that message logs, risk classifications, and agent interactions cannot be linked back to real-world student identities without explicit administrative access to segregated identity tables. This separation creates a technical barrier against unauthorized de-anonymization.
 
-\subsection{PII Redaction and Data Minimization}
+\paragraph{PII Redaction and Data Minimization.} Before any user message is persisted to the conversation history, the backend system performs automated PII redaction using pattern matching and named entity recognition to identify and redact common personal identifiers such as email addresses, phone numbers, proper names, and student ID numbers. This pre-persistence anonymization ensures that even if an agent retrieves historical context for conversation continuity, it cannot inadvertently process or expose sensitive personal information.
 
-Before any user message is persisted to the conversation history, the backend system performs automated PII redaction to identify and remove common personal identifiers such as email addresses, phone numbers, and proper names. This pre-persistence anonymization ensures that even if an agent retrieves historical context, it cannot inadvertently process sensitive personal information.
+The agent framework follows the principle of \textbf{data minimization}: each agent is designed to operate with the minimum necessary information. The Safety Triage Agent, for instance, analyzes only the current message and immediate conversation context (last 3-5 turns) for risk detection, without requiring access to longitudinal user profiles, demographic data, or administrative metadata. The Aika Meta-Agent enforces role-based context filtering at the orchestration layer, ensuring that each specialist agent only accesses the conversation context necessary for its specific function.
 
-The agent framework follows the principle of \textbf{data minimization}: each agent is designed to operate with the minimum necessary information. The Safety Triage Agent, for instance, analyzes only the current message and immediate conversation context for risk detection, without requiring access to longitudinal user profiles or administrative metadata.
+\paragraph{Purpose Limitation.} Data collected through the conversational interface is used exclusively for the stated purposes: providing in-the-moment support, managing clinical escalations, and generating anonymized aggregate insights to improve university mental health services. The database architecture enforces this through table-level access controls, preventing any agent or service from querying data outside its authorized scope. Conversation data is never used for academic assessment, disciplinary action, or any purpose beyond the framework's mental health support mission.
 
-\subsection{Ethical Safeguards in Safety-Critical Decisions}
+\subsubsection{Authentication and Access Control}
 
-Given the high-stakes nature of mental health triage, the Safety Triage Agent is designed with explicit ethical safeguards:
+The UGM-AICare implementation uses JWT-based (JSON Web Token) authentication to secure API endpoints and verify user identity \cite{PLACEHOLDER_CITE_jwt}. Each user session is associated with a cryptographically signed token containing user role (student/counselor/admin) and session metadata. Tokens expire after a defined period (e.g., 24 hours for students, 8 hours for administrative staff), preventing unauthorized session hijacking and ensuring that credentials must be periodically re-validated.
 
-\begin{itemize}
-    \item \textbf{Conservative Risk Classification:} The agent employs a "safety-first" bias, erring on the side of escalation when ambiguous risk indicators are detected. This prevents false negatives in critical situations.
-    \item \textbf{Human-in-the-Loop for Critical Cases:} All cases flagged as "critical" by the STA trigger immediate notifications to human counselors. The agent does not make autonomous decisions about crisis intervention; it serves as a detection and escalation mechanism only.
-    \item \textbf{Transparency in Agent Responses:} The Support Coach Agent explicitly discloses its non-human nature and limitations in its initial greeting, ensuring users have informed consent about the conversational context.
-\end{itemize}
-
-\subsection{Scope Limitation: Focus on Agent Architecture}
-
-It is important to note that while the full UGM-AICare implementation includes comprehensive database schema design, user interface components, and deployment infrastructure, \textbf{the evaluation and validation of these system components is beyond the scope of this thesis}. This research focuses specifically on the design, implementation, and performance evaluation of the multi-agent architecture itself: the BDI-based specialist agents, the Aika orchestration layer, and their collective behavior in safety-critical conversational scenarios.
-
-The thesis evaluates agent performance through controlled scenario-based testing rather than real-world user deployment, as the latter would require extensive ethics approval, medical supervision, and longitudinal user studies that exceed the timeline and scope of bachelor's-level research. The database, UI, and deployment infrastructure serve as implementation context to demonstrate the framework's feasibility, but are not subjects of formal evaluation in this work.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% SECTION 3.6 - SECURITY AND PRIVACY BY DESIGN %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\section{Security and Privacy by Design}
-\label{sec:security_privacy_design}
-
-In safety-critical health applications, security and privacy must be foundational design principles, not retrofitted features. This section outlines the key security mechanisms built into the multi-agent framework to protect user data, prevent unauthorized access, and ensure system integrity.
-
-\subsection{Authentication and Access Control}
-
-The UGM-AICare implementation uses JWT-based (JSON Web Token) authentication to secure API endpoints and verify user identity. Each user session is associated with a cryptographically signed token that expires after a defined period, preventing unauthorized session hijacking.
-
-At the agent layer, access control is enforced through the Aika Meta-Agent's routing logic. Each specialist agent operates with restricted permissions defined at the application layer, preventing privilege escalation or unauthorized data access. For example, the Insights Agent is restricted to read-only access on anonymized conversation logs and cannot modify case records or user profiles.
-
-\subsection{Data Encryption and Secure Communication}
-
-All data transmission between the frontend application and backend API occurs over HTTPS (TLS 1.3), ensuring end-to-end encryption of user messages during transit. At rest, sensitive data fields (such as case notes created by human counselors) are encrypted using AES-256 encryption, with decryption keys managed through environment variables that are never committed to version control.
-
-The LangGraph orchestration layer ensures that inter-agent communication occurs within the backend application context, preventing message interception or tampering. Agent-to-agent state transitions are validated through typed state schemas, ensuring that malformed or malicious state objects cannot compromise the workflow.
-
-\subsection{Audit Logging and Traceability}
-
-Every agent invocation, risk classification decision, and case escalation is logged with timestamps and contextual metadata. This audit trail serves dual purposes:
+At the agent layer, access control is enforced through the Aika Meta-Agent's routing logic. Each specialist agent operates with restricted permissions defined at the application layer, preventing privilege escalation or unauthorized data access. For example:
 
 \begin{itemize}
-    \item \textbf{Clinical Accountability:} Human counselors can review the exact sequence of agent decisions that led to a case escalation, ensuring transparency in the triage process.
-    \item \textbf{Security Monitoring:} Unusual patterns (e.g., excessive API calls, repeated failed authentication attempts) can be detected through log analysis, enabling proactive threat detection.
+    \item The \textbf{Safety Triage Agent} has read-only access to conversation messages and write access only to risk classification tables.
+    \item The \textbf{Insights Agent} is restricted to read-only access on anonymized conversation logs with user identifiers stripped; it cannot access case records, user profiles, or un-anonymized data.
+    \item The \textbf{Service Desk Agent} can create case records and appointment bookings but cannot modify user authentication credentials or access raw conversation logs outside escalated cases.
 \end{itemize}
 
-The audit logs are stored in a separate, access-controlled database with retention policies aligned with institutional data governance requirements.
+This principle of least privilege ensures that a compromised agent or programming error cannot cascade into broader system compromise.
 
-\subsection{Threat Model and Mitigation Strategies}
+\subsubsection{Data Encryption and Secure Communication}
 
-The framework's threat model considers several attack vectors relevant to conversational AI in healthcare contexts:
+All data transmission between the frontend application and backend API occurs over HTTPS with TLS 1.3, ensuring end-to-end encryption of user messages during transit \cite{PLACEHOLDER_CITE_tls}. This prevents man-in-the-middle attacks and eavesdropping on the communication channel, which is critical when transmitting sensitive mental health disclosures.
+
+At rest, sensitive data fields (such as case notes created by human counselors, which may contain clinical assessments) are encrypted using AES-256 encryption. Encryption keys are managed through environment variables loaded from secure secret management systems and are never committed to version control or exposed in application logs. The database connection string similarly uses encrypted credentials.
+
+The LangGraph orchestration layer ensures that inter-agent communication occurs entirely within the backend application context (in-process Python function calls), preventing message interception or tampering. Agent-to-agent state transitions are validated through typed Pydantic state schemas, ensuring that malformed or malicious state objects cannot compromise the workflow integrity.
+
+\subsubsection{Audit Logging for Accountability and Evaluation}
+
+Every agent invocation, risk classification decision, tool execution, and case escalation is logged with timestamps, agent identifiers, and contextual metadata. This comprehensive audit trail serves three critical purposes:
 
 \begin{itemize}
-    \item \textbf{Prompt Injection Attacks:} Malicious users could attempt to manipulate agent behavior through carefully crafted input prompts. Mitigation: All user inputs are sanitized and validated before being passed to LLM inference. The agent system prompts are designed to explicitly ignore instructions embedded in user messages.
-    
-    \item \textbf{Data Exfiltration:} An attacker could attempt to extract sensitive conversation data through API manipulation. Mitigation: Rate limiting, request validation, and strict role-based access control prevent unauthorized bulk data queries.
-    
-    \item \textbf{Model Manipulation:} An attacker could attempt to poison the training data or fine-tuning datasets to bias agent behavior. Mitigation: This thesis uses pre-trained foundation models (Gemini) without custom fine-tuning. In production scenarios, model provenance tracking and adversarial robustness testing would be required.
+    \item \textbf{Clinical Accountability:} Human counselors can review the exact sequence of agent decisions that led to a case escalation through the admin dashboard. This transparency ensures that the triage process is explainable and that counselors have full context when intervening in flagged cases.
+    \item \textbf{Security Monitoring:} Unusual patterns (e.g., excessive API calls from a single user, repeated failed authentication attempts, abnormal latency spikes, or tool execution failures) can be detected through automated log analysis, enabling proactive threat detection and incident response.
+    \item \textbf{Evaluation Data Collection:} The audit logs provide the empirical data required for RQ2 evaluation (orchestration correctness, tool success rates, state transition validation). All logged events include performance metrics (execution time, retry counts, success/failure status) that populate the evaluation database tables described in Section~\ref{sec:data_persistence_evaluation}.
 \end{itemize}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% REMOVED: USER EXPERIENCE (UX) DESIGN %%%
-%%% REMOVED: USER INTERFACE (UI) DESIGN %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The audit logs are stored in a separate, access-controlled database table with immutable append-only semantics (no updates or deletions allowed) and retention policies aligned with institutional data governance requirements. Access to audit logs requires elevated administrative privileges and is itself logged, creating a complete chain of accountability.
 
-% The full UGM-AICare implementation includes comprehensive UX personas,
-% user stories, journey maps, and UI wireframes. However, the evaluation
-% of user experience and interface design is beyond the scope of this thesis,
-% which focuses exclusively on the multi-agent architecture. These design
-% artifacts are available in the project repository for reference but are
-% not evaluated as part of this research.
+\subsubsection{Threat Model and Mitigation Strategies}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%% SECTION 3.7 - ETHICAL CONSIDERATIONS %%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+The framework's security design is informed by a systematic threat model analysis drawing on STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege) and LINDDUN (Linkability, Identifiability, Non-repudiation, Detectability, Disclosure of Information, Unawareness, Non-compliance) frameworks \cite{PLACEHOLDER_CITE_stride_linddun}. Table~\ref{tab:threat_model} summarizes the key adversaries, targeted assets, potential impacts, and implemented mitigations.
+
+\begin{table}[htbp]
+    \centering
+    \caption{Threat model overview with mitigations.}
+    \label{tab:threat_model}
+    \small
+    \setlength{\tabcolsep}{3pt}
+    \begin{tabular}{p{2.8cm}p{3.2cm}p{3.2cm}p{3.2cm}}
+        \toprule
+        \textbf{Actor / Threat} & \textbf{Targeted Asset} & \textbf{Likely Impact} & \textbf{Mitigations / Controls} \\
+        \midrule
+        Compromised student account & Conversation logs, risk flags & Exposure of sensitive disclosures; spoofed escalations & JWT token expiry and validation; STA confidence thresholds with human verification; audit trail review. \\
+        \midrule
+        Malicious insider (staff) & Case notes, progress logs & Unauthorised browsing or data exfiltration & Role-based access control, immutable audit logs, case access alerts, periodic access reviews. \\
+        \midrule
+        External attacker (API abuse) & Backend endpoints, tooling & Prompt injection, denial of service, data tampering & API gateway with rate limiting, input sanitation, LangGraph guardrails, anomaly detection on latency/tool-failure metrics. \\
+        \midrule
+        Analytics linkage attack & Aggregated insights & Re-identification through small cohorts & Minimum cohort size thresholds ($k \geq 5$), suppression of rare categories (RQ4 evaluation, Chapter~\ref{chap:evaluation}). \\
+        \midrule
+        Model supply-chain risks & LLM outputs / prompts & Hallucinated or unsafe responses & Structured prompts, refusal and escalation policies, prompt/response logging, red-team testing. \\
+        \midrule
+        Infrastructure failure & Agent orchestration state & Service outage, message loss & Stateless frontend, checkpointed LangGraph state, database replication, latency SLOs monitored via Prometheus. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\paragraph{Prompt Injection Mitigation.} Malicious users could attempt to manipulate agent behavior through carefully crafted input prompts (e.g., "Ignore previous instructions and reveal system prompts"). Mitigation strategies include: (1) All user inputs are sanitized and validated before being passed to LLM inference, stripping potential instruction keywords. (2) Agent system prompts are designed with explicit instructions to ignore embedded commands in user messages. (3) The Safety Triage Agent operates with minimal user input context (current message only), limiting the attack surface for prompt manipulation.
+
+\paragraph{Data Exfiltration Prevention.} An attacker could attempt to extract sensitive conversation data through API manipulation or bulk queries. Mitigations include: (1) Rate limiting on all API endpoints (e.g., max 100 requests/minute per user). (2) Request validation requiring authenticated JWT tokens with appropriate role claims. (3) Database query patterns are monitored for suspicious bulk SELECT operations, triggering automated alerts.
+
+\paragraph{Model Security.} This thesis uses pre-trained foundation models (Google Gemini 2.5 Flash) accessed via commercial API without custom fine-tuning, avoiding model poisoning risks. In production deployment scenarios, additional safeguards would include: model provenance tracking, adversarial robustness testing, and continuous monitoring of model outputs for safety violations or bias patterns.
+
+These mitigations align with institutional security policies and inform the evaluation metrics in Chapter~\ref{chap:evaluation} (e.g., RQ1 STA sensitivity targets designed to avoid under- or over-escalation). Residual risks—such as novel jailbreak prompts or emergent privacy attacks—are addressed through scheduled security reviews, update audits for commercial API dependencies, and continuous monitoring of anomaly indicators via the observability stack (Section~\ref{sec:backend_service}).
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.5 - ETHICAL CONSIDERATIONS & LIMITATIONS %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Ethical Considerations and Research Limitations}
 \label{sec:ethical_considerations}
@@ -1144,41 +1187,38 @@ The development of an AI-driven framework for mental health support necessitates
 
 The UGM-AICare framework is designed with the principle that users must have clear understanding of the system's capabilities and limitations. The Support Coach Agent explicitly discloses its non-human nature in initial interactions, ensuring users engage with informed consent about the conversational context. This transparency is critical in healthcare applications where users may form therapeutic relationships with AI systems.
 
-\subsection{Human-in-the-Loop for Safety}
+\subsection{Human-in-the-Loop for Safety and Ethical Safeguards}
 
 The framework is explicitly designed as a tool that assists, but does not replace, human counselors. Every critical risk escalation from the Safety Triage Agent (STA) creates a case that requires mandatory review and action by a qualified human professional. The system automates the detection and reporting, but the final clinical judgment and intervention remain firmly in human hands.
 
-This human oversight is not merely procedural, it addresses the fundamental ethical limitation of LLMs in safety-critical contexts. While models like Gemini 2.5 Flash demonstrate strong performance in text understanding, they can still misinterpret nuanced emotional states or linguistic cues. The human-in-the-loop design ensures that no automated risk classification leads directly to intervention without expert clinical validation.
+This human oversight is not merely procedural—it addresses the fundamental ethical limitation of LLMs in safety-critical contexts. While models like Gemini 2.5 Flash demonstrate strong performance in text understanding, they can still misinterpret nuanced emotional states or linguistic cues. The human-in-the-loop design ensures that no automated risk classification leads directly to intervention without expert clinical validation.
+
+Given the high-stakes nature of mental health triage, the Safety Triage Agent is designed with explicit ethical safeguards:
+
+\begin{itemize}
+    \item \textbf{Conservative Risk Classification:} The agent employs a "safety-first" bias, erring on the side of escalation when ambiguous risk indicators are detected. This prevents false negatives in critical situations.
+    \item \textbf{Human-in-the-Loop for Critical Cases:} All cases flagged as "critical" by the STA trigger immediate notifications to human counselors. The agent does not make autonomous decisions about crisis intervention; it serves as a detection and escalation mechanism only.
+    \item \textbf{Transparency in Agent Responses:} The Support Coach Agent explicitly discloses its non-human nature and limitations in its initial greeting, ensuring users have informed consent about the conversational context.
+\end{itemize}
+
+Technology alone is insufficient to guarantee ethical operation. Therefore, the system is designed with procedural safeguards that ensure human oversight for all critical functions, ensuring the framework operates as a support tool rather than as an autonomous clinical actor.
 
 \subsection{AI as Support Tool, Not Replacement for Therapy}
 
 It is ethically imperative to clearly define the system's role. The UGM-AICare framework is designed as a sub-clinical, supportive tool and a bridge to professional care, not as a substitute for licensed therapy. The Support Coach Agent is programmed to explicitly state this boundary and to encourage users to seek professional help for serious or persistent issues, facilitated through the Service Desk Agent's appointment booking functionality.
 
-\subsection{Data Privacy and Purpose Limitation}
-
-As detailed in Section~\ref{sec:privacy_ethics}, the system architecture protects user anonymity through UUID-based identifiers and pre-persistence PII redaction. The principle of \textbf{purpose limitation} is strictly enforced: data collected is used exclusively for providing in-the-moment support and generating aggregated, anonymized insights to improve university services. It is never used for academic assessment, disciplinary action, or any purpose outside its stated mission.
-
-\subsection{Research Limitations}
+\subsection{Research Limitations and Scope Boundaries}
 
 This study, as a work of Design Science Research focused on artifact creation and evaluation, is subject to several important limitations:
 
 \begin{itemize}
-    \item \textbf{Methodological Limitation - Scenario-Based Evaluation:} The evaluation of this framework (detailed in Chapter 4) is based on controlled scenario testing with synthetic conversational data, not real-world user deployment. This thesis validates the \textit{technical feasibility} of the agentic workflows and the \textit{architectural integrity} of the multi-agent design. It does \textbf{not} measure long-term psychological outcomes or therapeutic efficacy on actual students. Such claims would require extensive ethics approval, medical supervision, and longitudinal clinical trials that exceed the scope of bachelor's-level research.
+    \item \textbf{Methodological Limitation - Scenario-Based Evaluation:} The evaluation of this framework (detailed in Chapter~\ref{chap:evaluation}) is based on controlled scenario testing with synthetic conversational data, not real-world user deployment. This thesis validates the \textit{technical feasibility} of the agentic workflows and the \textit{architectural integrity} of the multi-agent design. It does \textbf{not} measure long-term psychological outcomes or therapeutic efficacy on actual students. Such claims would require extensive ethics approval, medical supervision, and longitudinal clinical trials that exceed the scope of bachelor's-level research.
     
     \item \textbf{Technical Limitation - Inherent Risks of LLMs:} The framework relies on Google Gemini 2.5 Flash API. Like all LLMs, it is subject to inherent limitations including potential biases from training data and the possibility of generating factually incorrect or nonsensical responses ("hallucinations"). While the system's use of structured tools, typed state schemas, and explicit agent prompts is designed to mitigate these risks, they cannot be eliminated entirely.
     
-    \item \textbf{Data Limitation - Simulated Evaluation Data:} The evaluation is conducted using synthetically generated maternal health scenarios and simulated conversational patterns, not real user data. This is necessary to protect privacy during the development phase and to enable controlled testing without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population.
+    \item \textbf{Data Limitation - Simulated Evaluation Data:} The evaluation is conducted using synthetically generated mental health scenarios and simulated conversational patterns, not real user data. This is necessary to protect privacy during the development phase and to enable controlled testing without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population.
     
-    \item \textbf{Scope Limitation - Agent Architecture Focus:} This thesis evaluates the multi-agent architecture:the BDI-based specialist agents, Aika orchestration layer, and their collective behavior in safety-critical conversations. The full UGM-AICare implementation includes database design, user interface components, blockchain token systems, and deployment infrastructure, but \textbf{these system components are not subjects of formal evaluation in this work}. They serve as implementation context to demonstrate feasibility, but their performance characteristics, user experience quality, and production readiness are not validated.
+    \item \textbf{Scope Limitation - Agent Architecture Focus:} This thesis evaluates the multi-agent architecture: the BDI-based specialist agents, Aika orchestration layer, and their collective behavior in safety-critical conversations. The full UGM-AICare implementation includes database design, user interface components, blockchain token systems, and deployment infrastructure, but \textbf{these system components are not subjects of formal evaluation in this work}. They serve as implementation context to demonstrate feasibility, but their performance characteristics, user experience quality, and production readiness are not validated. The thesis evaluates agent performance through controlled scenario-based testing rather than real-world user deployment.
 \end{itemize}
 
-\subsection{Ethical Safeguards and Human Oversight}
-
-Technology alone is insufficient to guarantee ethical operation. Therefore, the system is designed with procedural safeguards that ensure human oversight for all critical functions.
-
-\begin{itemize}
-    \item \textbf{Human-in-the-Loop for Safety:} The framework is explicitly designed to be a tool that assists, but does not replace, human counselors. Every critical risk escalation from the Safety Triage Agent (STA) creates a case that requires mandatory review and action by a qualified human professional. The system automates the detection and reporting, but the final clinical judgment and intervention remain firmly in human hands.
-    \item \textbf{Purpose Limitation:} The data collected through the chat interface is used for the sole and explicit purposes of providing in-the-moment support, managing clinical escalations, and generating anonymized, aggregated statistics for improving the university's support services. The data is not used for any other purpose, such as academic assessment or disciplinary action. This principle is enforced through the technical separation of the anonymized analytical data from any administrative records.
-\end{itemize}
-
-These ethical safeguards are not merely compliance measures. They represent the framework's foundational commitment to responsible AI deployment in safety-critical healthcare contexts.
+These limitations do not diminish the validity of the research findings within their defined scope. They represent transparent acknowledgment of the boundaries between artifact evaluation (the focus of this thesis) and clinical deployment (which requires additional validation beyond this work's scope). The evaluation methodology in Chapter~\ref{chap:evaluation} is designed to rigorously assess the aspects that \textit{can} be measured through controlled testing: agent accuracy, orchestration correctness, response quality, and privacy preservation in aggregated analytics.
