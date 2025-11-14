@@ -274,7 +274,7 @@ This separation provides several critical advantages:
     
     \item \textbf{Modular Evolution:} When safety triage logic requires refinement (e.g., adjusting crisis keywords or classification thresholds), changes are isolated to the STA module without risk of inadvertently affecting the SCA's therapeutic coaching behavior. This modularity accelerates development velocity and reduces regression risk \cite{burguillo2017multiagentsystems}.
     
-    \item \textbf{Independent Performance Optimization:} Each agent can employ task-appropriate LLM configurations. For instance, the STA prioritizes \textit{low latency} (using Gemini 2.0 Flash with temperature=0.1 for deterministic classification), while the SCA prioritizes \textit{response quality} (using Gemini 2.5 Pro with temperature=0.7 for natural, empathetic conversation). This optimization would be impossible with a monolithic architecture.
+    \item \textbf{Independent Performance Optimization:} Each agent can employ task-appropriate LLM configurations. The Aika Meta-Agent uses Gemini 2.5 Flash (stable) for routing decisions and Gemini 2.5 Flash Lite for lightweight conversational responses, while STA, SCA, and SDA all use Gemini 2.5 Flash with temperature=0.3--0.7 depending on task requirements (deterministic classification vs. empathetic conversation generation). The Insights Agent (IA) uses a two-stage approach: SQL-only aggregation with k-anonymity enforcement for privacy-preserving data extraction, followed by Gemini 2.5 Pro (temperature=0.5) for advanced reasoning and narrative generation. This per-agent model selection enables optimization impossible with monolithic architecture.
     
     \item \textbf{Domain-Specific Tool Access:} Tool-calling is scoped to agent roles. The STA has access to \code{escalate_crisis} and \code{log_risk_assessment} tools but \textit{cannot} schedule appointments or generate intervention plans---capabilities reserved for the SCA and Service Desk Agent (SDA). This enforces the principle of \textit{least privilege} and prevents unintended agent behaviors.
 \end{enumerate}
@@ -426,7 +426,7 @@ The STA perceives the conversational environment by intercepting each user messa
 \end{itemize}
 
 \subsubsection{Processing Logic}
-The core logic of the STA is a high-speed classification task. Upon receiving the message $M_t$, the agent invokes a specialized function, powered by the Gemini 2.5 Pro model, to classify the message into one of several predefined risk categories. The classification function, $f_{STA}$, can be represented as:
+The core logic of the STA is a high-speed classification task. Upon receiving the message $M_t$, the agent invokes a specialized function, powered by the Gemini 2.5 Flash model (configured with temperature=0.3 for consistent classification), to classify the message into one of several predefined risk categories. The classification function, $f_{STA}$, can be represented as:
 $$ R_t = f_{STA}(M_t; \theta_{LLM}) $$
 where $\theta_{LLM}$ represents the parameters of the underlying Large Language Model, and the output, $R_t$, is an element of the set of possible risk levels, $R \in \{\text{Low, Moderate, Critical}\}$. The prompt for this classification is highly optimized for speed and accuracy, instructing the model to evaluate the text for indicators of self-harm, severe distress, or explicit requests for urgent help.
 
@@ -484,32 +484,54 @@ The IA operates under strict privacy-preserving constraints:
 \subsection{The Insights Agent (IA): The Strategic Analyst}
 
 \subsubsection{Goal}
-The IA is designed to function as the institution's automated well-being analyst. Its goal is to autonomously process anonymized, aggregated conversation data to identify population-level mental health trends, sentiment shifts, and emerging topics of concern. This provides the institution with actionable, data-driven intelligence to inform resource allocation and proactive strategy.
+The IA is designed to function as the institution's automated well-being analyst. Its goal is to autonomously process anonymized, aggregated conversation data to identify population-level mental health trends, generate interpretive narratives, and provide actionable recommendations. This provides the institution with data-driven intelligence that bridges the gap between raw metrics and strategic action.
 
 \subsubsection{Perception (Inputs)}
-The IA is activated by a time-based trigger (e.g., a weekly Cron job) and its primary input is the entire corpus of anonymized conversation logs.
+The IA is activated by administrator requests via the Admin Dashboard and operates on aggregated institutional data.
 \begin{itemize}
-    \item \textbf{Time-Based Trigger:} A signal from the APScheduler to begin its analysis.
-    \item \textbf{Anonymized Database Access:} Read-only access to the \code{conversation_logs} table, from which all personally identifiable information (PII) has been redacted.
+    \item \textbf{Query Request:} Administrator selects analytics question (e.g., "crisis trend," "session dropoffs," "resource reuse") and specifies date range (up to 365 days).
+    \item \textbf{Anonymized Database Access:} Read-only access to multiple operational tables (\code{cases}, \code{conversations}, \code{messages}, \code{triage\_assessments}, \code{intervention\_plan\_records}) with strict k-anonymity enforcement.
 \end{itemize}
 
 \subsubsection{Processing Logic}
-The IA's logic involves a pipeline of Natural Language Processing (NLP) tasks performed on the collected data. This includes:
+The IA employs a two-stage analytical pipeline combining privacy-preserving data aggregation with LLM-powered interpretation:
+
+\textbf{Stage 1: Privacy-Preserving SQL Analytics.} The agent executes one of six allow-listed SQL queries with k-anonymity enforcement (k $\geq$ 5):
 \begin{itemize}
-    \item \textbf{Topic Modeling:} Using algorithms like Latent Dirichlet Allocation (LDA) or modern transformer-based clustering to identify the most prevalent topics of discussion (e.g., "exam stress," "social isolation").
-    \item \textbf{Sentiment Analysis:} Calculating the overall sentiment score for the student population over the given period and tracking its change over time.
-    \item \textbf{Summarization:} Using the Gemini 2.5 Pro model to generate concise, human-readable summaries of the key findings from the topic and sentiment analysis.
+    \item \textbf{Crisis Trend:} Daily counts of high/critical severity cases with unique user cohorts (minimum 5 users per group).
+    \item \textbf{Session Dropoffs:} Early abandonment rates (conversations with $\leq$2 messages) and average engagement metrics.
+    \item \textbf{Resource Reuse:} Intervention plan revisit rates and completion percentages, indicating content effectiveness.
+    \item \textbf{Fallback Reduction:} AI autonomous resolution rates vs. human escalation frequencies.
+    \item \textbf{Cost Per Helpful:} Processing efficiency metrics (latency, success rates) for resource allocation optimization.
+    \item \textbf{Coverage Windows:} Hourly/weekly usage heatmaps identifying peak demand periods and staffing gaps.
 \end{itemize}
+
+All queries include \code{HAVING COUNT(DISTINCT user\_id) >= 5} clauses to suppress small cohorts, preventing individual re-identification even through linkage attacks.
+
+\textbf{Stage 2: LLM-Powered Narrative Generation.} The agent passes aggregated results to Gemini 2.5 Pro with a specialized analytical prompt to generate:
+\begin{itemize}
+    \item \textbf{Trend Identification:} Statistical patterns and temporal correlations (e.g., "Crisis cases increased 23\% during midterm period").
+    \item \textbf{Contextual Narratives:} Human-readable interpretations connecting metrics to institutional events or seasonal factors.
+    \item \textbf{Actionable Recommendations:} Specific operational suggestions (e.g., "Schedule 2 additional counselors during exam weeks; increase evening coverage for peak 18:00-22:00 window").
+    \item \textbf{Anomaly Detection:} Identification of unexpected deviations requiring administrator attention.
+\end{itemize}
+
+This two-stage design ensures transparency (SQL queries are auditable) while providing the qualitative insights administrators need for strategic decision-making.
 
 \subsubsection{Action (Outputs)}
 \begin{itemize}
-    \item \textbf{Structured Report Generation:} The final output is a structured report (e.g., in JSON or PDF format) containing visualizations (e.g., charts of topic frequency over time) and the generated summaries.
-    \item \textbf{Dashboard Update:} The agent pushes this report to the Admin Dashboard, updating the analytics view for university staff.
-    \item \textbf{Email Notification:} It can be configured to automatically email the report to a list of stakeholders, such as the head of counseling services.
+    \item \textbf{Structured Analytics Report:} JSON response containing quantitative data tables, chart configurations, and LLM-generated narrative summary with recommendations.
+    \item \textbf{Dashboard Visualization:} Real-time updates to Admin Dashboard with interactive charts (time series, heatmaps, bar charts) and executive summary cards.
+    \item \textbf{Report Export:} PDF generation capability (backend-rendered for consistency) enabling offline review and stakeholder distribution.
 \end{itemize}
 
+\subsubsection{Design Rationale and Privacy Safeguards}
 \begin{itemize}
-    \item \textbf{Design Rationale:} Assumes access to anonymised logs aggregated with $k\geq50$ users and retained for no longer than 90 days; enforces differential privacy noise addition (placeholder $\epsilon=1.0$) and suppresses outputs below the threshold; analytical prompts and pipelines were stress-tested via the stability checks in Chapter~\ref{sec:rq4}.\cite{FIND_CITATION_PLACEHOLDER}
+    \item \textbf{K-Anonymity Enforcement:} All aggregations require minimum cohort size k=5, validated through SQL \code{HAVING} clauses. Results below threshold are automatically suppressed.
+    \item \textbf{Query Allow-Listing:} Only 6 pre-approved queries are executable, preventing arbitrary SQL injection and limiting attack surface for privacy violations.
+    \item \textbf{Date Range Constraints:} Maximum 365-day query windows prevent excessive historical data access and limit temporal linkage attack vectors.
+    \item \textbf{LLM Isolation:} Narrative generation operates only on pre-aggregated, anonymized statistics—never raw conversation content. This ensures individual messages remain protected even during interpretation phase.
+    \item \textbf{No Individual-Level Access:} All outputs are cohort-level summaries. The system architecturally prevents queries targeting specific users or identifiable small groups.
 \end{itemize}
 
 \subsection{The Aika Meta-Agent: Unified Orchestration Layer}
@@ -572,6 +594,37 @@ where:
     \item $\pi_{\text{intent}}(u, \mathcal{H}) \rightarrow \mathcal{I}$ classifies user intent into $\mathcal{I} = \{\texttt{crisis}, \texttt{support}, \texttt{scheduling}, \texttt{analytics}\}$
     \item $\pi_{\text{role}}(r)$ applies role-specific constraints: $\pi_{\text{role}}(\texttt{student}) \cap \{A_{\text{IA}}\} = \emptyset$
 \end{itemize}
+
+\subsubsection{LLM Model Configuration Per Agent}
+
+Each agent employs task-specific LLM configurations optimized for their operational requirements. Table~\ref{tab:agent_llm_config} summarizes the model assignments, temperature settings, and design rationales that enable independent performance optimization across the multi-agent system.
+
+\begin{table}[htbp]
+    \centering
+    \caption{LLM Model Configuration by Agent Role}
+    \label{tab:agent_llm_config}
+    \begin{tabular}{|l|p{3.5cm}|c|p{5cm}|}
+        \hline
+        \textbf{Agent} & \textbf{Model(s)} & \textbf{Temperature} & \textbf{Design Rationale} \\
+        \hline
+        Aika (Routing) & Gemini 2.5 Flash & 0.3 & Fast, stable routing decisions with consistent intent classification \\
+        \hline
+        Aika (Conversational) & Gemini 2.5 Flash Lite & 0.7 & Lightweight model for high-volume student interactions; balances cost and quality \\
+        \hline
+        STA & Gemini 2.5 Flash & 0.3 & Low-temperature classification for consistent crisis detection with minimal variance \\
+        \hline
+        SCA & Gemini 2.5 Flash & 0.7 & Higher temperature for natural, empathetic response generation with CBT alignment \\
+        \hline
+        SDA & Gemini 2.5 Flash & 0.5 & Moderate temperature for procedural case management workflows with structured outputs \\
+        \hline
+        IA (Analytics) & None (SQL-only) & N/A & Privacy-preserving data aggregation via k-anonymity enforced SQL queries \\
+        \hline
+        IA (Interpretation) & Gemini 2.5 Pro & 0.5 & Advanced reasoning model for trend analysis, narrative generation, and actionable recommendations from aggregated data \\
+        \hline
+    \end{tabular}
+\end{table}
+
+This differentiated configuration enables each agent to optimize for their specific task requirements: STA prioritizes deterministic classification (low temperature), SCA prioritizes conversational fluency (high temperature), and IA employs a two-stage pipeline where SQL handles privacy-preserving aggregation and Gemini 2.5 Pro generates interpretive insights from anonymized statistics.
 
 \subsubsection{Role-Based Orchestration Workflows}
 
@@ -1709,7 +1762,7 @@ The framework's security design is informed by a systematic threat model analysi
 
 \textbf{2. Data Exfiltration Prevention.} An attacker could attempt to extract sensitive conversation data through API manipulation or bulk queries. Mitigations include: (1) Rate limiting on all API endpoints (e.g., max 100 requests/minute per user). (2) Request validation requiring authenticated JWT tokens with appropriate role claims. (3) Database query patterns are monitored for suspicious bulk SELECT operations, triggering automated alerts.
 
-\textbf{3. Model Security.} This thesis uses pre-trained foundation models (Google Gemini 2.5 Flash) accessed via commercial API without custom fine-tuning, avoiding model poisoning risks. In production deployment scenarios, additional safeguards would include: model provenance tracking, adversarial robustness testing, and continuous monitoring of model outputs for safety violations or bias patterns.
+\textbf{3. Model Security.} This thesis uses pre-trained foundation models (Google Gemini 2.5 Flash and Gemini 2.5 Flash Lite) accessed via commercial API without custom fine-tuning, avoiding model poisoning risks. In production deployment scenarios, additional safeguards would include: model provenance tracking, adversarial robustness testing, and continuous monitoring of model outputs for safety violations or bias patterns.
 
 \noindent These mitigations align with institutional security policies and inform the evaluation metrics in Chapter~\ref{chap:evaluation} (e.g., RQ1 STA sensitivity targets designed to avoid under- or over-escalation). Residual risks—such as novel jailbreak prompts or emergent privacy attacks—are addressed through scheduled security reviews, update audits for commercial API dependencies, and continuous monitoring of anomaly indicators via the observability stack (Section~\ref{sec:backend_service}).
 
@@ -1754,7 +1807,7 @@ This study, as a work of Design Science Research focused on artifact creation an
 \begin{itemize}
     \item \textbf{Methodological Limitation - Scenario-Based Evaluation:} The evaluation of this framework (detailed in Chapter~\ref{chap:evaluation}) is based on controlled scenario testing with synthetic conversational data, not real-world user deployment. This thesis validates the \textit{technical feasibility} of the agentic workflows and the \textit{architectural integrity} of the multi-agent design. It does \textbf{not} measure long-term psychological outcomes or therapeutic efficacy on actual students. Such claims would require extensive ethics approval, medical supervision, and longitudinal clinical trials that exceed the scope of bachelor's-level research.
     
-    \item \textbf{Technical Limitation - Inherent Risks of LLMs:} The framework relies on Google Gemini 2.5 Flash API. Like all LLMs, it is subject to inherent limitations including potential biases from training data and the possibility of generating factually incorrect or nonsensical responses ("hallucinations"). While the system's use of structured tools, typed state schemas, and explicit agent prompts is designed to mitigate these risks, they cannot be eliminated entirely.
+    \item \textbf{Technical Limitation - Inherent Risks of LLMs:} The framework relies on Google Gemini 2.5 Flash and Gemini 2.5 Flash Lite APIs for different agent tasks (routing, classification, plan generation). Like all LLMs, these models are subject to inherent limitations including potential biases from training data and the possibility of generating factually incorrect or nonsensical responses ("hallucinations"). While the system's use of structured tools, typed state schemas, and explicit agent prompts is designed to mitigate these risks, they cannot be eliminated entirely.
     
     \item \textbf{Data Limitation - Simulated Evaluation Data:} The evaluation is conducted using synthetically generated mental health scenarios and simulated conversational patterns, not real user data. This is necessary to protect privacy during the development phase and to enable controlled testing without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population.
     
