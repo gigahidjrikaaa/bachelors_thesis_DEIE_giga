@@ -125,13 +125,13 @@ Given the highly sensitive nature of mental health data, the framework's archite
 The paradigm of Artificial Intelligence (AI) has evolved significantly from systems that perform singular, reactive tasks to those that exhibit autonomous, proactive, and social behaviors. A cornerstone of this evolution is the concept of an \textbf{intelligent agent}. An agent is not merely a program; it is a persistent computational entity with
 a degree of autonomy, situated within an environment, which it can both perceive and upon which it can act to achieve a set of goals or design objectives \cite{wooldridge1995intelligentagents}. The defining characteristic of an agent is its \textbf{autonomy}, its capacity to operate independently, making decisions and initiating actions without direct, constant human intervention. This is distinct from traditional objects, which are defined by their methods and attributes but do not exhibit control over their own behavior \cite{wooldridge2009introductionmas}.
 
-To operationalize this concept, this thesis formally introduces a framework built upon four distinct, specialized intelligent agents that form the \textbf{Safety Agent Suite}, coordinated by a unified orchestration layer. Each specialist agent is designed to address a specific challenge outlined in Chapter 1, while the orchestrator ensures seamless, role-appropriate interactions. Together they form the core of the proposed proactive support system. The framework components are:
+To operationalize this concept, this thesis formally introduces a framework built upon four distinct, specialized intelligent agents that form the \textbf{Safety Agent Suite}, coordinated by a unified orchestration layer. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---all user interactions occur exclusively through Aika's conversational interface, which internally orchestrates specialist agent invocations as needed. This design ensures a consistent user experience while enabling modular, specialized intelligence. Each specialist agent operates transparently in the background, invoked conditionally based on user role and intent. Together they form the core of the proposed proactive support system. The framework components are:
 \begin{itemize}
-    \item The \textbf{Safety Triage Agent (STA)}, responsible for real-time risk assessment and crisis intervention.
-    \item The \textbf{Support Coach Agent (SCA)}, responsible for delivering personalized, evidence-based coaching.
-    \item The \textbf{Service Desk Agent (SDA)}, responsible for managing clinical case workflows and administrative tasks.
-    \item The \textbf{Insights Agent (IA)}, responsible for privacy-preserving data analysis and trend identification.
-    \item The \textbf{Aika Meta-Agent}, responsible for context-aware routing, role-based access control, and synthesizing coherent responses across specialist agents.
+    \item The \textbf{Aika Meta-Agent}, responsible for: (1) serving as the sole user-facing conversational interface for all stakeholders, (2) performing immediate Tier 1 risk screening via structured JSON responses from Gemini API, (3) context-aware routing to specialist agents based on user role and intent classification, (4) synthesizing specialist outputs into coherent, role-appropriate conversational responses, and (5) role-based access control enforcement.
+    \item The \textbf{Safety Triage Agent (STA)}, operating in the background to perform comprehensive conversation-level risk analysis (Tier 2) at conversation end, identifying cumulative risk patterns and recommending proactive follow-up interventions.
+    \item The \textbf{Therapeutic Coach Agent (TCA)}, operating entirely in the background to generate personalized, evidence-based CBT intervention plans and coping strategies that students access asynchronously via their dashboard. TCA does not participate in real-time conversations.
+    \item The \textbf{Case Management Agent (CMA)}, invoked conditionally through Aika when: (1) immediate crisis escalation is required (high/critical risk detected), (2) students/staff request appointment scheduling, or (3) counselors initiate case management workflows. CMA handles clinical case workflows, counselor assignment, and SLA tracking.
+    \item The \textbf{Insights Agent (IA)}, operating in the background for scheduled analytics, but invocable on-demand through Aika when administrators/counselors request analytics queries (e.g., ``show trending topics,'' ``case statistics for November''). IA performs privacy-preserving data analysis and trend identification on anonymized conversation data.
 \end{itemize}
 
 The theoretical underpinnings of these agents' architecture and behavior are drawn from established models of rational agency and multi-agent systems, as detailed below.
@@ -180,7 +180,7 @@ To formally ground the proposed framework in this established model, the roles a
         \end{itemize} \\
         \midrule
 
-        \textbf{SCA} &
+        \textbf{TCA} &
         \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
             \item User goals \& history
             \item Evidence-based intervention library (CBT)
@@ -195,7 +195,7 @@ To formally ground the proposed framework in this established model, the roles a
         \end{itemize} \\
         \midrule
 
-        \textbf{SDA} &
+        \textbf{CMA} &
         \begin{itemize}[leftmargin=*, nosep, topsep=0pt, partopsep=0pt]
             \item Clinical case status
             \item Counselor availability
@@ -269,12 +269,12 @@ Int_t = \text{deliberate}(Des_t, Bel_t, Int_{t-1})
 \end{equation}
 where the deliberation process considers current desires, beliefs, and previous intentions to form a committed plan.
 
-For example, in the \textbf{Safety Triage Agent (STA)}, $\text{percept}_t$ is the incoming student message $M_t$, beliefs include prior conversation context and crisis patterns, desires map to intervention goals (de-escalation, resource connection), and intentions become the selected action (escalate to SDA, provide coping strategy, or direct to emergency resources).
+For example, in the \textbf{Safety Triage Agent (STA)}, $\text{percept}_t$ is the incoming student message $M_t$, beliefs include prior conversation context and crisis patterns, desires map to intervention goals (de-escalation, resource connection), and intentions become the selected action (escalate to CMA, provide coping strategy, or direct to emergency resources).
 
 When multiple agents, each with its own goals and capabilities, co-exist and interact within a shared environment, they form a \textbf{Multi-Agent System (MAS)}. An MAS is a system in which the overall intelligent behavior and functionality are a product of the collective, emergent dynamics of its constituent agents \cite{burguillo2017multiagentsystems, petrova2025agenticweb}. The power of an MAS lies in its ability to solve problems that would be difficult or impossible for a monolithic system or a single agent to handle. This is achieved through social interaction, primarily:
 
 \begin{itemize}
-    \item \textbf{Coordination and Cooperation:} Agents must coordinate their actions to avoid interference and cooperate to achieve common goals. In this thesis, the \textbf{Insights}, \textbf{Support Coach}, \textbf{Safety Triage}, and \textbf{Service Desk} agents must cooperate: the Insights Agent provides the data-driven insights (beliefs) that the Support Coach Agent uses to form its outreach plans (intentions), while the Safety Triage Agent handles immediate, real-time needs that may fall outside the other agents' scopes, and the Service Desk Agent manages the administrative follow-up.
+    \item \textbf{Coordination and Cooperation:} Agents must coordinate their actions to avoid interference and cooperate to achieve common goals. In this thesis, the \textbf{Insights}, \textbf{Therapeutic Coach}, \textbf{Safety Triage}, and \textbf{Case Management} agents must cooperate: the Insights Agent provides the data-driven insights (beliefs) that the Therapeutic Coach Agent uses to form its outreach plans (intentions), while the Safety Triage Agent handles immediate, real-time needs that may fall outside the other agents' scopes, and the Case Management Agent manages the administrative follow-up.
     \item \textbf{Negotiation:} When agents have conflicting goals or must compete for limited resources, they must be able to negotiate to find a mutually acceptable compromise \cite{paurobally2002rationalagents, agerri2006unifiedcommunication}.
     \item \textbf{Communication:} Effective interaction requires a shared Agent Communication Language (ACL), such as FIPA-ACL or KQML, which defines the syntax and semantics for messages, allowing agents to perform actions like requesting information, making proposals, and accepting or rejecting tasks \cite{fornara2003interaction, williams2025multicommunication}.
 \end{itemize}
@@ -300,11 +300,11 @@ where $\theta_{LLM}$ represents the LLM parameters (Gemini 2.5 Flash) and $\math
 \end{cases}
 \end{equation}
 
-This classification determines subsequent routing: moderate risk ($R_t = 1$) triggers supportive coaching via SCA, while high or critical risk ($R_t \geq 2$) initiates immediate escalation to the Service Desk Agent for clinical case management.
+This classification determines subsequent routing: moderate risk ($R_t = 1$) triggers supportive coaching via TCA, while high or critical risk ($R_t \geq 2$) initiates immediate escalation to the Case Management Agent for clinical case management.
 
-\paragraph{Support Coach Agent (SCA)} The SCA generates therapeutic response $A_t$ given the current message and conversation history:
+\paragraph{Therapeutic Coach Agent (TCA)} The TCA generates therapeutic response $A_t$ given the current message and conversation history:
 \begin{equation}
-A_t = f_{SCA}(M_t, H_{t-1}; \theta_{LLM}, \mathcal{I})
+A_t = f_{TCA}(M_t, H_{t-1}; \theta_{LLM}, \mathcal{I})
 \end{equation}
 where $H_{t-1} = \{(M_0, A_0), \ldots, (M_{t-1}, A_{t-1})\}$ is the conversation history capturing previous exchanges, and $\mathcal{I}$ represents the intervention library containing evidence-based therapeutic frameworks (CBT, Motivational Interviewing). The history dependency enables the agent to maintain therapeutic continuity and adapt interventions based on student progress.
 
@@ -314,9 +314,9 @@ where $H_{t-1} = \{(M_0, A_0), \ldots, (M_{t-1}, A_{t-1})\}$ is the conversation
 \end{equation}
 where $q$ represents the analytical query (e.g., crisis trend analysis, topic modeling, sentiment aggregation) and $\mathcal{K}$ enforces privacy constraints such as k-anonymity and query result suppression. The IA's output informs institutional decision-making by quantifying population-level trends while preserving individual privacy.
 
-\paragraph{Service Desk Agent (SDA)} The SDA determines administrative action $\alpha_t$ based on case state and available resources:
+\paragraph{Case Management Agent (CMA)} The CMA determines administrative action $\alpha_t$ based on case state and available resources:
 \begin{equation}
-\alpha_t = f_{SDA}(C_t, R_{avail}; \theta_{LLM})
+\alpha_t = f_{CMA}(C_t, R_{avail}; \theta_{LLM})
 \end{equation}
 where $C_t$ represents the current case state (severity, student information, appointment history) and $R_{avail}$ denotes available resources (counselor schedules, emergency contact protocols). Actions include appointment scheduling, case note creation, and resource allocation.
 
@@ -528,7 +528,7 @@ Conditional edges implement routing logic via predicate functions that inspect t
 \end{cases}
 \end{equation}
 
-This formalization enables dynamic multi-agent orchestration where the STA's risk assessment ($R_t$) determines subsequent workflow paths: moderate risk routes to the SCA for therapeutic intervention, high or critical risk escalates to the SDA for clinical case creation, and low risk concludes the interaction. The explicit state management ensures that all downstream agents have access to the complete conversation context, enabling informed decision-making throughout the workflow.
+This formalization enables dynamic multi-agent orchestration where the STA's risk assessment ($R_t$) determines subsequent workflow paths: moderate risk routes to the TCA for therapeutic intervention, high or critical risk escalates to the CMA for clinical case creation, and low risk concludes the interaction. The explicit state management ensures that all downstream agents have access to the complete conversation context, enabling informed decision-making throughout the workflow.
 
 More generally, for any conditional routing decision, the next node is determined by a routing function $\rho$:
 \begin{equation}
@@ -566,9 +566,9 @@ This target ensures crisis indicators are identified within human perceptual thr
 
 \textbf{End-to-End User Experience:} The complete interaction flow from user message to final response must maintain acceptable responsiveness:
 \begin{equation}
-T_{E2E} = T_{STA} + T_{routing} + T_{SCA} + T_{network} \leq 1500\text{ms} \quad (p95)
+T_{E2E} = T_{STA} + T_{routing} + T_{TCA} + T_{network} \leq 1500\text{ms} \quad (p95)
 \end{equation}
-where $T_{routing}$ represents orchestration overhead, $T_{SCA}$ is the Support Coach Agent's response generation time, and $T_{network}$ accounts for transmission delays.
+where $T_{routing}$ represents orchestration overhead, $T_{TCA}$ is the Therapeutic Coach Agent's response generation time, and $T_{network}$ accounts for transmission delays.
 
 \paragraph{Performance Monitoring and Alerting}
 Node-level latency is continuously monitored through execution tracking:
@@ -610,8 +610,8 @@ The central argument of this thesis is that the next frontier in institutional m
 Therefore, this research directly addresses the identified gap by proposing and prototyping a novel agentic AI framework, the \textbf{Safety Agent Suite}, where:
 \begin{itemize}
     \item An \textbf{Insights Agent (IA)} autonomously identifies trends, moving beyond the static dashboards of current well-being analytics and creating actionable intelligence.
-    \item A \textbf{Support Coach Agent (SCA)} and a \textbf{Safety Triage Agent (STA)} act on this intelligence and on real-time user needs, providing both proactive, personalized coaching and immediate, context-aware crisis support. They function as the intelligent front-door to the support ecosystem, overcoming the limitations of purely reactive chatbots.
-    \item A \textbf{Service Desk Agent (SDA)} closes the "insight-to-action" loop on an administrative level, automating the workflows for clinical case management and resource allocation that currently render proactive models inefficient and unscalable.
+    \item A \textbf{Therapeutic Coach Agent (TCA)} and a \textbf{Safety Triage Agent (STA)} act on this intelligence and on real-time user needs, providing both proactive, personalized coaching and immediate, context-aware crisis support. They function as the intelligent front-door to the support ecosystem, overcoming the limitations of purely reactive chatbots.
+    \item A \textbf{Case Management Agent (CMA)} closes the "insight-to-action" loop on an administrative level, automating the workflows for clinical case management and resource allocation that currently render proactive models inefficient and unscalable.
 \end{itemize}
 
 By designing and evaluating a system where these agents work in concert, orchestrated by LangGraph, this thesis pioneers a holistic solution that is fundamentally more proactive, scalable, and efficient than the disparate tools described in the current literature.

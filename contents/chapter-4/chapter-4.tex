@@ -29,9 +29,9 @@ This section documents the evaluation protocol that links the Design Science sta
 \subsection*{Evaluation Environment}
 
 \begin{itemize}
-    \item \textbf{Agents under test}: Safety Triage Agent (STA), Support Coach Agent (SCA), Service Desk Agent (SDA), and Insights Agent (IA) running inside the LangGraph orchestration described in Chapter~\ref{chap:system_design}. All tool invocations are captured through structured logs to enable replay and auditing.
+    \item \textbf{Agents under test}: Safety Triage Agent (STA), Therapeutic Coach Agent (TCA), Case Management Agent (CMA), and Insights Agent (IA) running inside the LangGraph orchestration described in Chapter~\ref{chap:system_design}. All tool invocations are captured through structured logs to enable replay and auditing.
     \item \textbf{Execution platform}: FastAPI backend running LangGraph orchestration (Python~3.11) with PostgreSQL persistence for conversation state and case records. Tests are executed in a controlled development environment sufficient to validate agent behavior under conversational scenarios without production infrastructure load.
-    \item \textbf{LLM Infrastructure}: Agents utilize Google Gemini API via the free tier (5 requests/minute, 25 requests/day). The system employs differentiated model selection per agent: Aika Meta-Agent uses Gemini 2.5 Flash (stable) for routing decisions and Gemini 2.5 Flash Lite for conversational responses; STA, SCA, and SDA use Gemini 2.5 Flash with task-specific temperature settings (0.3 for classification, 0.7 for generation); IA uses SQL-only aggregation for privacy-preserving analytics, followed by Gemini 2.5 Pro (advanced reasoning) for trend interpretation and narrative generation. Test execution is scheduled across multiple days to accommodate rate limits: RQ1 scenarios distributed over 2 days, RQ2/RQ3 executed on separate days. This modest request volume is appropriate for proof-of-concept validation and aligns with DSR artifact evaluation conventions for bachelor's theses.
+    \item \textbf{LLM Infrastructure}: Agents utilize Google Gemini API via the free tier (5 requests/minute, 25 requests/day). The system employs differentiated model selection per agent: Aika Meta-Agent uses Gemini 2.5 Flash (stable) for routing decisions and Gemini 2.5 Flash Lite for conversational responses; STA, TCA, and CMA use Gemini 2.5 Flash with task-specific temperature settings (0.3 for classification, 0.7 for generation); IA uses SQL-only aggregation for privacy-preserving analytics, followed by Gemini 2.5 Pro (advanced reasoning) for trend interpretation and narrative generation. Test execution is scheduled across multiple days to accommodate rate limits: RQ1 scenarios distributed over 2 days, RQ2/RQ3 executed on separate days. This modest request volume is appropriate for proof-of-concept validation and aligns with DSR artifact evaluation conventions for bachelor's theses.
     \item \textbf{Instrumentation}: Langfuse observability platform provides trace-level monitoring for agent execution with span-level detail; execution state tracker (ExecutionStateTracker class) persists node timing, state transitions, and retry attempts to database; Prometheus metrics expose latency distributions (p50/p95/p99), escalation decisions, and error rates; processing time measured via Python's \lstinline{perf\_counter} with millisecond precision.
 \end{itemize}
 
@@ -40,7 +40,7 @@ This section documents the evaluation protocol that links the Design Science sta
 \begin{itemize}
     \item \textbf{Crisis corpus (RQ1):} 50 synthetic prompts (25 crisis scenarios featuring explicit/implicit crisis indicators such as suicidal ideation, self-harm, severe distress; 25 non-crisis emotionally charged messages) generated using GPT-4 with ground truth labels validated by primary researcher. Designed to measure classification accuracy and false positive/negative rates (see Appendix~\ref{app:crisis_corpus}).
     
-    \item \textbf{Orchestration test suite (RQ2):} 10 representative conversation flows exercising core agent routing patterns: STA→SCA (crisis to coaching), SCA→SDA (coaching to escalation), IA analytics queries, and basic SCA conversations. Selected to cover critical workflow paths with Langfuse trace analysis for qualitative validation.
+    \item \textbf{Orchestration test suite (RQ2):} 10 representative conversation flows exercising core agent routing patterns: STA→TCA (crisis to coaching), TCA→CMA (coaching to escalation), IA analytics queries, and basic TCA conversations. Selected to cover critical workflow paths with Langfuse trace analysis for qualitative validation.
     
     \item \textbf{Coaching prompts (RQ3):} 10 conversation scenarios spanning stress management, motivation issues, and boundary-testing cases (out-of-scope medical/legal requests). Evaluated using structured 5-dimension rubric (empathy \& validation, CBT techniques, cultural appropriateness, boundary respect, resource usefulness) by primary researcher with GPT-4 independent validation (see Appendix~\ref{app:coaching_prompts}).
     
@@ -51,7 +51,7 @@ This section documents the evaluation protocol that links the Design Science sta
 
 \begin{itemize}
     \item \textbf{Safety reviews}: All STA classifications on crisis corpus are validated against ground truth labels; disagreements analyzed for root cause (linguistic ambiguity, cultural context, implicit indicators).
-    \item \textbf{Coaching evaluation}: SCA responses assessed by primary researcher using structured 5-dimension rubric (empathy \& validation, CBT techniques, cultural appropriateness, boundary respect, resource usefulness) with 1--5 Likert scale. GPT-4 performs independent evaluation on same responses using identical rubric to provide validation reference point. Qualitative analysis supplements quantitative scores to identify strengths and improvement areas.
+    \item \textbf{Coaching evaluation}: TCA responses assessed by primary researcher using structured 5-dimension rubric (empathy \& validation, CBT techniques, cultural appropriateness, boundary respect, resource usefulness) with 1--5 Likert scale. GPT-4 performs independent evaluation on same responses using identical rubric to provide validation reference point. Qualitative analysis supplements quantitative scores to identify strengths and improvement areas.
     \item \textbf{Privacy verification}: Code inspection validates that all IA SQL queries include k-anonymity enforcement clauses. Unit tests confirm automatic suppression logic functions correctly under edge cases (small cohorts, rare topics, individual queries).
 \end{itemize}
 
@@ -65,7 +65,7 @@ This section documents the evaluation protocol that links the Design Science sta
         arrow/.style={-Latex, thick, ugmBlue}
     ]
         \node[data] (datasets) {Scenario Assets\\150 crisis prompts\\25 coaching prompts\\4-week synthetic logs};
-        \node[stage, right=of datasets] (agents) {Agents Under Test\\STA, SCA, SDA, IA\\LangGraph orchestration};
+        \node[stage, right=of datasets] (agents) {Agents Under Test\\STA, TCA, CMA, IA\\LangGraph orchestration};
         \node[stage, right=of agents] (metrics) {Instrumentation\\Langfuse traces\\Execution tracker\\Prometheus metrics};
         \node[stage, right=of metrics] (oversight) {Quality Control\\Ground truth validation\\Rubric assessment};
         \node[stage, right=of oversight] (reporting) {Reporting\\RQ-specific analysis\\Chapter~IV sections};
@@ -232,7 +232,7 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 
 \textbf{Calculation Procedure:}
 \begin{enumerate}
-    \item Generate SCA responses for all 10 coaching prompts via \lstinline {/api/v1/aika} endpoint
+    \item Generate TCA responses for all 10 coaching prompts via \lstinline {/api/v1/aika} endpoint
     \item Primary researcher scores each response using structured rubric
     \item Record scores in spreadsheet with columns: \lstinline {prompt\_id, empathy\_score, cbt\_score, cultural\_score, boundary\_score, resource\_score}
     \item Compute mean scores per dimension:
@@ -249,7 +249,7 @@ Given the crisis corpus with ground truth labels, we construct a confusion matri
 \textbf{Calculation Procedure:}
 \begin{enumerate}
     \item Identify 5 boundary-testing prompts in coaching corpus (marked \lstinline {refusal\_required = true})
-    \item Manually inspect SCA responses for refusal indicators:
+    \item Manually inspect TCA responses for refusal indicators:
     \begin{itemize}
         \item Contains explicit refusal statement ("I cannot provide medical advice")
         \item Provides alternative resource (health center referral, counselor contact)
@@ -454,16 +454,16 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
         \toprule
         \textbf{Flow ID} & \textbf{Agent Path} & \textbf{Scenario Description} \\
         \midrule
-        F1 & STA → SCA & Crisis detected, escalated to coaching support \\
-        F2 & SCA only & Basic coaching conversation (stress management) \\
-        F3 & SCA → SDA & Coaching session requiring administrative escalation \\
-        F4 & STA → SDA & Immediate crisis requiring counselor contact \\
+        F1 & STA → TCA & Crisis detected, escalated to coaching support \\
+        F2 & TCA only & Basic coaching conversation (stress management) \\
+        F3 & TCA → CMA & Coaching session requiring administrative escalation \\
+        F4 & STA → CMA & Immediate crisis requiring counselor contact \\
         F5 & IA query & Analytics request for aggregate insights \\
-        F6 & SCA multi-turn & Extended coaching conversation (3+ turns) \\
-        F7 & STA non-crisis & Non-crisis classification, direct SCA routing \\
-        F8 & SCA refusal & Out-of-scope request triggering boundary response \\
-        F9 & SDA case creation & Administrative task with database persistence \\
-        F10 & Mixed workflow & STA → SCA → IA (crisis → coaching → insights) \\
+        F6 & TCA multi-turn & Extended coaching conversation (3+ turns) \\
+        F7 & STA non-crisis & Non-crisis classification, direct TCA routing \\
+        F8 & TCA refusal & Out-of-scope request triggering boundary response \\
+        F9 & CMA case creation & Administrative task with database persistence \\
+        F10 & Mixed workflow & STA → TCA → IA (crisis → coaching → insights) \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -474,8 +474,8 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
     
     \item \textbf{Langfuse Trace Analysis:} Access Langfuse web interface (\texttt{langfuse.ugm-aicare.com}) for each execution. For each trace:
     \begin{itemize}
-        \item Verify all expected agent nodes appear in trace (STA, SCA, SDA, IA as per scenario)
-        \item Confirm state transitions follow expected workflow (e.g., F1: message → STA node → escalation decision → SCA node → coaching response)
+        \item Verify all expected agent nodes appear in trace (STA, TCA, CMA, IA as per scenario)
+        \item Confirm state transitions follow expected workflow (e.g., F1: message → STA node → escalation decision → TCA node → coaching response)
         \item Check tool invocations are captured with input/output (database queries, case creation, analytics)
         \item Measure total execution time from trace start to trace end
         \item Take screenshot of trace for documentation (include in appendix)
@@ -549,7 +549,7 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
 \begin{itemize}
     \item Correct state transitions: [REPORT VALUE]
     \item State corruption incidents: [REPORT VALUE]
-    \item Agent handoff success rate (STA → SCA, SCA → SDA, etc.)
+    \item Agent handoff success rate (STA → TCA, TCA → CMA, etc.)
 \end{itemize}
 
 \textbf{Agent Reasoning Performance:}
@@ -575,12 +575,12 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
     \item Recommendations for production-grade error handling
 \end{itemize}
 
-\section{RQ3: Support Coach Agent Response Quality}
+\section{RQ3: Therapeutic Coach Agent Response Quality}
 \label{sec:rq3}
 
 \subsection{Evaluation Design}
 
-\textbf{Objective:} Evaluate the appropriateness, empathy, and CBT-alignment of Support Coach Agent responses through structured qualitative assessment with dual-rater validation (researcher + GPT-4).
+\textbf{Objective:} Evaluate the appropriateness, empathy, and CBT-alignment of Therapeutic Coach Agent responses through structured qualitative assessment with dual-rater validation (researcher + GPT-4).
 
 \textbf{Test Dataset (See Appendix~\ref{app:coaching_prompts}):}
 \begin{itemize}
@@ -597,7 +597,7 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
 
 \textbf{Evaluation Procedure (Figure~\ref{fig:rq3_method}):}
 \begin{enumerate}
-    \item \textbf{Response Generation:} For each of 10 prompts, send to \texttt{/api/v1/aika} endpoint with conversation context. Save SCA response to structured spreadsheet with columns: \texttt{\{prompt\_id, prompt\_text, sca\_response, notes\}}.
+    \item \textbf{Response Generation:} For each of 10 prompts, send to \texttt{/api/v1/aika} endpoint with conversation context. Save TCA response to structured spreadsheet with columns: \texttt{\{prompt\_id, prompt\_text, tca\_response, notes\}}.
     
     \item \textbf{Researcher Evaluation:} Primary researcher scores each response using structured rubric (Table~\ref{tab:rq3_rubric}) with 1-5 Likert scale:
     \begin{enumerate}
@@ -676,7 +676,7 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
     ]
         % Top row
         \node[data] (prompts) {10 Coaching\\Prompts};
-        \node[process, right=of prompts] (generate) {Generate SCA\\Responses};
+        \node[process, right=of prompts] (generate) {Generate TCA\\Responses};
         \node[data, right=of generate] (responses) {Save Responses\\to Spreadsheet};
         
         % Second row
@@ -733,7 +733,7 @@ where $\text{KL}(P \parallel M) = \sum_i P(i) \log \frac{P(i)}{M(i)}$ is the Kul
 
 \textbf{Strengths and Limitations:}
 \begin{itemize}
-    \item Dimensions where SCA excels (e.g., empathy, validation) vs. struggles (e.g., advanced CBT techniques like Socratic questioning)
+    \item Dimensions where TCA excels (e.g., empathy, validation) vs. struggles (e.g., advanced CBT techniques like Socratic questioning)
     \item Consistency across different prompt types (stress vs. motivation vs. academic)
     \item Single-rater evaluation limits generalizability; future work should include clinical experts and inter-rater reliability analysis
     \item Comparison to baseline (generic empathetic responses without CBT grounding) demonstrates value of structured prompt engineering
@@ -973,18 +973,18 @@ Key findings:
 
 Key findings:
 \begin{itemize}
-    \item \textbf{What worked:} Standard conversation flows (STA→SCA, SCA-only, IA queries) executed without errors. State management correctly preserved conversation context across agent handoffs. Tool invocations (database queries, case creation) succeeded with proper input/output capture.
+    \item \textbf{What worked:} Standard conversation flows (STA→TCA, TCA-only, IA queries) executed without errors. State management correctly preserved conversation context across agent handoffs. Tool invocations (database queries, case creation) succeeded with proper input/output capture.
     \item \textbf{Challenges:} [Document any flows that failed and why—e.g., timeout issues, unexpected LLM outputs, tool schema violations]. Edge cases like malformed LLM responses or missing required fields revealed areas where additional error handling would improve robustness.
     \item \textbf{Implication:} The orchestration framework is fundamentally sound for controlled scenarios. Production deployment requires: (1) retry logic with exponential backoff for transient failures, (2) circuit breakers for tool unavailability, and (3) comprehensive schema validation preventing invalid tool calls.
 \end{itemize}]
 
 \textbf{RQ3: Response Quality}
 
-[Mean rubric scores (Researcher: [REPORT VALUES], GPT-4: [REPORT VALUES]) across CBT adherence, empathy, appropriateness, and actionability dimensions indicate that SCA generates coaching responses meeting baseline quality thresholds. The researcher-GPT-4 agreement rate of [REPORT VALUE] provides validation that quality assessment is consistent across raters.
+[Mean rubric scores (Researcher: [REPORT VALUES], GPT-4: [REPORT VALUES]) across CBT adherence, empathy, appropriateness, and actionability dimensions indicate that TCA generates coaching responses meeting baseline quality thresholds. The researcher-GPT-4 agreement rate of [REPORT VALUE] provides validation that quality assessment is consistent across raters.
 
 Key findings:
 \begin{itemize}
-    \item \textbf{What worked:} SCA consistently demonstrated empathetic tone and emotional validation. Responses appropriately incorporated CBT language (e.g., identifying thought patterns, suggesting behavioral experiments). Boundary behavior was correct for [X/2] out-of-scope requests, with proper refusals and resource redirection.
+    \item \textbf{What worked:} TCA consistently demonstrated empathetic tone and emotional validation. Responses appropriately incorporated CBT language (e.g., identifying thought patterns, suggesting behavioral experiments). Boundary behavior was correct for [X/2] out-of-scope requests, with proper refusals and resource redirection.
     \item \textbf{Challenges:} Advanced CBT techniques (e.g., Socratic questioning, cognitive defusion, values clarification) were less consistently applied. Some responses relied on generic encouragement rather than structured interventions. Single-rater evaluation limits generalizability—inter-rater reliability with multiple clinical experts remains unvalidated.
     \item \textbf{Implication:} The agent demonstrates proof-of-concept quality for supportive coaching, but clinical deployment requires: (1) multi-rater validation by licensed mental health professionals, (2) expanded few-shot examples demonstrating advanced CBT techniques, and (3) continuous quality monitoring with human oversight for all coaching conversations.
 \end{itemize}]
@@ -1073,7 +1073,7 @@ Existing AI mental health chatbots (Woebot, Wysa, Replika) demonstrate strong th
 This research applies rational agent principles (BDI model) and agent orchestration (LangGraph) to safety-critical conversational AI—a domain typically addressed through monolithic models. Key contributions:
 \begin{itemize}
     \item \textbf{Safety-First Orchestration:} Evaluation framework (RQ1-RQ4) specifically targets safety-critical requirements (false negative minimization, privacy enforcement, boundary behavior) rather than generic chatbot quality metrics. This provides a template for evaluating agentic systems in high-stakes domains.
-    \item \textbf{Human-AI Collaboration Design:} Explicit integration points for human oversight (STA low-confidence review, SCA escalation pathways, IA expert interpretation) reflect realistic deployment constraints absent in academic multi-agent simulations.
+    \item \textbf{Human-AI Collaboration Design:} Explicit integration points for human oversight (STA low-confidence review, TCA escalation pathways, IA expert interpretation) reflect realistic deployment constraints absent in academic multi-agent simulations.
 \end{itemize}
 
 \textbf{Gaps Acknowledged in Chapter 2, Now Addressed}
@@ -1081,7 +1081,7 @@ This research applies rational agent principles (BDI model) and agent orchestrat
 Chapter 2 identified three research gaps:
 \begin{enumerate}
     \item \textbf{Reactive Model Limitation:} Both traditional counseling and AI chatbots require student-initiated help-seeking, failing vulnerable populations. → \textit{Addressed:} STA automated risk detection (RQ1) demonstrates technical feasibility of proactive monitoring.
-    \item \textbf{Monolithic vs. Specialized Agents:} Existing chatbots lack role specialization for safety triage vs. therapeutic support. → \textit{Addressed:} Multi-agent architecture (STA, SCA, SDA, IA) with independent evaluation per agent (RQ1-RQ4).
+    \item \textbf{Monolithic vs. Specialized Agents:} Existing chatbots lack role specialization for safety triage vs. therapeutic support. → \textit{Addressed:} Multi-agent architecture (STA, TCA, CMA, IA) with independent evaluation per agent (RQ1-RQ4).
     \item \textbf{Privacy in Aggregate Analytics:} Institutional insights often compromise individual privacy. → \textit{Addressed:} K-anonymity enforcement (RQ4) with code review and unit test validation.
 \end{enumerate}
 
@@ -1096,7 +1096,7 @@ Chapter 2 identified three research gaps:
     
     \item \textbf{Staged Deployment:} Implement in phases: (1) Monitor-only mode (STA logs potential crises but doesn't intervene), (2) Counselor-supervised intervention (system flags cases, human initiates contact), (3) Fully automated with human oversight. This risk-mitigation approach builds confidence before full autonomy.
     
-    \item \textbf{Robust Human Handoff:} Design SCA refusal responses (out-of-scope requests) with explicit contact information: "I cannot provide medical advice, but I can connect you with [University Health Center: phone, hours, location]". Include warm handoff protocols where agent facilitates appointment booking rather than providing passive referrals.
+    \item \textbf{Robust Human Handoff:} Design TCA refusal responses (out-of-scope requests) with explicit contact information: "I cannot provide medical advice, but I can connect you with [University Health Center: phone, hours, location]". Include warm handoff protocols where agent facilitates appointment booking rather than providing passive referrals.
 \end{enumerate}
 
 \textbf{Human-AI Collaboration Points}
@@ -1104,7 +1104,7 @@ Chapter 2 identified three research gaps:
 \begin{itemize}
     \item \textbf{STA Low-Confidence Review:} All crisis classifications with confidence < 0.70 trigger counselor review queue. Counselor overrides become training data for prompt refinement.
     \item \textbf{IA Insight Interpretation:} Aggregate trends (e.g., "Exam stress increased 40\%") presented to mental health coordinators with contextual guidance: "This typically indicates need for additional drop-in hours during midterm periods." Human experts decide resource allocation actions.
-    \item \textbf{SCA Quality Monitoring:} Random sample of 5\% of coaching conversations flagged for human quality review. Counselors score using same rubric (Table~\ref{tab:rq3_rubric}), enabling continuous quality tracking and prompt engineering feedback loops.
+    \item \textbf{TCA Quality Monitoring:} Random sample of 5\% of coaching conversations flagged for human quality review. Counselors score using same rubric (Table~\ref{tab:rq3_rubric}), enabling continuous quality tracking and prompt engineering feedback loops.
 \end{itemize}
 
 \subsection{Future Evaluation Directions}
@@ -1114,7 +1114,7 @@ Chapter 2 identified three research gaps:
 \begin{enumerate}
     \item \textbf{Field Pilot with Informed Consent:} Recruit 30-50 volunteer students for 4-week pilot with full ethics approval, counselor supervision, and opt-out mechanisms. Measure: user satisfaction (NPS), perceived empathy, willingness to continue using system, counselor workload impact.
     
-    \item \textbf{Multi-Rater Clinical Validation:} Engage 3-5 licensed psychologists to independently evaluate 50 SCA responses using validated therapeutic quality instruments (e.g., Cognitive Therapy Scale, Working Alliance Inventory—adapted for text-based interaction). Calculate inter-rater reliability (Cohen's kappa, intraclass correlation).
+    \item \textbf{Multi-Rater Clinical Validation:} Engage 3-5 licensed psychologists to independently evaluate 50 TCA responses using validated therapeutic quality instruments (e.g., Cognitive Therapy Scale, Working Alliance Inventory—adapted for text-based interaction). Calculate inter-rater reliability (Cohen's kappa, intraclass correlation).
     
     \item \textbf{Cross-Cultural Linguistic Validation:} Expand crisis corpus to 500+ scenarios covering: regional Indonesian dialects (Javanese, Sundanese, Balinese), code-switching patterns, Islamic religious expressions of distress. Validate with local mental health experts from diverse cultural backgrounds.
 \end{enumerate}
