@@ -1,0 +1,42 @@
+\chapter*{Appendix B\\Prompt and Behavioral Specifications for the Safety Agent Suite}
+\addcontentsline{toc}{chapter}{Appendix B -- Prompt and Behavioral Specifications}
+
+This appendix consolidates the textual specifications that govern each agent's behaviour inside the UGM-AICare implementation. The canonical versions live inside the \code{UGM-AICare/backend/app/agents} directory; the extracts below merely document the design intent, the file locations, and the structured outputs that Chapter~\ref{chap:system_design} references. All prompts are versioned alongside the codebase and inherit the same MIT license as the repository.
+
+\section{Prompt Sources and Scope}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Prompt sources per agent. Paths are relative to \protect\code{UGM-AICare/backend}. Behavioural summaries list only the dominant instructions; inline metadata (tone examples, fallback messages) remains in the source files.}
+    \label{tab:prompt_sources}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabularx}{\textwidth}{p{2.8cm} >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X}
+        \toprule
+        \textbf{Agent} & \textbf{Primary Files} & \textbf{Behavioural Emphasis} & \textbf{Structured Output Fields} \\
+        \midrule
+    Aika Meta-Agent & \code{app/agents/aika/identity.py}\newline\code{app/agents/aika_orchestrator_graph.py} & Persona guidance for students/admins/counselors, bilingual tone, explicit instructions on tool invocation frequency, inline Tier~1 risk heuristics. & JSON: \texttt{reply}, \texttt{intent}, \texttt{intent\_confidence}, \texttt{immediate\_risk}, \texttt{crisis\_keywords}, \texttt{risk\_reasoning}, \texttt{needs\_agents}, \texttt{reasoning}, \texttt{suggested\_response}. \\
+    Safety Triage Agent (STA) & \code{app/agents/sta/gemini_classifier.py}\newline\code{app/agents/sta/conversation_assessment.py} & Crisis lexicon in Indonesian and English, conservative scoring rules ("when unsure, escalate"), rubric for differentiating explicit vs implicit self-harm language. & JSON + DB row: \texttt{risk\_level (0--3)}, \texttt{severity}, \texttt{risk\_score}, \texttt{next\_step}, \texttt{keyword\_rationale}, \texttt{recommended\_action}, \texttt{should\_invoke\_cma}. \\
+    Therapeutic Coach Agent (TCA) & \code{app/agents/tca/gemini_plan_generator.py}\newline module templates under\newline\code{app/agents/tca/modules/} & CBT framing (psychoeducation, behavioural activation, grounding), refusal clauses for medication or diagnosis, instruction to produce 4--6 actionable steps with Indonesian-friendly labels. & Plan blob persisted through \texttt{create\_intervention\_plan}: \texttt{plan\_title}, \texttt{intervention\_type}, \texttt{plan\_steps\{id, label, description, duration\}}, \texttt{resource\_cards}, \texttt{next\_check\_in}, \texttt{safety\_review}. \\
+    Case Management Agent (CMA) & \code{app/agents/cma/cma_graph.py}\newline\code{app/agents/cma/sla.py}\newline\code{app/agents/cma/router.py} & Procedural tone, SLA timers (2h critical, 24h high), appointment workflow prompts, reminders to request consent before notifying humans. & Case payload: \texttt{case\_id}, \texttt{case\_severity}, \texttt{priority}, \texttt{assigned\_counsellor\_id}, \texttt{sla\_breach\_at}, \texttt{notification\_log}. \\
+    Insights Agent (IA) & \code{app/agents/ia/llm_interpreter.py}\newline\code{app/agents/ia/queries.py}\newline\code{app/agents/ia/schemas.py} & Two-stage prompting (SQL aggregation then narrative synthesis), strict language instructing the LLM to acknowledge suppressed cohorts and cite k-anonymity thresholds. & Analytics schema: \texttt{question\_id}, \texttt{filters}, \texttt{k\_threshold}, \texttt{analytics\_result\{figures, tables\}}, \texttt{interpretation}, \texttt{recommendations}, \texttt{privacy\_notes}. \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+\section{Two-Tier Risk Prompting}
+
+\begin{enumerate}
+    \item \textbf{Tier~1 (Inline in Aika).} The decision prompt embedded inside \code{aika_orchestrator_graph.py} directs Gemini 2.5 Flash to classify every incoming turn, emit \texttt{immediate\_risk}, and list crisis keywords. The heuristics privilege recall and explicitly mention Indonesian euphemisms (\textit{"ingin tidur selamanya"}, \textit{"capek hidup"}) so that the STA subgraph receives conservative signals.
+    \item \textbf{Tier~2 (STA Conversation Assessment).} \code{conversation_assessment.py} feeds the full conversation history into Gemini 2.5 Flash (temperature~0.5) once a session is idle or closed. The prompt forces the model to state trend direction, dominant stressors, protective factors, and whether CMA follow-up is warranted even if Tier~1 never escalated. Appendix~A's evaluation datasets exercise both tiers.
+    \item \textbf{Coordination Hooks.} Both prompts share vocabulary for severity labels (\texttt{none}, \texttt{low}, \texttt{moderate}, \texttt{high}, \texttt{critical}) so LangGraph can compare outputs without bespoke adapters. The alignment is enforced via snapshot tests under \code{research_evaluation/rq1_crisis_detection/}.
+\end{enumerate}
+
+\section{Refusal and Guardrail Patterns}
+
+\begin{itemize}
+    \item \textbf{Scope containment.} TCA refuses medical, diagnostic, or administrative requests by citing CMA's authority, while CMA's prompt declines therapeutic coaching. The refusal lexicon is encoded in \code{tca/modules/*/prompt.md} and mirrored inside \code{cma/router.py}.
+    \item \textbf{Cultural hedging.} All prompts instruct the model to mirror Indonesian conversational cues, avoid moralistic language, and acknowledge collective/familial coping strategies. This is particularly notable in \code{identity.py}, where examples show how to validate students who mix Bahasa Indonesia and English.
+    \item \textbf{Auditable reasoning.} Each agent's prompt requires a `reasoning` field or "why" paragraph. In STA it is mandatory for every classification; in CMA it appears in the case note; in IA it is attached to every recommendation. These requirements allow Chapter~IV to cross-reference narrative explanations with quantitative metrics.
+    \item \textbf{Versioning practice.} Prompt changes are gated through pull requests that must update the synthetic evaluation notebooks kept under \code{UGM-AICare/backend/research_evaluation}. This discipline ensures that any behavioural shift is accompanied by fresh evidence, a practice recommended by Design Science Research guidance.
+\end{itemize}

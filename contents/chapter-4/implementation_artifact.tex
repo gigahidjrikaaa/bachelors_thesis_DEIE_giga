@@ -1,0 +1,18 @@
+\section{Implementation Artifact: The UGM-AICare Prototype}
+\label{sec:implementation_artifact}
+
+The conceptual framework and agentic architecture detailed in Chapter~\ref{chap:system_design} were realized as a tangible software artifact within the UGM-AICare project. This prototype serves as the concrete object of study for the evaluation presented in this chapter. It is a full-stack web application designed to provide a practical testbed for the proposed proactive mental health support model. The complete source code for the artifact is publicly available for review and replication\footnote{The UGM-AICare project repository can be accessed at \url{https://github.com/gigahidjrikaaa/UGM-AICare} or through \url{https://aicare.sumbu.xyz}}.
+
+The artifact's technical implementation translates the architectural design into a working system:
+
+\begin{itemize}
+    \item \textbf{Backend Services:} The core of the system is a Python-based backend built on the \textbf{FastAPI} web framework. Each specialized agent (STA, TCA, CMA, IA) is implemented as a distinct service within this backend, ensuring modularity and separation of concerns. This service-oriented architecture allows for independent development, testing, and scaling of each agent's capabilities.
+
+    \item \textbf{Agent Orchestration Core:} The multi-agent coordination logic, described conceptually as a state machine in Chapter 3, is implemented using \textbf{LangGraph}. LangGraph provides the underlying engine to define the nodes (agents and tools) and edges (conditional transitions) of the agentic workflow. This allows the Aika Meta-Agent to dynamically route user requests and manage the flow of information between the specialized agents based on the evolving state of the conversation.
+
+    \item \textbf{Frontend Interface:} A user-facing web application, built with \textbf{Next.js} and TypeScript, provides the conversational interface for students and the administrative dashboard for counselors. This interface communicates with the FastAPI backend via a RESTful API, ensuring a clean separation between the presentation layer and the backend agentic logic.
+
+    \item \textbf{Integrated Observability:} As detailed in Section~\ref{sec:monitoring_infra}, the backend is instrumented with Prometheus for quantitative metrics and Langfuse for detailed tracing. This instrumentation is not an afterthought but a core part of the implementation, providing the empirical data necessary for the evaluation that follows.
+\end{itemize}
+
+This implementation provides the technical foundation upon which the evaluation protocols described in the remainder of this chapter are executed.

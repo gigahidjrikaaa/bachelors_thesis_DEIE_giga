@@ -1,25 +1,115 @@
-\chapter*{LAMPIRAN}
-%\addcontentsline{toc}{chapter}{LAMPIRAN}	
+\chapter*{Appendix A\\Design Science Research Assets}
+\addcontentsline{toc}{chapter}{Appendix A -- Design Science Research Assets}
 
-\section{Isi Lampiran}
+\section{DSR Methodology Justifications}
 
-Lampiran bersifat opsional bergantung hasil kesepakatan dengan pembimbing 
-dapat berupa:
+\begin{table}[htbp]
+    \centering
+    \caption{Justifications for adopting Design Science Research methodology.}
+    \label{tab:dsr_rationale}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.5cm}p{5.0cm}p{4.5cm}}
+        	oprule
+        	extbf{DSR Characteristic} & \textbf{Relevance to This Research} & \textbf{Contrast with Alternative Methodologies} \\
+        \midrule
+        Artifact-centric problem solving & The core contribution is the Safety Agent Suite framework itself---a novel multi-agent system architecture. DSR provides the appropriate epistemological stance for research where the primary output is a designed artifact \cite{dsr_methodology_hevner_2004}. & Descriptive research methodologies focus on understanding phenomena; purely experimental approaches test hypotheses in controlled settings but do not emphasize artifact creation as the primary contribution. \\
+        \midrule
+        Practical relevance and real-world impact & The reactive mental health support problem identified in Chapter~\ref{chap:introduction} is a genuine organizational challenge in Higher Education Institutions worldwide. DSR bridges academic rigor and practical utility by requiring artifacts address real problems \cite{dsr_methodology_peers_2006}. & A purely theoretical approach fails to deliver actionable solutions; a purely engineering approach lacks systematic evaluation rigor. DSR offers a middle ground ensuring both practical applicability and scholarly rigor. \\
+        \midrule
+        Iterative development and refinement & The DSR process explicitly incorporates feedback loops between design, demonstration, and evaluation stages, aligning naturally with agentic AI development where agent behaviors must be iteratively refined based on testing results. & Waterfall-style experimental research and ethnographic studies do not accommodate this iterative, build-evaluate-refine cycle as seamlessly. The cyclic nature of DSR is essential for complex system development. \\
+        \midrule
+        Compatibility with evaluation constraints & DSR accommodates scenario-based evaluation using synthetic or controlled test cases---essential when working with sensitive mental health data where live human trials require extensive ethical approvals and pose potential risks. Detailed in Chapter~IV. & Traditional empirical methodologies typically require access to real subjects and naturalistic data, which are infeasible given ethical constraints and undergraduate thesis scope. \\
+        \midrule
+        Knowledge contribution through design & DSR explicitly recognizes that designing, building, and evaluating artifacts generates generalizable design knowledge beyond specific instantiation \cite{dsr_methodology_hevner_2004}. This thesis contributes design principles, architectural patterns (dual-loop proactive-reactive model), and evaluation criteria. & Alternative methodologies may produce case-specific findings without explicit mechanisms for abstracting generalizable design knowledge applicable to future systems in the same problem domain. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
-\begin{enumerate}
-\item Bukti pelaksanaan Kuesioner seperti pertanyaan kuesioner, resume jawaban 
-responden, dan dokumentasi kuesioner. 
-\item Spesifikasi Aplikasi atau Sistem yang dikembangkan meliputi spesifikasi 
-teknis aplikasi, tautan unduh aplikasi, manual penggunaan aplikasi, hingga 
-screenshot aplikasi. 
-\item Cuplikan kode yang sekiranya penting dan ditambahkan. 
-\item Tabel yang terlalu panjang yang masih diperlukan tetapi tidak 
-memungkinkan untuk ditayangkan di bagian utama skripsi.
-\item Gambar-gambar pendukung yang tidak terlalu penting untuk ditampilkan di 
-bagian utama. Akan tetapi, mendukung argumentasi/pengamatan/analisis.
-\item Penurunan rumus-rumus atau pembuktian suatu teorema yang terlalu 
-panjang dan terlalu teknis sehingga Anda berasumsi bahwa pembaca biasa 
-tidak akan menelaah lebih lanjut. Hal ini digunakan untuk memberikan 
-kesempatan bagi pembaca tingkat lanjut untuk melihat proses penurunan 
-rumus-rumus ini.
-\end{enumerate}
+\section{Synthetic Evaluation Assets}
+
+\begin{table}[htbp]
+	\centering
+	\caption{Rationale for synthetic data in evaluation.}
+	\label{tab:synthetic_data_rationale}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabular}{p{3.5cm}p{4.0cm}p{5.0cm}}
+			oprule
+			extbf{Consideration} & \textbf{Constraint with Real Data} & \textbf{Advantage of Synthetic Data} \\
+		\midrule
+		Ethical approval & Collecting genuine mental health crisis conversations from students requires extensive ethical review board (ERB) approval, informed consent processes, and participant safeguarding mechanisms beyond the scope of an undergraduate thesis. & Eliminates need for ERB approval as no human participants are involved; allows research to proceed within feasible timeline. \\
+		\midrule
+		Privacy and safety risks & Even anonymized mental health disclosures carry re-identification risks and potential psychological harm to participants if data is breached or mishandled. & Removes risk of harm to real individuals; no sensitive personal data is collected or stored. \\
+		\midrule
+		Systematic coverage & Real conversational data is opportunistic and may not include rare but critical crisis scenarios (e.g., explicit self-harm statements, acute distress patterns). & Enables controlled, systematic testing of edge cases and boundary conditions essential for safety validation \cite{FIND_CITATION_PLACEHOLDER}. \\
+		\midrule
+		Reproducibility & Access to real student data is typically restricted and cannot be shared for replication purposes. & Synthetic datasets can be documented, versioned, and shared with evaluators, enhancing reproducibility and transparency. \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+	\centering
+	\caption{Test corpus design and coverage for proof-of-concept validation.}
+	\label{tab:test_corpus}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabular}{p{3.2cm}p{2.5cm}p{3.5cm}p{3.3cm}}
+			oprule
+			extbf{Corpus} & \textbf{Size} & \textbf{Content Coverage} & \textbf{Primary Evaluation Target} \\
+		\midrule
+		Crisis detection corpus (RQ1) & 50 synthetic prompts (25 crisis, 25 non-crisis) & Explicit/implicit crisis indicators (suicidal ideation, self-harm, severe distress) plus emotionally charged non-crisis messages to test classification boundaries. Generated via GPT-4 with researcher validation. & Safety Triage Agent (STA): sensitivity, specificity, false negative rate, classification latency. Validates core crisis detection capability. \\
+		\midrule
+		Orchestration test suite (RQ2) & 10 representative conversation flows & Coverage of critical agent routing patterns: STA→TCA (crisis to coaching), TCA→CMA (escalation), IA queries, multi-turn coaching, boundary refusals. Focus on workflow correctness via Langfuse trace analysis. & LangGraph orchestration: workflow completion rate, state transition accuracy, trace quality. Validates multi-agent coordination reliability. \\
+		\midrule
+		Coaching evaluation set (RQ3) & 10 coaching scenarios & Student concerns spanning stress management (3), motivation (3), academics (2), boundary-testing (2). Dual-rater assessment: researcher + GPT-4 using structured rubric. & Therapeutic Coach Agent (TCA): CBT adherence, empathy, appropriateness, actionability (1-5 Likert scale). Validates response quality and boundary behavior. \\
+		\midrule
+		Privacy validation (RQ4) & Code review + 5 unit tests & Inspection of 6 allow-listed IA SQL queries for k-anonymity enforcement (\code{HAVING COUNT(DISTINCT user_id) >= 5}). Unit tests: small cohort suppression, compliant publication, individual query blocking, boundary condition (k=5), multi-date selective suppression. & Insights Agent (IA): k-anonymity implementation correctness. Validates privacy safeguards function as designed without requiring synthetic log generation. \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\section{Instrumentation and Validity Frameworks}
+
+\begin{table}[htbp]
+	\centering
+	\caption{Instrumentation strategy for evaluation reproducibility.}
+	\label{tab:instrumentation}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabular}{p{3.0cm}p{4.5cm}p{5.0cm}}
+			oprule
+			extbf{Instrumentation Type} & \textbf{Implementation} & \textbf{Purpose} \\
+		\midrule
+		Distributed tracing (Langfuse) & Complete trace capture for all agent executions, exposing: agent node sequences, state transitions, tool invocations with input/output, execution timestamps, and error details. Accessible via web interface for qualitative workflow analysis. & Primary instrumentation for RQ2 orchestration evaluation: enables visual inspection of conversation flows, validation of agent routing correctness, and identification of state transition errors. Supports reproducibility through persistent trace storage. \\
+		\midrule
+		Latency measurement & Python \code{perf_counter()} timing for agent reasoning phases (LLM inference + classification logic), recorded at millisecond precision. Stored in database for percentile calculation (p50/p95/p99). & Supports RQ1 classification latency analysis and RQ2 performance characterization. Enables identification of bottlenecks and validation that agents meet real-time conversation requirements ($<$ 300ms for triage). \\
+		\midrule
+		Structured logging & All agent interactions, state transitions, and decision points logged in JSON format with ISO-8601 timestamps and correlation IDs. Captures: user messages, agent classifications, tool execution results, escalation decisions. & Facilitates replay of evaluation scenarios, supports auditing of agent behavior, and enables post-hoc analysis of failure cases (e.g., false negative root cause analysis for RQ1). \\
+		\midrule
+		Database persistence & All evaluation data persisted in PostgreSQL: crisis corpus labels, TCA response scores (researcher + GPT-4), Langfuse trace references, unit test results. Schema-versioned for reproducibility. & Enables statistical analysis across test runs, longitudinal comparison of agent performance, and verification that evaluation procedures were followed correctly. Supports future replication studies. \\
+		\bottomrule
+	\end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+	\centering
+	\caption{Validity and limitations framework for the evaluation methodology.}
+	\label{tab:validity_framework}
+	\small
+	\setlength{\tabcolsep}{4pt}
+	\begin{tabular}{p{2.8cm}p{5.0cm}p{5.2cm}}
+			oprule
+			extbf{Validity Type} & \textbf{Strengths in This Research} & \textbf{Limitations and Mitigation Strategies} \\
+		\midrule
+		Internal validity & High internal validity ensured through: (1) systematically designed test scenarios with controlled variables; (2) standardized execution platform (containerized environment); (3) minimized confounding variables through consistent test harnesses; (4) automated metrics reducing measurement subjectivity. & Potential for evaluation-to-evaluation variance in LLM outputs due to non-deterministic generation. Mitigated through: temperature=0 for classification tasks, multiple test runs with statistical aggregation, seed-based reproducibility where supported. \\
+		\midrule
+		External validity & Limited but explicitly acknowledged. The controlled evaluation demonstrates proof-of-concept functionality and validates design decisions under idealized conditions. & \textbf{Primary limitation}: Synthetic test data, while carefully designed, cannot fully capture the complexity, variability, and cultural nuances of authentic student conversations. Findings may not generalize to real-world deployment without field validation. Future work requires pilot studies with appropriate ethical oversight (discussed in Chapter~V). \\
+		\midrule
+		Construct validity & Strong construct validity: selected metrics (sensitivity, specificity, false negative rate, latency percentiles, tool success rates, rubric scores, k-anonymity compliance) are well-established constructs in AI system evaluation and mental health screening literature. Each metric directly measures intended system properties. & Risk of metric misalignment with real-world user experience. For example, high sensitivity may come at the cost of user trust if false positives are frequent. Mitigated through multi-dimensional evaluation (not relying on single metric) and stakeholder validation of acceptance criteria. \\
+		\midrule
+		Reliability & High measurement reliability ensured through: (1) automated instrumentation (OpenTelemetry, structured logging) providing consistent data collection; (2) deterministic evaluation scripts with version-controlled test datasets; (3) dual-rater assessment (researcher + GPT-4) for subjective coaching quality evaluations with structured rubric guidelines. & Human rating subjectivity for coaching quality (CBT rubric scores). Mitigated through: explicit rubric criteria (1-5 Likert scale), detailed scoring guidelines, and GPT-4 validation as independent reference point for consistency checking. Inter-rater agreement analysis with multiple clinical experts remains future work. \\
+		\bottomrule
+	\end{tabular}
+\end{table}

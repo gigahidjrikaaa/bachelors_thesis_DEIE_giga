@@ -10,177 +10,7 @@
 
 The research presented in this thesis is constructive in nature, aimed not merely at describing or explaining a phenomenon, but at creating a novel and useful artifact to solve a real-world problem. To provide a rigorous and systematic structure for this endeavor, this study adopts the \textbf{Design Science Research (DSR)} methodology. DSR is a well-established paradigm in Information Systems research focused on the creation and evaluation of innovative IT artifacts intended to solve identified organizational problems \cite{dsr_methodology_hevner_2004}. The primary goal of DSR is to generate prescriptive design knowledge through the building and evaluation of these artifacts.
 
-\subsection{Rationale for Design Science Research}
-
-The selection of DSR as the methodological framework for this research is justified by several key considerations that align with the nature of the problem and the objectives of this study. Table~\ref{tab:dsr_rationale} summarizes the primary justifications for adopting DSR over alternative research methodologies.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Justifications for adopting Design Science Research methodology.}
-    \label{tab:dsr_rationale}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.5cm}p{5.0cm}p{4.5cm}}
-        \toprule
-        \textbf{DSR Characteristic} & \textbf{Relevance to This Research} & \textbf{Contrast with Alternative Methodologies} \\
-        \midrule
-        Artifact-centric problem solving & The core contribution is the Safety Agent Suite framework itself---a novel multi-agent system architecture. DSR provides the appropriate epistemological stance for research where the primary output is a designed artifact \cite{dsr_methodology_hevner_2004}. & Descriptive research methodologies focus on understanding phenomena; purely experimental approaches test hypotheses in controlled settings but do not emphasize artifact creation as the primary contribution. \\
-        \midrule
-        Practical relevance and real-world impact & The reactive mental health support problem identified in Chapter~\ref{chap:introduction} is a genuine organizational challenge in Higher Education Institutions worldwide. DSR bridges academic rigor and practical utility by requiring artifacts address real problems \cite{dsr_methodology_peers_2006}. & A purely theoretical approach fails to deliver actionable solutions; a purely engineering approach lacks systematic evaluation rigor. DSR offers a middle ground ensuring both practical applicability and scholarly rigor. \\
-        \midrule
-        Iterative development and refinement & The DSR process explicitly incorporates feedback loops between design, demonstration, and evaluation stages, aligning naturally with agentic AI development where agent behaviors must be iteratively refined based on testing results. & Waterfall-style experimental research and ethnographic studies do not accommodate this iterative, build-evaluate-refine cycle as seamlessly. The cyclic nature of DSR is essential for complex system development. \\
-        \midrule
-        Compatibility with evaluation constraints & DSR accommodates scenario-based evaluation using synthetic or controlled test cases---essential when working with sensitive mental health data where live human trials require extensive ethical approvals and pose potential risks. Detailed in Chapter~IV. & Traditional empirical methodologies typically require access to real subjects and naturalistic data, which are infeasible given ethical constraints and undergraduate thesis scope. \\
-        \midrule
-        Knowledge contribution through design & DSR explicitly recognizes that designing, building, and evaluating artifacts generates generalizable design knowledge beyond specific instantiation \cite{dsr_methodology_hevner_2004}. This thesis contributes design principles, architectural patterns (dual-loop proactive-reactive model), and evaluation criteria. & Alternative methodologies may produce case-specific findings without explicit mechanisms for abstracting generalizable design knowledge applicable to future systems in the same problem domain. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-These justifications collectively establish DSR as the most appropriate methodological framework for this research, balancing the need for rigorous academic inquiry with the practical imperative of delivering a functional artifact that addresses a real-world problem.
-
-\subsection{The DSR Process Model}
-
-The DSR process model, as outlined by Peffers et al., provides an iterative framework that guides the research from problem identification to the communication of results \cite{dsr_methodology_peers_2006}. This thesis follows these stages, mapping them directly to its structure to ensure a logical and transparent research process:
-
-\begin{enumerate}
-    \item \textbf{Problem Identification and Motivation:} This initial stage, which involves defining the specific research problem and justifying the value of a solution, is addressed in \textbf{Chapter \ref{chap:introduction}} of this thesis. We have identified the inefficiencies of the reactive mental health support model as the core problem.
-
-    \item \textbf{Define Objectives and Knowledge Base:} Building on the identified problem, this stage formalizes the solution objectives and anchors them in the relevant knowledge base. The initial objectives are articulated in \textbf{Chapter \ref{chap:introduction}}, and they are refined and theoretically grounded through the literature synthesis in \textbf{Chapter \ref{sec:literature_review}}.
-
-    \item \textbf{Design and Development:} This is the core constructive phase where the artifact's architecture and functionalities are developed. This stage is the primary focus of the present chapter, \textbf{Chapter \ref{chap:system_design}}, which outlines the functional and technical blueprint of the agentic AI framework.
-
-    \item \textbf{Demonstration:} In this stage, the designed artifact is demonstrated to solve representative instances of the problem. The functional prototype and its scenario walkthroughs are presented in \textbf{Chapter~IV}, particularly Sections \ref{sec:setup} and \ref{sec:rq1}.
-
-    \item \textbf{Evaluation:} This stage observes and measures how well the artifact supports the solution objectives. The scenario-based tests and their analysis are reported in \textbf{Chapter~IV}, Sections \ref{sec:rq1}--\ref{sec:discussion}.
-
-    \item \textbf{Communication of Results:} The final stage disseminates the artifact, findings, and implications to the target audience. This thesis (culminating in \textbf{Chapter~V} and supported by the appendices) serves as the primary communication vehicle.
-\end{enumerate}
-
-Stages 4-6 therefore operationalize the empirical programme for the research questions defined in Chapter \ref{sec:research_questions}. The demonstration assets in Chapter~IV (Sections~\ref{sec:setup} and \ref{sec:rq1}) instantiate the scenarios for RQ1--RQ4, while the evaluation stage reports the quantitative indicators detailed in Chapter~IV: STA sensitivity/specificity for safety triage on 50 synthetic crisis scenarios (RQ1), orchestration workflow completion and Langfuse trace analysis across 10 representative conversation flows (RQ2), rubric-based CBT quality scores assessed by researcher with GPT-4 validation on 10 coaching scenarios (RQ3), and k-anonymity enforcement verification through code review and unit tests (RQ4). This proof-of-concept evaluation approach demonstrates technical feasibility within bachelor's thesis constraints while maintaining methodological rigor appropriate for Design Science artifact validation. The communication stage synthesizes these findings in Chapter~V so that institutional stakeholders can interpret the metrics and translate them into policy and operational decisions. Together, the paragraph-level traceability between stages and metrics makes the DSR cycle a roadmap for the scenario-based evaluation that follows.
-
-\subsection{Evaluation Strategy and Data Generation Approach}
-
-Given the sensitive nature of mental health support and the ethical constraints inherent in this domain, this research adopts a scenario-based evaluation methodology using carefully designed synthetic test cases rather than live human trials. This section presents the methodological decisions governing data generation, metric selection, and instrumentation.
-
-\subsubsection{Rationale for Synthetic Data}
-
-The decision to employ synthetic test data rather than authentic student conversations is driven by ethical, practical, and methodological considerations. Table~\ref{tab:synthetic_data_rationale} summarizes the primary justifications for this approach.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Rationale for synthetic data in evaluation.}
-    \label{tab:synthetic_data_rationale}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.5cm}p{4.0cm}p{5.0cm}}
-        \toprule
-        \textbf{Consideration} & \textbf{Constraint with Real Data} & \textbf{Advantage of Synthetic Data} \\
-        \midrule
-        Ethical approval & Collecting genuine mental health crisis conversations from students requires extensive ethical review board (ERB) approval, informed consent processes, and participant safeguarding mechanisms beyond the scope of an undergraduate thesis. & Eliminates need for ERB approval as no human participants are involved; allows research to proceed within feasible timeline. \\
-        Privacy and safety risks & Even anonymized mental health disclosures carry re-identification risks and potential psychological harm to participants if data is breached or mishandled. & Removes risk of harm to real individuals; no sensitive personal data is collected or stored. \\
-        Systematic coverage & Real conversational data is opportunistic and may not include rare but critical crisis scenarios (e.g., explicit self-harm statements, acute distress patterns). & Enables controlled, systematic testing of edge cases and boundary conditions essential for safety validation \cite{FIND_CITATION_PLACEHOLDER}. \\
-        Reproducibility & Access to real student data is typically restricted and cannot be shared for replication purposes. & Synthetic datasets can be documented, versioned, and shared with evaluators, enhancing reproducibility and transparency. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-This approach aligns with established practices in safety-critical AI system evaluation, where controlled test scenarios provide more comprehensive coverage than naturalistic data collection, particularly when evaluating rare high-stakes events \cite{FIND_CITATION_PLACEHOLDER}.
-
-\subsubsection{Test Corpus Design}
-
-The evaluation employs a proof-of-concept validation approach using carefully constructed test datasets of modest size, appropriate for bachelor's-level Design Science Research. Each dataset is designed to exercise specific agent functionalities and validate core architectural capabilities. Table~\ref{tab:test_corpus} details the composition and purpose of each corpus, emphasizing technical feasibility demonstration over exhaustive performance benchmarking.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Test corpus design and coverage for proof-of-concept validation.}
-    \label{tab:test_corpus}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.2cm}p{2.5cm}p{3.5cm}p{3.3cm}}
-        \toprule
-        \textbf{Corpus} & \textbf{Size} & \textbf{Content Coverage} & \textbf{Primary Evaluation Target} \\
-        \midrule
-        Crisis detection corpus (RQ1) & 50 synthetic prompts (25 crisis, 25 non-crisis) & Explicit/implicit crisis indicators (suicidal ideation, self-harm, severe distress) plus emotionally charged non-crisis messages to test classification boundaries. Generated via GPT-4 with researcher validation. & Safety Triage Agent (STA): sensitivity, specificity, false negative rate, classification latency. Validates core crisis detection capability. \\
-        \midrule
-        Orchestration test suite (RQ2) & 10 representative conversation flows & Coverage of critical agent routing patterns: STA→TCA (crisis to coaching), TCA→CMA (escalation), IA queries, multi-turn coaching, boundary refusals. Focus on workflow correctness via Langfuse trace analysis. & LangGraph orchestration: workflow completion rate, state transition accuracy, trace quality. Validates multi-agent coordination reliability. \\
-        \midrule
-        Coaching evaluation set (RQ3) & 10 coaching scenarios & Student concerns spanning stress management (3), motivation (3), academics (2), boundary-testing (2). Dual-rater assessment: researcher + GPT-4 using structured rubric. & Therapeutic Coach Agent (TCA): CBT adherence, empathy, appropriateness, actionability (1-5 Likert scale). Validates response quality and boundary behavior. \\
-        \midrule
-        Privacy validation (RQ4) & Code review + 5 unit tests & Inspection of 6 allow-listed IA SQL queries for k-anonymity enforcement (\code{HAVING COUNT(DISTINCT user_id) >= 5}). Unit tests: small cohort suppression, compliant publication, individual query blocking, boundary condition (k=5), multi-date selective suppression. & Insights Agent (IA): k-anonymity implementation correctness. Validates privacy safeguards function as designed without requiring synthetic log generation. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-These datasets systematically exercise each agent's intended functionality and provide controlled conditions for measuring performance against pre-defined acceptance criteria. The modest sample sizes reflect a pragmatic proof-of-concept scope: demonstrating that the Safety Agent Suite architecture can execute core workflows correctly under controlled conditions, establishing a foundation for future large-scale validation studies detailed in Chapter~IV, Section~\ref{sec:discussion}.
-
-\subsubsection{Metric Selection Principles}
-
-Evaluation metrics are selected according to three guiding principles to ensure methodological rigor and practical relevance:
-
-\begin{enumerate}
-    \item \textbf{Alignment with research questions and safety objectives:} Each metric directly addresses a specific research question or system requirement, ensuring that evaluation outcomes inform the research goals.
-    \item \textbf{Measurability through automated instrumentation:} Metrics must be objectively quantifiable through automated data collection to minimize measurement bias and enable continuous monitoring.
-    \item \textbf{Interpretability for institutional stakeholders:} Metrics are selected for their clarity and relevance to non-technical decision-makers (e.g., counseling administrators) who will assess system suitability for deployment.
-\end{enumerate}
-
-Each research question maps to specific quantitative metrics with pre-defined acceptance thresholds derived from system requirements and relevant literature. The complete evaluation plan, including metric definitions and acceptance criteria, is detailed in Chapter~IV, Table~\ref{tab:evaluation_plan}.
-
-\subsubsection{Instrumentation and Reproducibility}
-
-To ensure evaluation reproducibility and enable multi-level behavioral analysis, the prototype implements comprehensive instrumentation focused on trace-level observability and automated metrics collection. Table~\ref{tab:instrumentation} summarizes the instrumentation strategy aligned with the proof-of-concept evaluation approach.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Instrumentation strategy for evaluation reproducibility.}
-    \label{tab:instrumentation}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.0cm}p{4.5cm}p{5.0cm}}
-        \toprule
-        \textbf{Instrumentation Type} & \textbf{Implementation} & \textbf{Purpose} \\
-        \midrule
-        Distributed tracing (Langfuse) & Complete trace capture for all agent executions, exposing: agent node sequences, state transitions, tool invocations with input/output, execution timestamps, and error details. Accessible via web interface for qualitative workflow analysis. & Primary instrumentation for RQ2 orchestration evaluation: enables visual inspection of conversation flows, validation of agent routing correctness, and identification of state transition errors. Supports reproducibility through persistent trace storage. \\
-        \midrule
-        Latency measurement & Python \code{perf_counter()} timing for agent reasoning phases (LLM inference + classification logic), recorded at millisecond precision. Stored in database for percentile calculation (p50/p95/p99). & Supports RQ1 classification latency analysis and RQ2 performance characterization. Enables identification of bottlenecks and validation that agents meet real-time conversation requirements ($<$ 300ms for triage). \\
-        \midrule
-        Structured logging & All agent interactions, state transitions, and decision points logged in JSON format with ISO-8601 timestamps and correlation IDs. Captures: user messages, agent classifications, tool execution results, escalation decisions. & Facilitates replay of evaluation scenarios, supports auditing of agent behavior, and enables post-hoc analysis of failure cases (e.g., false negative root cause analysis for RQ1). \\
-        \midrule
-        Database persistence & All evaluation data persisted in PostgreSQL: crisis corpus labels, TCA response scores (researcher + GPT-4), Langfuse trace references, unit test results. Schema-versioned for reproducibility. & Enables statistical analysis across test runs, longitudinal comparison of agent performance, and verification that evaluation procedures were followed correctly. Supports future replication studies. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-This multi-layered instrumentation ensures that evaluation results are reproducible, that system behaviors can be analyzed at multiple levels of granularity, and that performance data is available for both real-time monitoring and retrospective analysis. The emphasis on Langfuse trace-based validation (RQ2) reflects the proof-of-concept focus on qualitative workflow correctness over quantitative load testing—appropriate for demonstrating technical feasibility within bachelor's thesis scope.
-
-\subsection{Validity and Limitations}
-
-The evaluation strategy employs multiple validity frameworks to assess the rigor and generalizability of findings. Table~\ref{tab:validity_framework} summarizes the validity considerations and their implications for this research.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Validity and limitations framework for the evaluation methodology.}
-    \label{tab:validity_framework}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{2.8cm}p{5.0cm}p{5.2cm}}
-        \toprule
-        \textbf{Validity Type} & \textbf{Strengths in This Research} & \textbf{Limitations and Mitigation Strategies} \\
-        \midrule
-        Internal validity & High internal validity ensured through: (1) systematically designed test scenarios with controlled variables; (2) standardized execution platform (containerized environment); (3) minimized confounding variables through consistent test harnesses; (4) automated metrics reducing measurement subjectivity. & Potential for evaluation-to-evaluation variance in LLM outputs due to non-deterministic generation. Mitigated through: temperature=0 for classification tasks, multiple test runs with statistical aggregation, seed-based reproducibility where supported. \\
-        \midrule
-        External validity & Limited but explicitly acknowledged. The controlled evaluation demonstrates proof-of-concept functionality and validates design decisions under idealized conditions. & \textbf{Primary limitation}: Synthetic test data, while carefully designed, cannot fully capture the complexity, variability, and cultural nuances of authentic student conversations. Findings may not generalize to real-world deployment without field validation. Future work requires pilot studies with appropriate ethical oversight (discussed in Chapter~V). \\
-        \midrule
-        Construct validity & Strong construct validity: selected metrics (sensitivity, specificity, false negative rate, latency percentiles, tool success rates, rubric scores, k-anonymity compliance) are well-established constructs in AI system evaluation and mental health screening literature. Each metric directly measures intended system properties. & Risk of metric misalignment with real-world user experience. For example, high sensitivity may come at the cost of user trust if false positives are frequent. Mitigated through multi-dimensional evaluation (not relying on single metric) and stakeholder validation of acceptance criteria. \\
-        \midrule
-        Reliability & High measurement reliability ensured through: (1) automated instrumentation (OpenTelemetry, structured logging) providing consistent data collection; (2) deterministic evaluation scripts with version-controlled test datasets; (3) dual-rater assessment (researcher + GPT-4) for subjective coaching quality evaluations with structured rubric guidelines. & Human rating subjectivity for coaching quality (CBT rubric scores). Mitigated through: explicit rubric criteria (1-5 Likert scale), detailed scoring guidelines, and GPT-4 validation as independent reference point for consistency checking. Inter-rater agreement analysis with multiple clinical experts remains future work. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-These validity considerations inform the interpretation of evaluation results in Chapter~IV and the recommendations for future research in Chapter~V. The primary limitation---external validity---is explicitly acknowledged throughout this thesis, and the evaluation is positioned as a necessary first step toward eventual field deployment rather than a conclusive clinical validation.
-
-The complete workflow of this research, following the DSR methodology, is visualized in Figure \ref{fig:dsr_flowchart}. This diagram illustrates the iterative path from problem formulation through to the final conclusions and recommendations.
+The DSR process model, as outlined by Peffers et al., provides an iterative framework that guides the research from problem identification to the communication of results \cite{dsr_methodology_peers_2006}. This thesis follows these stages, mapping them directly to its structure to ensure a logical and transparent research process. The complete workflow of this research is visualized in Figure \ref{fig:dsr_flowchart}. This diagram illustrates the iterative path from problem formulation through to the final conclusions and recommendations.
 
 \definecolor{ugmBlue}{RGB}{0,73,144}
 \definecolor{ugmGold}{RGB}{217,160,33}
@@ -188,32 +18,36 @@ The complete workflow of this research, following the DSR methodology, is visual
 \begin{figure}[htbp]
     \centering
     \resizebox{0.95\textwidth}{!}{%
-    \begin{tikzpicture}[
-        x=5.2cm, y=2.2cm,
-        process/.style={rectangle, rounded corners=5pt, draw=ugmBlue, very thick, minimum width=4.0cm, minimum height=1.2cm, align=center, fill=ugmBlue!6, font=\footnotesize},
+    \begin{tikzpicture} [
+        node distance=2.5cm and 1.5cm,
+        activity/.style={rectangle, draw=ugmBlue, very thick, rounded corners=3pt, fill=ugmBlue!5, minimum width=3.5cm, minimum height=1cm, align=center, font=\small},
         arrow/.style={-Latex, thick, ugmBlue},
-        looparrow/.style={-Latex, thick, ugmGold}
+        feedback/.style={-Latex, thick, ugmGold, dashed}
     ]
-        \node[process] (problem) at (0,1) {Problem Identification\\(Chapter~\ref{chap:introduction})};
-        \node[process] (literature) at (1,1) {Objectives \& Knowledge Base\\(Ch.~\ref{chap:introduction},~\ref{sec:literature_review})};
-        \node[process] (design) at (2,1) {Artifact Design \& Development\\(Chapter~\ref{chap:system_design})};
+        % Nodes for each stage
+        \node[activity] (problem) {1. Problem Identification \& Motivation};
+        \node[activity, right=of problem] (objectives) {2. Define Objectives};
+        \node[activity, right=of objectives] (design) {3. Design \& Development};
+        \node[activity, below=of design] (evaluation) {5. Evaluation};
+        \node[activity, left=of evaluation] (demonstration) {4. Demonstration};
+        \node[activity, left=of demonstration] (communication) {6. Communication};
 
-        \node[process] (implementation) at (0,0) {Prototype Demonstration\\(Chapter~IV, Sec.~\ref{sec:setup})};
-        \node[process] (evaluation) at (1,0) {Scenario Evaluation\\(Chapter~IV, Secs.~\ref{sec:rq1}--\ref{sec:discussion})};
-        \node[process] (conclusion) at (2,0) {Communication of Results\\(Chapter~V)};
+        % Arrows for the main flow
+        \draw[arrow] (problem) -- (objectives);
+        \draw[arrow] (objectives) -- (design);
+        \draw[arrow] (design) -- (evaluation);
+        \draw[arrow] (evaluation) -- (demonstration);
+        \draw[arrow] (demonstration) -- (communication);
+        
+        % Feedback loops
+        \draw[feedback] (design.south) to[out=-45, in=45] (objectives.south);
+        \draw[feedback] (evaluation.east) to[out=0, in=0, looseness=1.5] (design.east);
+        \draw[feedback] (demonstration.west) to[out=180, in=180, looseness=1.5] (design.west);
+        \draw[feedback] (communication.north) to[out=135, in=225, looseness=1.5] (problem.west);
 
-        \draw[arrow] (problem) -- (literature);
-        \draw[arrow] (literature) -- (design);
-        \draw[arrow] (implementation) -- (evaluation);
-        \draw[arrow] (evaluation) -- (conclusion);
-        \draw[arrow] (design) -- node[right, font=\footnotesize]{prototype assets} (implementation);
-        \draw[arrow] (literature) -- node[right, font=\footnotesize]{metrics \& RQs} (implementation);
-        \draw[looparrow, looseness=0.9] (evaluation.north) to[out=110, in=-110] (design.south);
-        \draw[looparrow, looseness=0.9] (implementation.north east) to[out=45, in=225] (literature.south west);
-        \draw[looparrow, looseness=1.0] (conclusion.east) to[out=0, in=0] (problem.east);
     \end{tikzpicture}%
     }% End resizebox
-    \caption{The Design Science Research (DSR) process model as applied in this thesis. The two-row layout shows how objectives inform design and how demonstration/evaluation feed back into earlier stages.}
+    \caption{The Design Science Research (DSR) process model as applied in this thesis, adapted from Peffers et al. \cite{dsr_methodology_peers_2006}. The diagram shows the sequential stages and the iterative feedback loops that inform the research process.}
     \label{fig:dsr_flowchart}
 \end{figure}
 
@@ -225,26 +59,23 @@ The complete workflow of this research, following the DSR methodology, is visual
 
 The artifact proposed and developed in this research is a novel agentic AI framework designed to address the systemic inefficiencies of traditional, reactive mental health support models in Higher Education Institutions. The conceptual architecture is predicated on the principles of a Multi-Agent System (MAS), wherein a suite of collaborative, specialized intelligent agents, collectively termed the \textbf{Safety Agent Suite}, work in concert to create a proactive, scalable, and data-driven support ecosystem. This framework is designed not as a monolithic application, but as a dynamic, closed-loop system that operates on two interconnected levels: a micro-level loop for real-time, individual student support and a macro-level loop for strategic, institutional oversight and proactive intervention \cite{kashiv2025aidrivennetworks, nwoke2025insightautomation}.
 
-The system's primary entities and their designated interaction points are illustrated in the conceptual context diagram in Figure \ref{fig:context_diagram}. These entities are:
-\begin{itemize}
-    \item \textbf{Students:} As the primary users, students interact exclusively with the \textbf{Aika Meta-Agent} through the conversational interface (UGM-AICare's `/aika` page). Aika is the sole user-facing component; students never directly access the specialist agents (STA, TCA, CMA, IA), which operate transparently in the background. This unified interface provides a consistent conversational experience while internally orchestrating specialist agent invocations as needed.
-    \item \textbf{University Staff/Counselors:} As the system's administrators and clinical supervisors, these stakeholders also interact primarily through Aika's conversational interface for analytics queries and case reviews, supplemented by a secure Admin Dashboard for detailed case management, escalation reviews, and system configuration. They can invoke the Insights Agent (IA) or Case Management Agent (CMA) through natural language requests to Aika (e.g., "show me this week's trending topics" routes to IA; "assign Case \#47 to Dr. Smith" routes to CMA).
-    \item \textbf{The Agentic AI Backend:} This is the core computational engine of the framework. It hosts the five components of the Safety Agent Suite (four specialist agents plus the Aika Meta-Agent orchestrator), manages their stateful interactions via LangGraph, and serves as the central hub for all data processing, logic execution, and communication with external services and databases. Critically, only Aika is exposed to user-facing interfaces; specialist agents operate as internal microservices invoked exclusively through Aika's orchestration logic.
-\end{itemize}
+The system's primary entities and their designated interaction points are illustrated in the conceptual context diagram in Figure \ref{fig:context_diagram}. This diagram shows how all users interact with a single, unified \textbf{Aika Meta-Agent}, which then coordinates the various specialist agents (STA, TCA, CMA, IA) that operate as background services.
 
 \begin{table}[htbp]
     \centering
-    \caption{Comparison of representative university well-being platforms.}
-    \label{tab:wellbeing_comparison}
-    \small % Reduce font size for better fit
-    \setlength{\tabcolsep}{4pt} % Reduce column separation
-    \begin{tabular}{p{3.2cm}p{3.3cm}p{3.3cm}p{3.3cm}}
+    \caption{Agent descriptions and their primary roles in the Safety Agent Suite.}
+    \label{tab:agent_descriptions}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{2.5cm} p{10.5cm}}
         \toprule
-        \textbf{Platform} & \textbf{Primary Modality} & \textbf{Safety/Privacy Posture} & \textbf{Contrast with Safety Agent Suite} \\
+        \textbf{Agent} & \textbf{Primary Role} \\
         \midrule
-        Woebot Campus Programme\cite{FIND_CITATION_PLACEHOLDER} & Daily CBT-aligned chatbot sessions with journaling prompts. & Crisis disclaimers and human referral prompts, but escalation remains manual and analytics are limited. & Lacks dedicated triage agent or orchestration guardrails; actionable insights are not automated, restricting proactive interventions. \\
-        Togetherall Peer Community\cite{FIND_CITATION_PLACEHOLDER} & Moderated peer-to-peer forums with clinician oversight and resource hubs. & Strong anonymity policies and moderator workflows, yet response time depends on human moderators. & Provides community support but no automated coaching, triage, or strategic analytics loop as offered by the Safety Agent Suite. \\
-        Kognito ``At-Risk'' Simulations\cite{FIND_CITATION_PLACEHOLDER} & Scenario-based training to help faculty/students identify and refer distressed peers. & Focuses on awareness; no live data capture or privacy-sensitive storage since it is a training tool. & Educates stakeholders but does not deliver operational support, automated escalation, or continuous monitoring of student well-being. \\
+        \textbf{Aika Meta-Agent} & The sole user-facing conversationalist and orchestrator. Manages all user interactions, performs initial risk assessment, and routes tasks to specialist agents. \\
+        \textbf{Safety Triage Agent (STA)} & A conceptual role embedded within Aika's initial analysis. Classifies immediate (Tier 1) and conversational (Tier 2) risk to enforce safety protocols. \\
+        \textbf{Therapeutic Coach Agent (TCA)} & A background agent that generates CBT-based intervention plans and recommends resources for the user's dashboard. Does not engage in direct conversation. \\
+        \textbf{Case Management Agent (CMA)} & The procedural backbone. Manages administrative tasks like crisis case creation, appointment scheduling, and sending notifications to counselors. \\
+        \textbf{Insights Agent (IA)} & The strategic analyst. Processes anonymized, aggregated data to provide population-level well-being trends and insights to administrators. \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -259,265 +90,120 @@ Conceptually, the framework's architecture is best understood as two distinct bu
     \item \textbf{The Strategic Oversight Loop:} This loop operates on a longer, asynchronous timescale to enable proactive, institution-wide strategy. The \textbf{Insights Agent (IA)} works entirely in the background, periodically analyzing anonymized, aggregated data from all student interactions. However, administrators and counselors can invoke IA through Aika by requesting analytics queries (e.g., "show trending topics this week", "case statistics for November"), at which point Aika routes the request to IA and synthesizes the analytics report into a user-friendly response. IA generates reports on population-level well-being trends, sentiment analysis, and emerging topics of concern, delivered via both scheduled batch processing and on-demand queries through Aika's conversational interface. These insights provide empirical evidence for data-driven resource allocation, such as commissioning new workshops or adjusting counseling staff schedules. This loop directly addresses the "insight-to-action" gap that plagues current systems \cite{nwoke2025insightautomation, jorno2018actionableinsight}.
 \end{enumerate}
 
-The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem.
-
-\subsection{Multi-Agent Design Principles}
-\label{sec:agent_design_principles}
-
-The decision to architect the Safety Agent Suite as a multi-agent system rather than a monolithic LLM application is grounded in established principles from Multi-Agent Systems (MAS) research and informed by the specific requirements of mental health support systems. This section articulates the foundational design principles that guided the decomposition of system intelligence into specialized, coordinated agents.
-
-\subsubsection{Separation of Concerns through Specialization}
-
-The primary architectural principle is \textbf{functional decomposition by domain expertise}. Rather than training a single large model to handle all aspects of mental health support---from crisis detection to therapeutic coaching to administrative case management---the system distributes these responsibilities across four specialist agents, each optimized for a distinct cognitive task \cite{wooldridge2009introductionmas}.
-
-This separation provides several critical advantages:
-
-\begin{enumerate}
-    \item \textbf{Targeted Prompt Engineering:} Each agent's behavior is governed by carefully crafted system prompts optimized for its specific role. The Safety Triage Agent (STA) uses classification-oriented prompts with explicit risk level definitions, while the Therapeutic Coach Agent (TCA) employs empathy-focused prompts aligned with Cognitive Behavioral Therapy (CBT) principles. This specialization allows for \textit{prompt tuning per agent} rather than requiring a single prompt to balance competing objectives.
-    
-    \item \textbf{Modular Evolution:} When safety triage logic requires refinement (e.g., adjusting crisis keywords or classification thresholds), changes are isolated to the STA module without risk of inadvertently affecting the TCA's therapeutic coaching behavior. This modularity accelerates development velocity and reduces regression risk \cite{burguillo2017multiagentsystems}.
-    
-    \item \textbf{Independent Performance Optimization:} Each agent can employ task-appropriate LLM configurations. The Aika Meta-Agent uses Gemini 2.5 Flash (stable) for routing decisions and Gemini 2.5 Flash Lite for lightweight conversational responses, while STA, TCA, and CMA all use Gemini 2.5 Flash with temperature=0.3--0.7 depending on task requirements (deterministic classification vs. empathetic conversation generation). The Insights Agent (IA) uses a two-stage approach: SQL-only aggregation with k-anonymity enforcement for privacy-preserving data extraction, followed by Gemini 2.5 Pro (temperature=0.5) for advanced reasoning and narrative generation. This per-agent model selection enables optimization impossible with monolithic architecture.
-    
-    \item \textbf{Domain-Specific Tool Access:} Tool-calling is scoped to agent roles. The STA has access to \code{escalate_crisis} and \code{log_risk_assessment} tools but \textit{cannot} schedule appointments or generate intervention plans---capabilities reserved for the TCA and Case Management Agent (CMA). This enforces the principle of \textit{least privilege} and prevents unintended agent behaviors.
-\end{enumerate}
-
-\subsubsection{Agent Role Segregation and Non-Overlapping Responsibilities}
-\label{sec:agent_role_segregation}
-
-A critical design principle in the Safety Agent Suite is \textbf{strict role segregation} to prevent functional overlap and ensure clear accountability boundaries. This segregation addresses common pitfalls in multi-agent systems where ambiguous role definitions can lead to redundant operations, inconsistent behavior, and complex debugging scenarios \cite{wooldridge2009introductionmas}. The nomenclature change from ``Support Coach Agent'' to ``Therapeutic Coach Agent'' and ``Service Desk Agent'' to ``Case Management Agent'' reinforces this segregation by making role boundaries linguistically explicit.
-
-\paragraph{Therapeutic Coach Agent (TCA)}
-
-\noindent \textbf{Designated Responsibilities:}
-\begin{itemize}
-    \item CBT-informed therapeutic coaching and emotional support
-    \item Intervention plan generation with structured coping strategies
-    \item Therapeutic exercise guidance (cognitive restructuring, behavioral activation)
-    \item Progress tracking for wellness goals and mood patterns
-    \item Resource recommendations (self-help modules, psychoeducation materials)
-\end{itemize}
-
-\noindent \textbf{Explicitly Excluded Capabilities:}
-\begin{itemize}
-    \item Crisis case creation or counselor escalation workflows
-    \item Appointment scheduling or SLA tracking
-    \item Administrative notifications to clinical staff
-    \item Any operational/procedural tasks beyond therapeutic support
-\end{itemize}
-
-\noindent \textbf{Design Rationale:} The TCA maintains exclusive focus on therapeutic intervention without dilution from operational concerns. This enables temperature=0.7 configuration for empathetic, human-like conversation generation while ensuring the agent never attempts administrative actions it lacks authority to perform. The prompt engineering explicitly instructs: ``If user requests appointment scheduling or administrative help, respond: 'I'll connect you with our case management team for that.' Do NOT attempt scheduling yourself.''
-
-\paragraph{Case Management Agent (CMA)y}
-
-\noindent \textbf{Designated Responsibilities:}
-\begin{itemize}
-    \item Crisis case creation with structured risk documentation
-    \item Appointment scheduling with counselor availability management
-    \item Counselor assignment based on specialization and workload
-    \item SLA calculation, breach prediction, and follow-up tracking
-    \item Administrative notifications (counselor alerts, status updates)
-\end{itemize}
-
-\noindent \textbf{Explicitly Excluded Capabilities:}
-\begin{itemize}
-    \item Therapeutic coaching or CBT-based interventions
-    \item Emotional support conversations or empathy-focused dialogue
-    \item Intervention plan generation or coping strategy recommendations
-    \item Any content requiring clinical/therapeutic expertise
-\end{itemize}
-
-\textbf{Design Rationale:} The CMA focuses on deterministic operational workflows requiring temperature=0.3 for consistent structured outputs (case IDs, SLA timestamps, counselor assignments). Preventing therapeutic content generation avoids boundary violations where a non-therapeutic agent provides clinical advice, which could undermine treatment integrity and violate counselor oversight protocols.
-
-\paragraph{Enforcement Mechanisms}
-
-This segregation is enforced through three complementary mechanisms:
-\begin{enumerate}
-    \item \textbf{Tool Access Control:} TCA has access to \code{generate\_intervention\_plan} and \code{recommend\_resources} tools but \textit{cannot} invoke \code{create\_case} or \code{schedule\_appointment}. Conversely, CMA has access to administrative tools but \textit{cannot} call \code{generate\_intervention\_plan}. Tool schemas are defined in separate modules with role-scoped imports.
-    
-    \item \textbf{Prompt Engineering with Refusal Policies:} System prompts explicitly define role boundaries with refusal instructions. When a TCA receives an administrative request, it responds: ``Let me connect you with our case management team for that'' and triggers Aika to route the next message to CMA. Similarly, CMA prompts prohibit therapeutic advice: ``I handle scheduling and case management. For emotional support, I'll reconnect you with your therapeutic coach.''
-    
-    \item \textbf{Orchestration Routing Invariants:} The Aika Meta-Agent enforces deterministic routing based on intent classification. Therapeutic intents (\code{emotional\_support}, \code{coping\_strategies}) route exclusively to TCA; operational intents (\code{schedule\_appointment}, \code{escalate\_crisis}) route exclusively to CMA. This prevents agents from receiving out-of-scope requests that could trigger inappropriate responses.
-\end{enumerate}
-
-\subsubsection{Hierarchical Coordination vs. Peer-to-Peer Negotiation}
-
-The system adopts a \textbf{hierarchical coordinator-specialist pattern} \cite{durfee1999distributedsystems, stone2000multiagentcoordination} rather than flat peer-to-peer agent negotiation schemes such as the Contract Net Protocol \cite{smith1980contractnet} or market-based coordination mechanisms. This design choice is justified by three domain-specific considerations:
-
-\begin{enumerate}
-    \item \textbf{Safety-First Routing Determinism:} Mental health applications require \textit{guaranteed routing policies} where crisis detection always precedes therapeutic intervention. In peer-to-peer negotiation, agents might compete for task ownership, introducing non-determinism into safety-critical workflows. The hierarchical Aika Meta-Agent enforces strict routing invariants: all student messages \textit{must} pass through STA before reaching TCA, ensuring zero-tolerance for undetected crises.
-    
-    \item \textbf{Simplified Role-Based Access Control (RBAC):} The coordinator pattern allows centralized enforcement of access policies. When an administrator queries platform analytics, Aika validates role permissions \textit{before} invoking the Insights Agent (IA). In a peer-to-peer model, each agent would need to independently implement authentication logic, creating redundancy and security vulnerabilities.
-    
-    \item \textbf{Unified User Experience:} Hierarchical coordination presents a \textit{single conversational interface} to users, with Aika synthesizing specialist outputs into coherent responses. Users interact with "Aika" (the system), not "STA" or "TCA" (implementation details). This abstraction aligns with mental health best practices emphasizing continuity of care and therapeutic relationship building \cite{norcross2019therapeutic}.
-\end{enumerate}
-
-The hierarchical model does sacrifice some theoretical advantages of peer-to-peer systems (e.g., fault tolerance through redundancy, emergent behavior through negotiation), but these properties are less critical for a deterministic, safety-constrained application than the guarantees provided by centralized orchestration.
-
-\subsubsection{Dual-Loop Proactive-Reactive Architecture}
-
-The system implements a \textbf{dual-loop architecture} that distinguishes between \textit{reactive} (event-driven) and \textit{proactive} (scheduled) intelligence:
-
-\begin{itemize}
-    \item \textbf{Reactive Loop (STA → TCA → CMA):} Triggered by incoming student messages, this loop provides real-time crisis detection and synchronous therapeutic support. The workflow executes in seconds: STA classifies risk (150-300ms), TCA generates intervention plan (1-2s), and CMA creates case record if escalation is required (200ms).
-    
-    \item \textbf{Proactive Loop (IA):} Operates on a time-based schedule (e.g., weekly cron jobs) to perform population-level analytics. The IA aggregates anonymized conversation logs to identify trending mental health concerns (e.g., sudden spike in exam-related stress), enabling institutional leadership to allocate counseling resources \textit{before} crises escalate.
-\end{itemize}
-
-This separation prevents proactive analytics computations (which may require minutes to hours for NLP pipelines over large datasets) from blocking real-time student support. The dual-loop principle is inspired by Brooks' subsumption architecture \cite{brooks1991intelligence}, adapted here for cognitive rather than robotic agents.
-
-\subsubsection{Design Rationale Summary}
-
-Table~\ref{tab:design_principles_summary} summarizes the design principles, their implementation in the Safety Agent Suite, and the architectural alternatives that were considered but rejected.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Summary of multi-agent design principles and alternative architectures considered.}
-    \label{tab:design_principles_summary}
-    \small
-    \setlength{\tabcolsep}{3pt}
-    \begin{tabular}{p{3.5cm}p{4.5cm}p{5.0cm}}
-        \toprule
-        \textbf{Design Principle} & \textbf{Implementation} & \textbf{Alternatives Considered \& Rejected} \\
-        \midrule
-        Functional specialization & Four domain-specific agents (STA, TCA, CMA, IA) with role-scoped prompts and tools & \textbf{Monolithic LLM:} Single model handling all tasks. Rejected due to: (1) conflicting optimization objectives (speed vs. quality), (2) inability to isolate safety logic, (3) complex prompt engineering. \\
-        \midrule
-        Hierarchical coordination & Aika Meta-Agent as centralized orchestrator with deterministic routing policies & \textbf{Peer-to-peer negotiation (Contract Net):} Agents bid for tasks. Rejected due to: (1) non-deterministic routing violates safety requirements, (2) RBAC complexity, (3) no unified user interface. \\
-        \midrule
-        Dual-loop architecture & Separate reactive (real-time) and proactive (scheduled) processing paths & \textbf{Unified event loop:} All processing event-driven. Rejected due to: (1) analytics blocking real-time responses, (2) inability to schedule strategic reviews. \\
-        \midrule
-        Privacy-by-architecture & Strict data access boundaries: identified data (STA/TCA/CMA) vs. anonymized data (IA) & \textbf{Centralized data lake:} All agents access unified database. Rejected due to: (1) re-identification risk, (2) privacy breach exposure, (3) violates least-privilege principle. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-These design principles collectively establish a robust foundation for the Safety Agent Suite, balancing the competing demands of real-time responsiveness, safety guarantees, therapeutic quality, and privacy protection. The subsequent sections detail how these principles are operationalized through specific technical mechanisms: tool-calling interfaces (Section~\ref{sec:tool_design}), prompt engineering strategies (Section~\ref{sec:prompt_engineering}), and state management protocols (Section~\ref{sec:state_schema}).
-
-\subsection{Orchestration Strategy: Rationale for Graph-Based Agent Coordination}
-
-The selection of an appropriate orchestration mechanism for multi-agent coordination is a critical architectural decision that directly impacts system reliability, maintainability, and performance. Classical multi-agent systems literature distinguishes between centralized planners, market-based negotiation schemes, and more recent graph-structured controllers for coordinating autonomous agents \cite{wooldridge1995intelligentagents,wooldridge2009introductionmas}. Contemporary surveys focused on LLM-powered agents demonstrate that orchestration frameworks such as LangGraph provide deterministic state persistence, guardrails, and cycle control that are difficult to obtain in purely contract-net or ad-hoc workflow engines \cite{yang2025aiagentprotocols,tran2025multiagentcollaboration,yu2025agentworkflow}.
-
-Table~\ref{tab:orchestration_patterns} presents a systematic comparison of three primary orchestration approaches, evaluating each against the specific requirements of the Safety Agent Suite. The analysis reveals that while centralized workflows offer simplicity and contract-net approaches provide flexibility, the graph-based stateful orchestrator best aligns with the system's need for deterministic escalation paths, comprehensive auditing capabilities, and robust metric capture infrastructure.
-
-\begin{table}[htbp]
-    \centering
-    \caption{Comparison of orchestration patterns for the Safety Agent Suite.}
-    \label{tab:orchestration_patterns}
-    \small % Smaller font for better readability
-    \setlength{\tabcolsep}{4pt} % Reduce column separation
-    \begin{tabular}{p{3.2cm}p{3.8cm}p{3.8cm}}
-        \toprule
-        \textbf{Approach} & \textbf{Coordination Strengths} & \textbf{Limitations and Implications for Safety Agent Suite} \\
-        \midrule
-        Centralized workflow/planner \cite{wooldridge2009introductionmas} & Deterministic control flow and straightforward verification of simple pipelines. & Brittle when the conversation requires branching or repeated loops; a single orchestrator becomes a failure hotspot and hinders human-in-the-loop escalations needed for STA. \\
-        Contract-net / market-based negotiation \cite{wooldridge1995intelligentagents,tran2025multiagentcollaboration} & Decentralized task allocation and flexibility for loosely coupled agents. & Negotiation latency and probabilistic assignment make it difficult to guarantee triage deadlines and safety invariants; insufficient for crisis escalation SLAs. \\
-        Graph-based, stateful orchestrator (LangGraph) \cite{yang2025aiagentprotocols,yu2025agentworkflow} & Explicit state persistence, guard conditions, and cyclic workflows that support guardrails, retries, and logging. & Requires deliberate state-schema design and emerging tooling, but best aligns with the need for deterministic escalation paths, auditing, and metric capture in Chapters~IV and~V. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-The adoption of LangGraph's graph-based orchestration provides several concrete advantages for the Safety Agent Suite. The stateful edges enable the Safety Triage Agent to enforce risk-score thresholds before delegating control to the Therapeutic Coach Agent or Case Management Agent, while preserving the ability to retry failed operations, maintain comprehensive logs, and escalate exceptions without requiring bespoke infrastructure. This orchestration choice directly supports the evaluation metrics reported in Chapters~IV and~V, particularly those concerning tool-call reliability, end-to-end latency, and system auditability. The deterministic nature of graph-based workflows also facilitates reproducible testing and debugging, which is essential for safety-critical mental health applications where understanding system behavior under failure conditions is paramount.
+The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem. This dual-loop architecture is visualized in Figure \ref{fig:two_loops_diagram}.
 
 \begin{figure}[htbp]
     \centering
     \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
-        entity/.style={rectangle, rounded corners=4pt, draw=ugmBlue, very thick, fill=ugmBlue!6, align=center, minimum width=3.6cm, minimum height=1.4cm},
-        external/.style={entity, fill=white},
-        userfacing/.style={entity, fill=ugmGold!20, draw=ugmGold, line width=1.5pt},
-        datastore/.style={rectangle, draw=ugmBlue, thick, fill=ugmBlue!10, align=center, minimum width=4.4cm, minimum height=1.2cm},
-        innerbox/.style={rectangle, rounded corners=3pt, draw=ugmBlue!70, fill=ugmBlue!12, minimum width=3.0cm, minimum height=0.85cm, font=\footnotesize, align=center},
-        bgagent/.style={rectangle, rounded corners=3pt, draw=ugmBlue!40, fill=ugmBlue!8, minimum width=2.8cm, minimum height=0.75cm, font=\scriptsize, align=center, dashed},
-        arrow/.style={-Latex, thick, ugmBlue},
-        userarrow/.style={-Latex, very thick, ugmGold},
-        dashedarrow/.style={-Latex, thick, ugmBlue, dashed}
+        node distance=1.5cm and 1cm,
+        loop/.style={
+            rectangle, 
+            draw=black, 
+            very thick, 
+            rounded corners=3pt, 
+            minimum width=8cm, 
+            minimum height=3.5cm, 
+            label={[font=\bfseries]above:#1}
+        },
+        actor/.style={
+            circle, 
+            draw=black, 
+            thick, 
+            fill=gray!10, 
+            minimum size=1.2cm, 
+            align=center
+        },
+        agent/.style={
+            rectangle, 
+            draw=black, 
+            thick, 
+            rounded corners=2pt, 
+            fill=gray!5, 
+            minimum width=2.5cm, 
+            align=center,
+            font=\small
+        },
+        data/.style={
+            rectangle, 
+            draw=black, 
+            dashed, 
+            thick, 
+            fill=gray!5, 
+            align=center, 
+            font=\small
+        },
+        arrow/.style={-Latex, thick},
+        data_arrow/.style={-Latex, thick, dashed}
     ]
-        \node[external] (student) {Student\\\footnotesize UGM-AICare App};
-        \node[entity, right=3.8cm of student, minimum width=4.6cm, minimum height=6.5cm] (backend) {};
-        \node at (backend.north) [yshift=-0.35cm, font=\bfseries\small, text=ugmBlue] {Safety Agent Suite Backend};
+        % Real-Time Interaction Loop
+        \node[loop=The Real-Time Interaction Loop] (realtime_loop) {};
+        \node[actor, left=of realtime_loop] (student) {Student};
+        \node[agent, at=(realtime_loop.center)] (agents) {Aika, STA, \\ TCA, CMA};
         
-        % Highlight Aika as USER-FACING
-        \node[userfacing] (aika) at ([yshift=1.65cm]backend.center) {\textbf{Aika Meta-Agent}\\\textit{SOLE USER-FACING}};
-        
-        % Background agents (dashed borders)
-        \node[bgagent] (sta) at ([yshift=0.65cm]backend.center) {Safety Triage (STA)\\\textit{Background Tier 2}};
-        \node[bgagent, below=0.15cm of sta] (tca) {Therapeutic Coach (TCA)\\\textit{Background Plans}};
-        \node[bgagent, below=0.15cm of tca] (cma) {Case Mgmt (CMA)\\\textit{Conditional via Aika}};
-        \node[bgagent, below=0.15cm of cma] (ia) {Insights (IA)\\\textit{Conditional via Aika}};
-        
-        \node[external, right=3.6cm of backend] (staff) {University Staff\\\footnotesize Admin Dashboard};
-        \node[datastore, below=2.2cm of backend] (dataplatform) {Data Platform\\\footnotesize Encrypted storage \& analytics};
-        \node[external, above=2.2cm of backend] (llm) {LLM Service\\\footnotesize (Gemini API)};
+        \draw[arrow] (student) to[bend left=20] node[midway, above, font=\small] {Interaction} (agents);
+        \draw[arrow] (agents) to[bend left=20] node[midway, below, font=\small] {Support} (student);
 
-        % User arrows emphasize Aika as interface
-        \draw[userarrow] (student) -- node[above, font=\footnotesize, fill=white]{\textbf{Messages (to Aika only)}} (backend);
-        \draw[userarrow] (backend) -- node[above, font=\footnotesize, fill=white]{\textbf{Aika responses}} (student);
-        \draw[userarrow] (backend) -- node[above, font=\footnotesize, fill=white]{\textbf{Aika + Analytics}} (staff);
-        \draw[dashedarrow] (staff) -- node[below, font=\footnotesize]{Config, reviews} (backend);
-        \draw[arrow] (backend) -- node[right, font=\footnotesize]{Anonymized logs} (dataplatform);
-        \draw[dashedarrow] (dataplatform) -- node[left, font=\footnotesize]{Aggregated reports} (backend);
-        \draw[arrow] (backend) -- node[right, font=\footnotesize]{Prompts, JSON schema} (llm);
-        \draw[dashedarrow] (llm) -- node[left, font=\footnotesize]{JSON responses} (backend);
-    \end{tikzpicture}}
-    \caption{High-level context of the Safety Agent Suite emphasizing Aika Meta-Agent as the sole user-facing component. Students and staff interact exclusively with Aika's conversational interface (gold highlight); specialist agents (STA, TCA, CMA, IA) operate as internal background services (dashed borders) invoked conditionally through Aika's orchestration logic. This architecture ensures consistent user experience while enabling modular specialist intelligence.}
-    \label{fig:context_diagram}
+        % Strategic Oversight Loop
+        \node[loop=The Strategic Oversight Loop, below=4.5cm of realtime_loop] (strategic_loop) {};
+        \node[actor, right=of strategic_loop] (admin) {Admin / \\ Counselor};
+        \node[agent, at=(strategic_loop.center)] (ia) {Insights Agent \\ (IA)};
+        
+        \draw[arrow] (ia) to[bend left=20] node[midway, above, font=\small] {Reports} (admin);
+        \draw[arrow] (admin) to[bend left=20] node[midway, below, font=\small] {Queries} (ia);
+
+        % Connecting the loops
+        \node[data] (agg_data) at ([yshift=-2.25cm]realtime_loop.center) {Aggregated, Anonymized Data};
+        
+        \draw[data_arrow] (agents) -- (agg_data) node[midway, right, font=\small] {Fuels};
+        \draw[data_arrow] (agg_data) -- (ia) node[midway, right, font=\small] {Informs};
+        \draw[data_arrow] (ia) to[bend right=30] (agents) node[midway, left, font=\small] {Improves};
+
+    \end{tikzpicture}%
+    }
+    \caption{The Two Proactive Loops: The real-time loop provides immediate student support, generating data that fuels the strategic loop. The strategic loop analyzes this data to produce insights that, in turn, improve the proactive capabilities of the real-time loop.}
+    \label{fig:two_loops_diagram}
 \end{figure}
 
-\subsection{Aika's Unified JSON Response Structure}
-\label{subsec:aika_json_response}
+\subsection{Core Interaction: The Unified JSON Response Schema}
 
-A critical architectural decision in the Safety Agent Suite is Aika Meta-Agent's use of a single, structured JSON response from the Gemini API that integrates both conversational content and embedded risk assessment (Tier 1). This design consolidates what would traditionally require multiple sequential API calls into a single sub-second interaction, enabling simultaneous dialogue generation and immediate safety screening without introducing latency bottlenecks.
+The architectural lynchpin of the real-time interaction loop is the system's reliance on a structured, unified JSON response schema. When a user sends a message, the Aika Meta-Agent does not engage in a multi-step reasoning process with other agents. Instead, it makes a single, optimized call to its underlying language model (Gemini 2.5 Flash), guided by a system prompt that instructs it to return a comprehensive JSON object. This design pattern ensures that conversational fluency, safety screening, and routing logic are handled in a single, atomic transaction.
 
-\subsubsection{Response Schema}
+The returned JSON object's schema is detailed in Table~\ref{tab:aika_json_schema}. Each field serves a distinct purpose in the agent's decision-making process, from generating an empathetic reply to providing a transparent audit trail for the assigned risk level.
 
-When a user sends a message, Aika invokes the Gemini 2.5 Flash model with a specialized system prompt that instructs the model to return a JSON object containing the following fields:
+\begin{table}[htbp]
+    \centering
+    \caption{The unified JSON response schema returned by the Aika Meta-Agent.}
+    \label{tab:aika_json_schema}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.5cm} p{1.5cm} p{8cm}}
+        \toprule
+        \textbf{Field} & \textbf{Type} & \textbf{Description} \\
+        \midrule
+        \code{reply} & string & The empathetic, context-aware conversational response to be displayed to the user. \\
+        \code{immediate\_risk} & string & A five-level risk classification (\texttt{none}, \texttt{low}, \texttt{moderate}, \texttt{high}, \texttt{critical}) for the single message, enabling instantaneous safety screening. \\
+        \code{crisis\_keywords} & array & A list of detected keywords from a predefined crisis lexicon (e.g., "bunuh diri," "menyakiti diri sendiri"). \\
+        \code{risk\_reasoning} & string & A model-generated explanation for the assigned risk level, providing transparency for human oversight. \\
+        \code{intent} & string & The classified user intent (e.g., \texttt{request\_support}, \texttt{schedule\_appointment}), which dictates subsequent routing logic. \\
+        \code{needs\_agents} & boolean & A flag indicating whether the query requires routing to a background specialist agent. \\
+        \code{reasoning} & string & A brief explanation of why specialist agents are or are not needed, justifying the routing decision. \\
+        \code{suggested\_response} & string & An optional, complete response for simple interactions, allowing the system to bypass agent orchestration and reduce latency. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
-\begin{itemize}
-    \item \textbf{\code{reply}} (string): The conversational response to display to the user. This text embodies Aika's personality (warm, empathetic, culturally appropriate for Indonesian university students) and addresses the user's query directly. For example: \texttt{"Halo! Saya Aika, asisten kesehatan mental UGM. Ada yang bisa saya bantu hari ini?"}
-    
-    \item \textbf{\code{intent}} (string): Classified intent of the user's message. Values include: \code{emotional\_support}, \code{crisis}, \code{casual\_chat}, \code{appointment\_request}, \code{analytics\_query}, \code{case\_management}, \code{unknown}. This classification drives Aika's routing decisions to specialist agents.
-    
-    \item \textbf{\code{intent\_confidence}} (float, 0.0--1.0): Confidence score for the intent classification. Low-confidence classifications ($<0.6$) trigger fallback behaviors or request clarification from the user.
-    
-    \item \textbf{\code{immediate\_risk}} (enum): Tier 1 risk assessment performed inline during response generation. Values: \code{none}, \code{low}, \code{moderate}, \code{high}, \code{critical}. This field embeds safety screening directly into every response, eliminating the need for a separate STA invocation for per-message screening.
-    
-    \item \textbf{\code{crisis\_keywords}} (array of strings): List of crisis-related keywords detected in the user's message (e.g., \code{["bunuh diri", "ingin mati"]}). Empty array if no crisis indicators found. Used for audit trails and counselor handoff context.
-    
-    \item \textbf{\code{risk\_reasoning}} (string): Brief 1--2 sentence explanation of the risk assessment (e.g., \code{"Explicit suicide plan with method and timeframe detected"}). Provides transparency for counselor review and debugging.
-    
-    \item \textbf{\code{needs\_agents}} (boolean): Decision flag indicating whether specialist agents (STA, TCA, CMA, IA) need to be invoked. \code{false} indicates Aika can respond directly without specialist consultation (e.g., for simple greetings); \code{true} triggers specialist agent routing.
-    
-    \item \textbf{\code{reasoning}} (string): Explanation of why \code{needs\_agents} is \code{true} or \code{false}, documenting Aika's decision-making logic for observability and debugging.
-    
-    \item \textbf{\code{suggested\_response}} (string, optional): If \code{needs\_agents} is \code{false}, this field contains the complete response to send directly to the user, bypassing specialist agent invocation. This optimization reduces latency for simple interactions (e.g., greetings, FAQ answers).
-\end{itemize}
+This unified response schema yields several architectural benefits. First, it facilitates \textbf{latency optimization}; by consolidating response generation and risk assessment into one call, the system can achieve sub-300ms response times, which is critical for maintaining conversational fluidity. Second, it enables \textbf{embedded safety}, as risk assessment is an integral and non-negotiable part of every interaction loop. Third, the schema ensures \textbf{transparent oversight} by providing a clear audit trail for the system's reasoning. Finally, the \code{needs_agents} flag allows for \textbf{conditional agent invocation}, an efficient resource management strategy that reduces backend compute costs by bypassing complex orchestration for simple queries.
 
-\subsubsection{Architectural Benefits}
+An example of this schema in practice is shown in Listing~\ref{lst:json_moderate_stress}, where a user expresses moderate, non-imminent distress. In contrast, Listing~\ref{lst:json_greeting} shows the optimized response for a simple greeting. This structure operationalizes the principle that Aika is the sole user-facing component, synthesizing conversational intelligence and safety screening into a single, coherent interface layer.
 
-This unified JSON structure provides several critical advantages:
-
-\begin{enumerate}
-    \item \textbf{Latency Optimization}: By consolidating conversational response generation and risk assessment into a single LLM call, the system achieves sub-300ms response times for direct Aika replies, compared to 500--800ms for sequential agent invocations. This is critical for maintaining conversational fluidity in a mental health support context where perceived responsiveness impacts user trust.
-    
-    \item \textbf{Two-Tier Risk Monitoring Integration}: The \code{immediate\_risk} field implements Tier 1 (per-message) risk screening without requiring a separate STA invocation for every message. Tier 2 (conversation-level) analysis by STA is deferred until conversation end, reducing API costs by approximately 90\% (11 calls vs. 20 per 10-message conversation) while maintaining comprehensive safety coverage as documented in Section~\ref{subsec:two_tier_risk}.
-    
-    \item \textbf{Observability and Auditability}: The \code{reasoning}, \code{risk\_reasoning}, and \code{crisis\_keywords} fields provide explicit provenance for every routing and safety decision, enabling post-hoc analysis of agent behavior, false negative investigations, and counselor handoff transparency. This addresses ethical requirements for explainable AI in healthcare contexts \cite{FIND_CITATION_PLACEHOLDER}.
-    
-    \item \textbf{Conditional Agent Invocation}: The \code{needs\_agents} flag enables efficient resource utilization by bypassing specialist agent orchestration for simple queries (e.g., ``Hello'', ``What is CBT?''), reducing backend compute costs and improving system scalability under high concurrent user loads.
-\end{enumerate}
-
-\subsubsection{Example JSON Response}
-
-A typical JSON response for a student expressing moderate stress might look like:
-
-\begin{lstlisting}[language=json,caption={Example Aika JSON response for moderate stress scenario}]
+\begin{lstlisting}[style=jsonStyle,caption={Example Aika JSON response for moderate stress scenario},label={lst:json_moderate_stress}]
 {
   "reply": "Saya mengerti kamu merasa tertekan dengan ujian yang akan datang. Wajar banget kok merasa cemas. Yuk, kita coba teknik grounding bersama untuk menenangkan pikiran.",
-  "intent": "emotional_support",
-  "intent_confidence": 0.87,
-  "immediate_risk": "low",
-  "crisis_keywords": [],
-  "risk_reasoning": "Student expresses exam stress without crisis indicators",
+  "immediate_risk": "moderate",
+  "crisis_keywords": ["ujian", "stres"],
+  "risk_reasoning": "User expresses feelings of pressure and anxiety related to upcoming exams, indicating moderate, non-imminent distress.",
+  "intent": "request_emotional_support",
   "needs_agents": true,
   "reasoning": "Requires TCA for CBT coping strategies and intervention plan"
 }
@@ -525,16 +211,15 @@ A typical JSON response for a student expressing moderate stress might look like
 
 In contrast, a simple greeting would return:
 
-\begin{lstlisting}[language=json,caption={Example Aika JSON response for casual greeting}]
+\begin{lstlisting}[style=jsonStyle,caption={Example Aika JSON response for casual greeting},label={lst:json_greeting}]
 {
   "reply": "Halo! Saya Aika, asisten kesehatan mental UGM. Saya di sini untuk mendengarkan dan membantu kamu. Ada yang ingin kamu ceritakan?",
-  "intent": "casual_chat",
-  "intent_confidence": 0.95,
   "immediate_risk": "none",
   "crisis_keywords": [],
-  "risk_reasoning": "No distress signals detected",
+  "risk_reasoning": "Casual greeting with no indicators of distress.",
+  "intent": "casual_greeting",
   "needs_agents": false,
-  "reasoning": "Simple greeting requires no specialist agent consultation",
+  "reasoning": "Simple greeting, no specialist agent required.",
   "suggested_response": "Halo! Saya Aika, asisten kesehatan mental UGM. Saya di sini untuk mendengarkan dan membantu kamu. Ada yang ingin kamu ceritakan?"
 }
 \end{lstlisting}
@@ -552,1369 +237,198 @@ The functional architecture of the framework is designed as a Multi-Agent System
 
 \subsection{The Safety Triage Agent (STA): The Real-Time Guardian}
 
-\subsubsection{Goal}
-The primary objective of the STA is to function as a real-time, automated safety monitor for every user interaction. Its goal is to assess the immediate risk level of a user's conversation to detect potential crises and trigger an appropriate escalation protocol without delay, ensuring that safety is the foremost priority of the system.
+The Safety Triage Agent (STA) serves as the system's frontline safety monitor. Its primary function is to analyze every incoming student message to assess the immediate risk level and update the shared system state accordingly. This ensures that no high-risk message proceeds to a therapeutic agent without a safety intervention, enforcing the system's foundational "safety-first" principle.
 
-\subsubsection{Perception (Inputs)}
-The STA perceives the conversational environment by intercepting each user message before it is processed by other agents. Its primary input is the raw text of the user's current utterance. Let $M_t$ be the user's message at time $t$. The STA's perception is solely focused on this message:
+The agentic behavior of the STA can be understood through the BDI model:
 \begin{itemize}
-    \item \textbf{Current User Message ($M_t$):} A string containing the user's latest input.
+    \item \textbf{Beliefs:} The STA's beliefs are formed from the raw text of the user's message and the structured output of the Gemini 2.5 Flash model, which provides a risk classification (\texttt{low}, \texttt{moderate}, \texttt{critical}) and detected crisis keywords.
+    \item \textbf{Desires:} Its fundamental desire is to ensure user safety by correctly identifying and escalating any potential crisis.
+    \item \textbf{Intentions:} Based on its beliefs, the STA forms a clear intention. If the belief is that the risk is \texttt{critical}, its intention becomes to update the agent state to trigger the "escalate\_to\_cma" edge in the LangGraph. Otherwise, its intention is to pass control to the next appropriate agent.
 \end{itemize}
 
-\subsubsection{Processing Logic}
-The core logic of the STA is a high-speed classification task. Upon receiving the message $M_t$, the agent invokes a specialized function, powered by the Gemini 2.5 Flash model (configured with temperature=0.3 for consistent classification), to classify the message into one of several predefined risk categories. The classification function, $f_{STA}$, can be represented as:
-$$ R_t = f_{STA}(M_t; \theta_{LLM}) $$
-where $\theta_{LLM}$ represents the parameters of the underlying Large Language Model, and the output, $R_t$, is an element of the set of possible risk levels, $R \in \{\text{Low, Moderate, Critical}\}$. The prompt for this classification is highly optimized for speed and accuracy, instructing the model to evaluate the text for indicators of self-harm, severe distress, or explicit requests for urgent help.
+\subsection{The Therapeutic Coach Agent (TCA): The Empathetic Guide}
 
-\subsubsection{Action (Outputs)}
-Based on the classification result $R_t$, the STA's action is to update the system's state, which in turn determines the next step in the LangGraph workflow.
+The Therapeutic Coach Agent (TCA) acts as the primary conversational partner for students in non-crisis situations. Once the STA has cleared a message as safe, the TCA takes over to provide empathetic listening, emotional support, and evidence-based therapeutic guidance.
+
+Its agentic model is as follows:
 \begin{itemize}
-    \item \textbf{State Update:} The agent's primary output is an update to the shared state graph, setting the \code{risk_level} variable to the value of $R_t$.
-    \item \textbf{Trigger Escalation (if $R_t$ = Critical):} If a critical risk is detected, the agent's action triggers a conditional edge in the graph that invokes the \code{escalate_crisis} tool. This tool flags the conversation on the Admin Dashboard, logs the event, and instructs the Case Management Agent (CMA) to create a high-priority case with SLA-bound response times. It also immediately presents the user with pre-defined emergency resources.
+    \item \textbf{Beliefs:} The TCA's beliefs include the user's message history, the STA's "safe" classification, and any previously generated intervention plans stored in the agent state.
+    \item \textbf{Desires:} Its core desire is to reduce user distress and build coping skills by providing helpful, evidence-based guidance.
+    \item \textbf{Intentions:} If the user's message indicates a need for coping strategies, the TCA forms the intention to execute its \texttt{generate\_intervention\_plan} tool. This tool call is a committed action to fulfill its desire. If the user is simply venting, its intention is to generate an empathetic, listening-oriented response.
 \end{itemize}
 
+\subsection{The Case Management Agent (CMA): The Procedural Coordinator}
+
+The Case Management Agent (CMA) serves as the system's administrative backbone, responsible for all procedural and operational tasks. It is activated under two conditions: following a critical risk escalation from the STA, or when a user directly expresses an intent for administrative action.
+
+Its BDI breakdown is highly procedural:
 \begin{itemize}
-    \item \textbf{Design Rationale:} Assumes each incoming $M_t$ is UTF-8 text already filtered for profanity/noise; applies a calibrated confidence threshold (LLM softmax score $\geq0.6$) before labelling critical risk, otherwise defers to a human counselor; prompt template and \code{escalate_crisis} schema were validated on the synthetic crisis corpus and scenario metrics reported in Chapter~\ref{sec:rq1}.\cite{FIND_CITATION_PLACEHOLDER}
+    \item \textbf{Beliefs:} The CMA believes the state of the world requires administrative action. This belief is triggered by either a \texttt{critical} flag from the STA or a direct user request for a service like booking an appointment.
+    \item \textbf{Desires:} Its primary desire is to execute administrative workflows reliably and accurately.
+    \item \textbf{Intentions:} When triggered by a crisis escalation, it forms the intention to execute the \texttt{create\_crisis\_case} tool. When triggered by a user request, it forms the intention to use the \texttt{schedule\_appointment} tool. Each intention maps directly to a deterministic, procedural tool call.
 \end{itemize}
-
-\subsubsection{Therapeutic Coach Agent (TCA) Design Constraints}
-
-The TCA's design incorporates the following assumptions and constraints that reflect its focus on evidence-based therapeutic intervention:
-
-\begin{enumerate}
-    \item \textbf{Pre-sanitized input}: The agent assumes that all incoming messages $M_t$ have been vetted by the STA and deemed safe for conversational processing, allowing the TCA to focus exclusively on therapeutic intervention without redundant crisis detection logic.
-    
-    \item \textbf{Context window management}: Conversation history $H_{t-1}$ is maintained with a maximum of 50 dialogue turns to bound context length and prevent token overflow in the LLM context window. Older messages are summarized or archived when this threshold is reached.
-    
-    \item \textbf{Therapeutic scope boundaries}: The agent enforces strict refusal policies for out-of-scope clinical topics (e.g., medication advice, psychiatric diagnosis, emergency medical conditions) and automatically escalates administrative intents (e.g., appointment scheduling, case management requests) to the Case Management Agent. These policies maintain the TCA's focus on CBT-based therapeutic coaching without scope creep into clinical case management domains.
-    
-    \item \textbf{Quality assurance}: Prompt templates and tool schemas underwent peer review and are evaluated via rubric-based assessment measuring CBT alignment, empathy, appropriateness, and actionability metrics as detailed in Chapter~\ref{sec:rq2} \cite{FIND_CITATION_PLACEHOLDER}.
-\end{enumerate}
-
-\subsubsection{Case Management Agent (CMA) Design Constraints}
-
-The CMA's procedural architecture requires:
-
-\begin{enumerate}
-    \item \textbf{Input validation}: All structured events must carry validated UUIDs, ISO-8601 formatted timestamps, and pass schema validation in upstream components before reaching the agent. This ensures data integrity and prevents malformed requests from disrupting clinical case management workflows.
-    
-    \item \textbf{Idempotency and retry logic}: The agent enforces idempotent tool execution with exponential backoff (delays: 1s, 2s, 4s) to handle transient failures gracefully. After three failed retry attempts, the system escalates to human staff to prevent infinite loops and ensure critical cases receive immediate clinical attention.
-    
-    \item \textbf{Integration testing}: Tool schemas and workflow sequences were exercised through comprehensive integration tests that verify correct database state transitions, external API interactions, notification delivery, and SLA tracking as summarized in Chapter~\ref{sec:rq2} \cite{FIND_CITATION_PLACEHOLDER}.
-\end{enumerate}
-
-\subsubsection{Insights Agent Design Constraints}
-
-The IA operates under strict privacy-preserving constraints:
-
-\begin{enumerate}
-    \item \textbf{Anonymization requirements}: The agent accesses only anonymized conversation logs that have been aggregated with minimum cohort size thresholds (k $\geq$ 50 to maintain k-anonymity). This prevents re-identification attacks through demographic or temporal correlation.
-    
-    \item \textbf{Data retention limits}: Logs are retained for a maximum of 90 days in accordance with institutional data retention policies, after which they are permanently deleted to minimize privacy risk exposure.
-    
-    \item \textbf{Output suppression}: Analytics outputs for cohorts below the minimum threshold are automatically suppressed to prevent potential re-identification through small sample sizes.
-    
-    \item \textbf{Pipeline validation}: Analytical prompts and NLP pipelines (topic modeling, sentiment analysis) were stress-tested through stability checks that measure consistency across multiple runs and temporal windows, as reported in Chapter~\ref{sec:rq4} \cite{FIND_CITATION_PLACEHOLDER}.
-\end{enumerate}
 
 \subsection{The Insights Agent (IA): The Strategic Analyst}
 
-\subsubsection{Goal}
-The IA is designed to function as the institution's automated well-being analyst. Its goal is to autonomously process anonymized, aggregated conversation data to identify population-level mental health trends, generate interpretive narratives, and provide actionable recommendations. This provides the institution with data-driven intelligence that bridges the gap between raw metrics and strategic action.
+The Insights Agent (IA) functions as the institution's automated well-being analyst, tasked with identifying population-level mental health trends from aggregated data. It is invoked exclusively by administrators to generate strategic reports.
 
-\subsubsection{Perception (Inputs)}
-The IA is activated by administrator requests via the Admin Dashboard and operates on aggregated institutional data.
+Its agentic model is focused on data analysis and synthesis:
 \begin{itemize}
-    \item \textbf{Query Request:} Administrator selects analytics question (e.g., "crisis trend," "session dropoffs," "resource reuse") and specifies date range (up to 365 days).
-    \item \textbf{Anonymized Database Access:} Read-only access to multiple operational tables (\code{cases}, \code{conversations}, \code{messages}, \code{triage\_assessments}, \code{intervention\_plan\_records}) with strict k-anonymity enforcement.
-\end{itemize}
-
-\subsubsection{Processing Logic}
-The IA employs a two-stage analytical pipeline combining privacy-preserving data aggregation with LLM-powered interpretation:
-
-\textbf{Stage 1: Privacy-Preserving SQL Analytics.} The agent executes one of six allow-listed SQL queries with k-anonymity enforcement (k $\geq$ 5):
-\begin{itemize}
-    \item \textbf{Crisis Trend:} Daily counts of high/critical severity cases with unique user cohorts (minimum 5 users per group).
-    \item \textbf{Session Dropoffs:} Early abandonment rates (conversations with $\leq$2 messages) and average engagement metrics.
-    \item \textbf{Resource Reuse:} Intervention plan revisit rates and completion percentages, indicating content effectiveness.
-    \item \textbf{Fallback Reduction:} AI autonomous resolution rates vs. human escalation frequencies.
-    \item \textbf{Cost Per Helpful:} Processing efficiency metrics (latency, success rates) for resource allocation optimization.
-    \item \textbf{Coverage Windows:} Hourly/weekly usage heatmaps identifying peak demand periods and staffing gaps.
-\end{itemize}
-
-All queries include \code{HAVING COUNT(DISTINCT user\_id) >= 5} clauses to suppress small cohorts, preventing individual re-identification even through linkage attacks.
-
-\textbf{Stage 2: LLM-Powered Narrative Generation.} The agent passes aggregated results to Gemini 2.5 Pro with a specialized analytical prompt to generate:
-\begin{itemize}
-    \item \textbf{Trend Identification:} Statistical patterns and temporal correlations (e.g., "Crisis cases increased 23\% during midterm period").
-    \item \textbf{Contextual Narratives:} Human-readable interpretations connecting metrics to institutional events or seasonal factors.
-    \item \textbf{Actionable Recommendations:} Specific operational suggestions (e.g., "Schedule 2 additional counselors during exam weeks; increase evening coverage for peak 18:00-22:00 window").
-    \item \textbf{Anomaly Detection:} Identification of unexpected deviations requiring administrator attention.
-\end{itemize}
-
-This two-stage design ensures transparency (SQL queries are auditable) while providing the qualitative insights administrators need for strategic decision-making.
-
-\subsubsection{Action (Outputs)}
-\begin{itemize}
-    \item \textbf{Structured Analytics Report:} JSON response containing quantitative data tables, chart configurations, and LLM-generated narrative summary with recommendations.
-    \item \textbf{Dashboard Visualization:} Real-time updates to Admin Dashboard with interactive charts (time series, heatmaps, bar charts) and executive summary cards.
-    \item \textbf{Report Export:} PDF generation capability (backend-rendered for consistency) enabling offline review and stakeholder distribution.
-\end{itemize}
-
-\subsubsection{Design Rationale and Privacy Safeguards}
-\begin{itemize}
-    \item \textbf{K-Anonymity Enforcement:} All aggregations require minimum cohort size k=5, validated through SQL \code{HAVING} clauses. Results below threshold are automatically suppressed.
-    \item \textbf{Query Allow-Listing:} Only 6 pre-approved queries are executable, preventing arbitrary SQL injection and limiting attack surface for privacy violations.
-    \item \textbf{Date Range Constraints:} Maximum 365-day query windows prevent excessive historical data access and limit temporal linkage attack vectors.
-    \item \textbf{LLM Isolation:} Narrative generation operates only on pre-aggregated, anonymized statistics—never raw conversation content. This ensures individual messages remain protected even during interpretation phase.
-    \item \textbf{No Individual-Level Access:} All outputs are cohort-level summaries. The system architecturally prevents queries targeting specific users or identifiable small groups.
+    \item \textbf{Beliefs:} The IA's beliefs are derived from the administrator's query (e.g., "Show me crisis trends for October") and the aggregated, anonymized data it can access from the database.
+    \item \textbf{Desires:} Its desire is to provide accurate, privacy-preserving, and actionable insights that help university leadership make data-driven decisions.
+    \item \textbf{Intentions:} Based on the administrator's request, the IA forms an intention to run a specific, pre-defined SQL query against the database. It then forms a subsequent intention: to synthesize the numerical results from that query into a coherent, narrative summary for the administrator.
 \end{itemize}
 
 \subsection{The Aika Meta-Agent: Unified Orchestration Layer}
 \label{sec:aika_meta_agent}
 
-While the four specialized agents (STA, TCA, CMA, IA) constitute the core intelligence of the Safety Agent Suite, their effective coordination requires an additional orchestration layer that addresses a fundamental challenge in multi-agent systems: how to present a unified, coherent interface to heterogeneous user roles while dynamically routing requests to the appropriate specialist based on intent classification, role-based access control, and conversational context \cite{wooldridge2009introductionmas, burguillo2017multiagentsystems}.
+While the four specialized agents (STA, TCA, CMA, IA) provide the system's core intelligence, their coordination requires an orchestration layer. This layer must solve a fundamental challenge in multi-agent systems: how to present a unified, coherent interface to different user roles while dynamically routing requests based on intent, access rights, and context \cite{wooldridge2009introductionmas}. The Aika Meta-Agent is designed as this unified orchestration layer, acting as the single point of contact for all users and the master controller for the specialist agents operating in the background. Its primary responsibilities are to interpret user intent, manage conversational state, enforce role-based access control, and synthesize the outputs of the specialist agents into a coherent response.
 
-\subsubsection{Motivation and Formal Problem Statement}
-
-In traditional multi-agent architectures, users must explicitly select their target agent, introducing decision friction and potential misrouting. This becomes particularly problematic in mental health applications where a single user utterance may require sequential processing by multiple agents (e.g., crisis detection followed by therapeutic coaching). Furthermore, different stakeholder classes (students, counselors, administrators) require fundamentally different interaction paradigms with the same underlying agent infrastructure.
-
-The Aika Meta-Agent addresses this orchestration challenge by functioning as a \textbf{context-aware dispatcher and personality synthesizer}. The name "Aika", combining the Japanese characters for "love/affection" and "excellence/beautiful", encapsulates the system's dual mandate: delivering compassionate, human-centered support while maintaining technical rigor and operational excellence.
-
-Formally, the orchestration problem can be stated as follows. Let $\mathcal{U} = \{u_1, u_2, \ldots, u_n\}$ represent the set of user messages, $\mathcal{R} = \{\texttt{student}, \texttt{counselor}, \texttt{admin}\}$ denote the set of authenticated user roles, and $\mathcal{H}_t = \{(u_1, a_1), (u_2, a_2), \ldots, (u_{t-1}, a_{t-1})\}$ represent the conversation history up to time $t$, where each tuple $(u_i, a_i)$ pairs a user utterance with the system's response. The agent space is defined as $\mathcal{A} = \{A_{\text{STA}}, A_{\text{TCA}}, A_{\text{CMA}}, A_{\text{IA}}\}$.
-
-The orchestration function $\Phi_{\text{Aika}}$ must satisfy:
-\begin{equation}
-\Phi_{\text{Aika}}: \mathcal{U} \times \mathcal{R} \times \mathcal{H} \rightarrow \mathcal{A}^* \times \mathcal{P}
-\label{eq:orchestration_function}
-\end{equation}
-where $\mathcal{A}^*$ denotes a sequence of agent invocations (allowing for multi-agent workflows), and $\mathcal{P}$ is the personality space encoding role-appropriate linguistic register, tone, and domain-specific terminology.
-
-The orchestration must satisfy several invariants:
-\begin{enumerate}
-    \item \textbf{Safety First (Crisis Routing):} $\forall u \in \mathcal{U}, r = \texttt{student} \Rightarrow A_{\text{STA}} \in \Phi_{\text{Aika}}(u, r, \mathcal{H})$
-    \item \textbf{Role-Based Access Control:} Privileged operations (case management, analytics) are only accessible to authenticated staff: $\Phi_{\text{Aika}}(u, \texttt{student}, \mathcal{H}) \cap \{A_{\text{CMA}}, A_{\text{IA}}\} = \emptyset$ for administrative queries
-    \item \textbf{Deterministic Safety Escalation:} High-risk classifications must deterministically route to CMA: $f_{\text{STA}}(u) \geq \theta_{\text{critical}} \Rightarrow A_{\text{CMA}} \in \Phi_{\text{Aika}}(u, r, \mathcal{H})$
-\end{enumerate}
-
-\subsubsection{Architectural Pattern: Hierarchical Meta-Agent Coordination}
-
-Aika implements a \textbf{hierarchical coordinator-specialist architecture} \cite{durfee1999distributedsystems, stone2000multiagentcoordination}, distinct from flat peer-to-peer agent negotiation schemes (e.g., Contract Net Protocol \cite{smith1980contractnet}) or fully decentralized market-based approaches. In this pattern, a meta-controller maintains global state and routing policies while delegating task execution to domain specialists.
-
-The architecture can be formalized as a two-level hierarchy:
-\begin{equation}
-\text{Level 1 (Meta-Layer)}: \quad \mathcal{M} = (\mathcal{S}_{\text{global}}, \pi_{\text{route}}, \psi_{\text{synthesize}})
-\label{eq:meta_layer}
-\end{equation}
-where:
-\begin{itemize}
-    \item $\mathcal{S}_{\text{global}}$ is the global state space containing user role, session context, and agent invocation history
-    \item $\pi_{\text{route}}: \mathcal{S}_{\text{global}} \times \mathcal{U} \rightarrow \mathcal{A}$ is the routing policy function
-    \item $\psi_{\text{synthesize}}: \mathcal{A}^* \times \mathcal{R} \rightarrow \text{Response}$ is the response synthesis function that aggregates specialist outputs into a role-coherent reply
-\end{itemize}
-
-\begin{equation}
-\text{Level 2 (Specialist Layer)}: \quad \mathcal{S} = \{(A_i, \mathcal{D}_i, f_i) \mid i \in \{\text{STA, TCA, CMA, IA}\}\}
-\label{eq:specialist_layer}
-\end{equation}
-where each specialist agent $A_i$ operates over its domain $\mathcal{D}_i$ with processing function $f_i$.
-
-The routing policy $\pi_{\text{route}}$ is implemented as a compositional function:
-\begin{equation}
-\pi_{\text{route}}(s, u) = \pi_{\text{role}}(r) \circ \pi_{\text{intent}}(u, \mathcal{H}) \circ \pi_{\text{safety}}(u)
-\label{eq:routing_composition}
-\end{equation}
-where:
-\begin{itemize}
-    \item $\pi_{\text{safety}}(u)$ performs immediate risk screening (Tier 1) via Aika's JSON output, auto-escalating to $\{A_{\text{CMA}}\}$ for high/critical risk
-    \item $\pi_{\text{intent}}(u, \mathcal{H}) \rightarrow \mathcal{I}$ classifies user intent into $\mathcal{I} = \{\texttt{crisis}, \texttt{support}, \texttt{scheduling}, \texttt{analytics}\}$
-    \item $\pi_{\text{role}}(r)$ applies role-specific constraints: $\pi_{\text{role}}(\texttt{student}) \cap \{A_{\text{IA}}\} = \emptyset$
-    \item At conversation end, $\{A_{\text{STA}}\}$ performs comprehensive Tier 2 analysis with full conversation context
-\end{itemize}
-
-\subsubsection{LLM Model Configuration Per Agent}
-
-Each agent employs task-specific LLM configurations optimized for their operational requirements. Table~\ref{tab:agent_llm_config} summarizes the model assignments, temperature settings, and design rationales that enable independent performance optimization across the multi-agent system.
-
-\begin{table}[htbp]
-    \centering
-    \caption{LLM Model Configuration by Agent Role}
-    \label{tab:agent_llm_config}
-    \begin{tabular}{|l|p{3.5cm}|c|p{5cm}|}
-        \hline
-        \textbf{Agent} & \textbf{Model(s)} & \textbf{Temperature} & \textbf{Design Rationale} \\
-        \hline
-        Aika (Routing) & Gemini 2.5 Flash & 0.3 & Fast, stable routing decisions with consistent intent classification \\
-        \hline
-        Aika (Conversational) & Gemini 2.5 Flash Lite & 0.7 & Lightweight model for high-volume student interactions; balances cost and quality \\
-        \hline
-        STA & Gemini 2.5 Flash & 0.3 & Low-temperature classification for consistent crisis detection with minimal variance \\
-        \hline
-        TCA & Gemini 2.5 Flash & 0.7 & Higher temperature for natural, empathetic response generation with CBT alignment \\
-        \hline
-        CMA & Gemini 2.5 Flash & 0.5 & Moderate temperature for procedural case management workflows with structured outputs \\
-        \hline
-        IA (Analytics) & None (SQL-only) & N/A & Privacy-preserving data aggregation via k-anonymity enforced SQL queries \\
-        \hline
-        IA (Interpretation) & Gemini 2.5 Pro & 0.5 & Advanced reasoning model for trend analysis, narrative generation, and actionable recommendations from aggregated data \\
-        \hline
-    \end{tabular}
-\end{table}
-
-This differentiated configuration enables each agent to optimize for their specific task requirements: STA prioritizes deterministic classification (low temperature), TCA prioritizes conversational fluency (high temperature), and IA employs a two-stage pipeline where SQL handles privacy-preserving aggregation and Gemini 2.5 Pro generates interpretive insights from anonymized statistics.
-
-\subsubsection{Role-Based Orchestration Workflows}
-
-The meta-agent implements distinct workflow graphs for each user role, formalized as finite state machines over the agent space.
-
-\paragraph{Student Workflow ($r = \texttt{student}$)}
-For student interactions, the workflow implements a safety-first pipeline:
-\begin{equation}
-\Gamma_{\text{student}}(u, \mathcal{H}) = \begin{cases}
-A_{\text{STA}} \rightarrow A_{\text{TCA}} \rightarrow \text{END} & \text{if } R(u) \in [\text{Low}, \text{Moderate}] \\
-A_{\text{STA}} \rightarrow A_{\text{CMA}} \rightarrow \text{END} & \text{if } R(u) \in [\text{High}, \text{Critical}]
-\end{cases}
-\label{eq:student_workflow}
-\end{equation}
-where $R(u)$ is the risk classification output by $f_{\text{STA}}(u; \theta_{\text{LLM}})$.
-
-The personality function for students is defined as:
-\begin{equation}
-\psi_{\texttt{student}}(a_{\text{specialist}}) = \text{Transform}(a_{\text{specialist}}, \mathcal{T}_{\text{empathetic}}, \mathcal{L}_{\text{informal-ID}})
-\label{eq:student_personality}
-\end{equation}
-where $\mathcal{T}_{\text{empathetic}}$ represents empathetic tone markers (e.g., "Aku mengerti kamu sedang...") and $\mathcal{L}_{\text{informal-ID}}$ denotes informal Indonesian linguistic register.
-
-\paragraph{Administrator Workflow ($r = \texttt{admin}$)}
-For administrative users, the workflow bifurcates based on query classification:
-\begin{equation}
-\Gamma_{\text{admin}}(u, \mathcal{H}) = \begin{cases}
-A\_{\text{IA}} \rightarrow \text{END} & \text{if } \texttt{classify\_intent}(u) = \texttt{analytics} \\
-A\_{\text{CMA}} \rightarrow \text{END} & \text{if } \texttt{classify\_intent}(u) = \texttt{operational}
-\end{cases}
-\label{eq:admin_workflow}
-\end{equation}
-
-The personality transform for administrators emphasizes data-driven professionalism:
-\begin{equation}
-\psi_{\texttt{admin}}(a_{\text{specialist}}) = \text{Transform}(a_{\text{specialist}}, \mathcal{T}_{\text{analytical}}, \mathcal{L}_{\text{formal-ID/EN}})
-\label{eq:admin_personality}
-\end{equation}
-
-\paragraph{Counselor Workflow ($r = \texttt{counselor}$)}
-For clinical staff, the workflow provides integrated case management and insights:
-\begin{equation}
-\Gamma_{\text{counselor}}(u, \mathcal{H}) = \begin{cases}
-A_{\text{CMA}} \rightarrow A_{\text{IA}} \rightarrow \text{END} & \text{if } \texttt{classify\_intent}(u) = \texttt{case\_query} \\
-A_{\text{CMA}} \rightarrow A_{\text{TCA}} \rightarrow \text{END} & \text{if } \texttt{classify\_intent}(u) = \texttt{intervention\_plan}
-\end{cases}
-\label{eq:counselor_workflow}
-\end{equation}
-
-The personality adopts clinical terminology and evidence-based framing:
-\begin{equation}
-\psi_{\texttt{counselor}}(a_{\text{specialist}}) = \text{Transform}(a_{\text{specialist}}, \mathcal{T}_{\text{clinical}}, \mathcal{V}_{\text{CBT/therapeutic}})
-\label{eq:counselor_personality}
-\end{equation}
-where $\mathcal{V}_{\text{CBT/therapeutic}}$ denotes the specialized vocabulary space for therapeutic interventions.
-
-\subsubsection{LangGraph StateGraph Implementation}
-
-The Aika orchestrator is implemented as a LangGraph StateGraph with typed state management. The state schema extends the base \code{SafetyAgentState}:
-\begin{equation}
-\texttt{AikaState} = \texttt{SafetyAgentState} \cup \{\texttt{user\_role}, \texttt{intent\_class}, \texttt{agent\_sequence}, \texttt{routing\_metadata}\}
-\label{eq:aika_state}
-\end{equation}
-
-The graph structure implements the routing composition from Equation~\ref{eq:routing_composition}:
-\begin{align}
-\texttt{workflow} &= \texttt{StateGraph(AikaState)} \nonumber \\
-\texttt{nodes} &= \{\texttt{classify\_intent}, \texttt{route\_by\_role}, \texttt{invoke\_sta}, \texttt{invoke\_sca}, \nonumber \\
-&\quad\quad \texttt{invoke\_sda}, \texttt{invoke\_ia}, \texttt{synthesize\_response}\} \label{eq:langgraph_nodes}
-\end{align}
-
-Conditional edges implement the role-based workflows from Equations~\ref{eq:student_workflow}--\ref{eq:counselor_workflow}:
-\begin{equation}
-\texttt{add\_conditional\_edges}(\texttt{classify\_intent}, \lambda s: \pi_{\text{role}}(s.\texttt{user\_role}), \mathcal{E}_{\text{role}})
-\label{eq:conditional_routing}
-\end{equation}
-where $\mathcal{E}_{\text{role}}$ maps role states to specialist invocation nodes.
-
-Figure~\ref{fig:aika_orchestration} illustrates the complete orchestration flow, showing how Aika coordinates role-based routing to the Safety Agent Suite specialists.
-
-\begin{figure}[h]
-    \centering
-    \begin{tikzpicture}[
-        node distance=1.2cm and 1.5cm,
-        % Academic style definitions
-        metanode/.style={
-            rectangle, 
-            draw=black!80, 
-            line width=1.2pt,
-            fill=yellow!15, 
-            align=center, 
-            minimum width=5.0cm, 
-            minimum height=1.4cm, 
-            font=\small\sffamily\bfseries
-        },
-        rolenode/.style={
-            rectangle, 
-            draw=black!60, 
-            line width=0.6pt,
-            fill=white, 
-            align=center, 
-            minimum width=2.8cm, 
-            minimum height=0.9cm, 
-            font=\footnotesize\sffamily
-        },
-        agentnode/.style={
-            rectangle, 
-            draw=black!40, 
-            line width=0.5pt,
-            dashed,
-            fill=black!3, 
-            align=center, 
-            minimum width=2.5cm, 
-            minimum height=0.85cm, 
-            font=\footnotesize\sffamily
-        },
-        % Arrow styles
-        inputarrow/.style={
-            -Stealth, 
-            line width=0.9pt,
-            black!80
-        },
-        routearrow/.style={
-            -Stealth, 
-            line width=0.6pt,
-            black!50,
-            dashed
-        },
-        backarrow/.style={
-            -Stealth, 
-            line width=0.5pt,
-            black!40,
-            dashed
-        },
-        % Label styles
-        edgelabel/.style={
-            font=\scriptsize,
-            align=center,
-            fill=white,
-            inner sep=1pt
-        },
-        % Layer boxes
-        layerbox/.style={
-            rectangle,
-            draw=black!30,
-            line width=0.4pt,
-            rounded corners=2pt,
-            inner sep=8pt
-        }
-    ]
-        % User Role Layer
-        \node[rolenode] (student) {\textbf{Student}\\{\scriptsize$r = \texttt{student}$}};
-        \node[rolenode, right=of student] (admin) {\textbf{Administrator}\\{\scriptsize$r = \texttt{admin}$}};
-        \node[rolenode, right=of admin] (counselor) {\textbf{Counselor}\\{\scriptsize$r = \texttt{counselor}$}};
-        
-        % Layer label for user roles
-        \node[left=0.3cm of student, font=\scriptsize, text width=1.5cm, align=right] (userlabel) {\textit{User\\Roles}};
-        
-        % Meta-Agent Layer (highlighted as USER-FACING)
-        \node[metanode, below=2cm of admin] (aika) {
-            \textbf{Aika Meta-Agent}\\
-            {\scriptsize\textit{SOLE USER-FACING INTERFACE}}\\
-            {\scriptsize JSON: \{reply, immediate\_risk, ...\}}
-        };
-        
-        % Layer label for meta-agent
-        \node[left=0.3cm of aika, font=\scriptsize, text width=1.5cm, align=right] (metalabel) {\textit{User-\\Facing\\Layer}};
-        
-        % Specialist Agent Layer (BACKGROUND - dashed borders)
-        \node[agentnode, below left=2.5cm and 3.5cm of aika] (sta) {
-            \textbf{STA}\\
-            {\scriptsize Tier 2 (conv. end)}
-        };
-        \node[agentnode, right=0.8cm of sta] (tca) {
-            \textbf{TCA}\\
-            {\scriptsize Background plans}
-        };
-        \node[agentnode, right=0.8cm of tca] (cma) {
-            \textbf{CMA}\\
-            {\scriptsize Crisis escalation}
-        };
-        \node[agentnode, right=0.8cm of cma] (ia) {
-            \textbf{IA}\\
-            {\scriptsize On-demand analytics}
-        };
-        
-        % Layer label for specialist agents
-        \node[left=0.3cm of sta, font=\scriptsize, text width=1.5cm, align=right] (agentlabel) {\textit{Background\\Services\\(internal)}};
-        
-        % Input arrows from user roles to meta-agent (BOLD - user-facing)
-        \draw[inputarrow] (student.south) -- node[edgelabel, left, pos=0.4] {$u, \mathcal{H}_t$} (aika.north -| student.south);
-        \draw[inputarrow] (admin.south) -- node[edgelabel, above, pos=0.3] {$u, \mathcal{H}_t$} (aika.north);
-        \draw[inputarrow] (counselor.south) -- node[edgelabel, right, pos=0.4] {$u, \mathcal{H}_t$} (aika.north -| counselor.south);
-        
-        % Routing arrows from meta-agent to specialists (DASHED - internal)
-        \draw[routearrow] (aika.south) -- ++(-3.5,-1.0) -- node[edgelabel, above left, pos=0.7] {\scriptsize conv. end} (sta.north);
-        \draw[routearrow] (aika.south) -- ++(-1.3,-1.0) -- node[edgelabel, above left, pos=0.6] {\scriptsize dashboard} (tca.north);
-        \draw[routearrow] (aika.south) -- ++(1.3,-1.0) -- node[edgelabel, above right, pos=0.6] {\scriptsize if crisis} (cma.north);
-        \draw[routearrow] (aika.south) -- ++(3.5,-1.0) -- node[edgelabel, above right, pos=0.7] {\scriptsize if admin query} (ia.north);
-        
-        % Response aggregation arrows (dashed)
-        \draw[backarrow] (sta.north) -- ++(0,0.6) -| node[edgelabel, above, pos=0.12] {\scriptsize proactive recs} (aika.south);
-        \draw[backarrow] (tca.north) -- ++(0,0.4) -| node[edgelabel, above, pos=0.15] {\scriptsize plans} (aika.south);
-        \draw[backarrow] (cma.north) -- ++(0,0.4) -| node[edgelabel, above, pos=0.15] {\scriptsize case ID} (aika.south);
-        \draw[backarrow] (ia.north) -- ++(0,0.6) -| node[edgelabel, above, pos=0.12] {\scriptsize analytics} (aika.south);
-        
-        % Agent descriptions below specialist layer
-        \node[below=0.15cm of sta, font=\scriptsize, text width=2.3cm, align=center, text=black!60] {
-            Conversation-level\\risk analysis
-        };
-        \node[below=0.15cm of tca, font=\scriptsize, text width=2.3cm, align=center, text=black!60] {
-            CBT intervention\\plans (async)
-        };
-        \node[below=0.15cm of cma, font=\scriptsize, text width=2.3cm, align=center, text=black!60] {
-            Clinical case mgmt\\(via Aika)
-        };
-        \node[below=0.15cm of ia, font=\scriptsize, text width=2.3cm, align=center, text=black!60] {
-            Privacy-aware\\analytics (via Aika)
-        };
-        
-        % Academic-style legend
-        \node[below=3.2cm of aika, font=\scriptsize, text width=12cm, align=left] (legend) {
-            \textbf{Notation:} 
-            $u$ = user message; 
-            $r$ = user role; 
-            $\mathcal{H}_t$ = conversation history at time $t$. 
-            \textbf{Bold box} = user-facing interface (Aika only); 
-            \textbf{dashed boxes} = background services invoked conditionally through Aika. 
-            Solid arrows = user requests; dashed arrows = internal routing/responses.
-        };
-    \end{tikzpicture}
-    \caption{Revised hierarchical architecture emphasizing Aika Meta-Agent as the sole user-facing component (highlighted in yellow). Students and staff interact exclusively with Aika, which performs immediate Tier 1 risk screening via structured JSON responses. Specialist agents (dashed borders) operate as internal background services: STA analyzes conversations at end (Tier 2), TCA generates dashboard intervention plans asynchronously, CMA is invoked for crisis escalation, and IA is invoked for admin analytics queries. This architecture ensures a unified conversational experience while enabling modular specialist intelligence.}
-    \label{fig:aika_orchestration}
-\end{figure}
-
-\subsubsection{Complexity Analysis and Performance Characteristics}
-
-The orchestration overhead can be analyzed through computational complexity and latency budgets.
-
-\paragraph{Time Complexity}
-The routing decision $\pi_{\text{route}}$ involves three sequential operations:
-\begin{equation}
-T_{\text{orchestration}} = T_{\texttt{auth}}(r) + T_{\texttt{intent}}(u) + T_{\texttt{lookup}}(\mathcal{A})
-\label{eq:orchestration_time}
-\end{equation}
-where:
-\begin{itemize}
-    \item $T_{\texttt{auth}}(r) = O(1)$ for role verification via JWT token validation
-    \item $T_{\texttt{intent}}(u) = O(|u| \cdot d_{\text{LLM}})$ for LLM-based intent classification, where $d_{\text{LLM}}$ is the model's computational depth
-    \item $T_{\texttt{lookup}}(\mathcal{A}) = O(1)$ for hash-based agent registry lookup
-\end{itemize}
-
-Empirically, intent classification dominates: $T_{\texttt{intent}} \in [100, 200]$ ms (p95), contributing $\approx 10\%$ to the end-to-end latency budget of 1.5s defined in Section~\ref{chap:technical_architecture}.
-
-\paragraph{Space Complexity}
-The global state $\mathcal{S}_{\text{global}}$ maintains:
-\begin{equation}
-|\mathcal{S}_{\text{global}}| = O(|\mathcal{H}|) + O(|\mathcal{R}|) + O(|\mathcal{A}|) = O(k \cdot n + 3 + 4) \approx O(n)
-\label{eq:state_complexity}
-\end{equation}
-where $k$ is the maximum conversation history length (bounded at 50 turns per Section~\ref{chap:functional_architecture}) and $n$ is the average message length. This scales linearly with conversation depth, making it tractable for real-time operation.
-
-\subsubsection{Advantages, Trade-offs, and Design Rationale}
-
-The Aika Meta-Agent architecture provides several formal guarantees and practical benefits:
-
-\begin{enumerate}
-    \item \textbf{Safety Invariant Preservation:} By enforcing $A_{\text{STA}} \in \Phi_{\text{Aika}}(u, \texttt{student}, \mathcal{H})$ for all student messages, the meta-layer ensures crisis detection cannot be bypassed through direct agent access.
-    
-    \item \textbf{Cognitive Load Reduction:} Users interface with a single coherent AI entity ($\Phi_{\text{Aika}}$) rather than selecting from $|\mathcal{A}| = 4$ specialist agents, reducing decision friction by $O(|\mathcal{A}|)$ choices per interaction.
-    
-    \item \textbf{Role-Based Access Control:} The routing constraints $\pi_{\text{role}}(r)$ enforce privilege separation: students cannot access administrative analytics ($A_{\text{IA}}$) or case management ($A_{\text{CMA}}$), preventing unauthorized data exposure.
-    
-    \item \textbf{Conversational Coherence:} The synthesis function $\psi_{\text{synthesize}}$ maintains personality consistency across multi-agent workflows, avoiding jarring tone shifts that would occur in naive agent chaining.
-    
-    \item \textbf{Modularity and Maintainability:} Changes to specialist agent logic (e.g., updating CBT prompts in $f_{\text{TCA}}$) do not require modifications to $\Phi_{\text{Aika}}$, as long as input/output schemas remain stable.
-\end{enumerate}
-
-However, this design introduces measurable trade-offs:
-
-\begin{enumerate}
-    \item \textbf{Latency Overhead:} Intent classification adds $T_{\texttt{intent}} \approx 150$ ms (median) before specialist invocation, increasing p95 end-to-end latency from $\approx 1.3$s (direct agent access) to $\approx 1.5$s (via Aika). This overhead is deemed acceptable given the $<2$s threshold for conversational UI responsiveness \cite{nielsen1993responsetimes}.
-    
-    \item \textbf{Single Point of Failure:} The centralized orchestration pattern makes $\Phi_{\text{Aika}}$ a critical component whose failure blocks all user interactions. This is mitigated through stateless implementation (enabling horizontal scaling) and circuit breaker patterns for LLM API failures.
-    
-    \item \textbf{Prompt Engineering Complexity:} Maintaining role-consistent personalities across $|\mathcal{R}| = 3$ roles and $|\mathcal{A}| = 4$ agents requires careful curation of $\psi_{\text{synthesize}}$ transforms, validated through user acceptance testing (not formalized in this prototype).
-\end{enumerate}
-
-\subsubsection{Integration with Evaluation Framework}
-
-The Aika Meta-Agent's performance is evaluated indirectly through the metrics framework defined in Chapter~\ref{sec:rq1}--\ref{sec:rq4}:
-
-\begin{enumerate}
-    \item \textbf{Routing Accuracy (RQ2):} Let $\mathcal{E}_{\text{route}}$ denote routing errors (misclassified intents). The orchestrator's contribution to workflow reliability is measured as:
-    \begin{equation}
-    \text{Accuracy}_{\text{route}} = 1 - \frac{|\mathcal{E}_{\text{route}}|}{|\mathcal{U}_{\text{test}}|}
-    \label{eq:routing_accuracy}
-    \end{equation}
-    Target: $\text{Accuracy}_{\text{route}} \geq 0.95$ (i.e., $<5\%$ misrouting rate).
-    
-    \item \textbf{Latency Contribution (RQ1, RQ2):} The orchestration overhead is incorporated into end-to-end measurements:
-    \begin{equation}
-    T_{\text{total}} = T_{\text{orchestration}} + \sum_{A_i \in \Phi_{\text{Aika}}(u,r,\mathcal{H})} T_{A_i}
-    \label{eq:total_latency}
-    \end{equation}
-    Target: $T_{\text{orchestration}}$ contributes $<15\%$ to $T_{\text{total}}$ (measured via p95 latency breakdown).
-    
-    \item \textbf{Safety Escalation Preservation (RQ1):} The meta-agent must not introduce false negatives in crisis routing:
-    \begin{equation}
-    \forall u : f_{\text{STA}}(u) \geq \theta_{\text{critical}} \Rightarrow A_{\text{CMA}} \in \Phi_{\text{Aika}}(u, \texttt{student}, \mathcal{H})
-    \label{eq:safety_preservation}
-    \end{equation}
-    This invariant is verified through crisis corpus testing (Section~\ref{sec:rq1}).
-\end{enumerate}
-
-\subsubsection{Positioning in Multi-Agent Systems Literature}
-
-The Aika Meta-Agent instantiates a \textbf{mediator pattern} \cite{gamma1994designpatterns} within the multi-agent systems framework, combining elements of:
-\begin{itemize}
-    \item \textbf{Blackboard architectures} \cite{engelmore1988blackboard}, where $\mathcal{S}_{\text{global}}$ serves as shared knowledge space
-    \item \textbf{Hierarchical task networks} \cite{erol1994htn}, where $\Gamma_r$ decomposes high-level goals into specialist subtasks
-    \item \textbf{Belief-Desire-Intention (BDI) orchestration} \cite{rao1995bdi}, where routing policies encode institutional-level intentions (safety-first mandate, RBAC compliance)
-\end{itemize}
-
-This design contrasts with fully decentralized approaches (e.g., multi-agent reinforcement learning \cite{busoniu2008marl}) by prioritizing deterministic safety guarantees and explainable routing decisions over emergent coordination, a critical requirement for safety-critical healthcare applications \cite{topol2019deepmedicine}.
-
-By introducing the Aika Meta-Agent as the fifth component of the framework, the system achieves a synthesis of specialized expertise (via the four Safety Agent Suite agents) and unified user experience (via centralized orchestration with personality adaptation). This architectural layering enables the framework to scale from individual student support to institution-wide analytics while maintaining the safety-first invariants that define its clinical validity.
-
-\begin{figure}[h]
-    \centering
-    \resizebox{0.95\textwidth}{!}{%
-    \begin{tikzpicture}[
-        node distance=2.3cm,
-        actor/.style={rectangle, rounded corners=4pt, draw=ugmBlue, very thick, fill=white, align=center, minimum width=2.8cm, minimum height=1.1cm},
-        agent/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, fill=ugmBlue!7, align=center, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
-        datastore/.style={rectangle, draw=ugmBlue, thick, fill=ugmBlue!10, align=center, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
-        arrow/.style={-Latex, thick, ugmBlue},
-        dashedarrow/.style={-Latex, thick, ugmBlue, dashed}
-    ]
-        \node[actor] (user) {Student};
-        \node[agent, right=of user] (sta) {Safety Triage Agent};
-        \node[agent, right=of sta] (tca) {Therapeutic Coach Agent};
-        \node[actor, right=of tca] (studentReturn) {Student Response};
-
-        \draw[arrow] (user) -- node[above, font=\footnotesize]{Message} (sta);
-        \draw[arrow] (sta) -- node[above, font=\footnotesize]{Safe prompt} (tca);
-        \draw[arrow] (tca) -- node[above, font=\footnotesize]{CBT coaching} (studentReturn);
-
-        \node[agent, below=2.0cm of sta] (cma) {Case Management Agent};
-        \node[actor, right=of cma] (admin) {Counselor / Staff};
-        \draw[arrow] (sta) -- node[left, font=\footnotesize]{Escalation} (cma);
-        \draw[arrow] (cma) -- node[above, font=\footnotesize]{Case alert} (admin);
-        \draw[dashedarrow] (admin) -- node[below, font=\footnotesize]{Resolution update} (cma);
-
-        \node[datastore, below=2.0cm of tca] (progress) {Progress Logs};
-        \draw[arrow] (tca) -- node[right, font=\footnotesize]{Module completion} (progress);
-
-        \node[agent, below=1.6cm of progress] (ia) {Insights Agent};
-        \node[datastore, right=of ia] (analytics) {Aggregated Reports};
-        \draw[arrow] (progress) -- node[right, font=\footnotesize]{Anonymised traces} (ia);
-        \draw[arrow] (ia) -- node[above, font=\footnotesize]{Weekly summary} (analytics);
-        \draw[arrow] (ia) -- node[left, font=\footnotesize]{Trend alert} (admin);
-    \end{tikzpicture}}
-    \caption{Data flow between the Safety Agent Suite and its users. Solid arrows show operational data paths; dashed arrows show supervisory feedback.}
-    \label{fig:dfd}
-\end{figure}
-
-\subsection{Tool Design and Function Calling Architecture}
-\label{sec:tool_design}
-
-Agent autonomy in the Safety Agent Suite is operationalized through a \textbf{structured tool-calling interface} that enables agents to perform actions beyond text generation. This section details the tool architecture, schema definitions, execution workflows, and security constraints that govern how LLM-based agents interact with the system's backend services and external resources.
-
-\subsubsection{Conceptual Foundation: Tools as Agent Effectors}
-
-In the perception-cognition-action paradigm of agent systems \cite{russell2010artificialintelligence}, tools represent the \textit{effector mechanisms} through which agents enact decisions in their environment. While the LLM provides cognitive capabilities (reasoning, language understanding), tools bridge the gap between linguistic outputs and concrete system state changes.
-
-Formally, a tool $\tau$ is defined as a function:
-\begin{equation}
-\tau: \mathcal{P} \rightarrow \mathcal{R} \cup \{\text{error}\}
-\end{equation}
-where $\mathcal{P}$ is the parameter space defined by the tool's JSON Schema, and $\mathcal{R}$ is the result space (success responses or structured error objects). The LLM's role is to generate valid tool invocations $(\tau_i, p_i) \in \mathcal{T} \times \mathcal{P}$ based on conversational context, where $\mathcal{T}$ is the set of available tools.
-
-\subsubsection{Tool Registry and Organization}
-
-The system implements a \textbf{centralized ToolRegistry} that manages tool discovery, schema validation, and execution dispatching. Tools are organized into eight functional categories to facilitate role-based tool access control:
-
-\begin{table}[htbp]
-    \centering
-    \caption{Tool categories and their primary agent consumers.}
-    \label{tab:tool_categories}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.0cm}p{5.0cm}p{4.5cm}}
-        \toprule
-        \textbf{Category} & \textbf{Purpose} & \textbf{Primary Consumers} \\
-        \midrule
-        \code{user_context} & Retrieve user profile, preferences, mental health summary & TCA, Aika (student role) \\
-        \code{progress_tracking} & Wellness state, goal tracking, mood logging & TCA, Aika (student role) \\
-        \code{conversation} & Conversation history, search past messages & TCA, CMA, Aika \\
-        \code{safety} & Risk assessment history, active cases, crisis resources & STA, TCA, CMA \\
-        \code{intervention} & CBT modules, intervention plans, treatment resources & TCA \\
-        \code{case_management} & Create cases, assign counselors, update case status & CMA, Aika (counselor/admin roles) \\
-        \code{external_context} & Weather, time, campus events (for natural conversation) & Aika (student role) \\
-        \code{analytics} & Platform statistics, trending topics, counselor workload & IA, Aika (admin role) \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-Each agent has access to a \textit{curated subset} of tools appropriate to its role. For example, the STA has access only to \code{safety} tools (\code{log_risk_assessment}, \code{get_crisis_resources}), while the TCA has access to \code{user_context}, \code{progress_tracking}, \code{conversation}, \code{safety}, and \code{intervention} categories. This scoping enforces the principle of least privilege and prevents unintended cross-agent behaviors.
-
-\subsubsection{Tool Schema Definition}
-
-Tools are defined using Gemini-compatible JSON Schema format, which specifies the function signature, parameter types, and documentation strings used by the LLM to understand when and how to invoke each tool. Figure~\ref{fig:tool_schema_example} presents the schema for the \code{create_intervention_plan} tool used by the TCA to generate structured CBT-based action plans.
-
-\begin{figure}[htbp]
-\centering
-\begin{lstlisting}[language=json, basicstyle=\scriptsize\ttfamily, breaklines=true, frame=single, captionpos=b]
-{
-  "name": "create_intervention_plan",
-  "description": "Create a structured intervention plan with actionable steps and resource recommendations. Use when user expresses stress, anxiety, or need for structured coping strategies.",
-  "parameters": {
-    "type": "object",
-    "properties": {
-      "user_id": {
-        "type": "integer",
-        "description": "User ID receiving the intervention plan"
-      },
-      "plan_title": {
-        "type": "string",
-        "description": "Clear, concise plan title in Indonesian (e.g., 'Strategi Mengelola Stres Akademik')"
-      },
-      "plan_type": {
-        "type": "string",
-        "enum": ["calm_down", "break_down_problem", "general_coping", "cognitive_restructuring", "behavioral_activation"],
-        "description": "Type of intervention aligned with user's need"
-      },
-      "plan_steps": {
-        "type": "array",
-        "description": "4-6 actionable steps, each with title and description",
-        "items": {
-          "type": "object",
-          "properties": {
-            "step_title": {"type": "string"},
-            "step_description": {"type": "string"},
-            "duration_minutes": {"type": "integer"}
-          },
-          "required": ["step_title", "step_description"]
-        }
-      },
-      "resource_cards": {
-        "type": "array",
-        "description": "1-2 helpful resources (optional)",
-        "items": {
-          "type": "object",
-          "properties": {
-            "resource_title": {"type": "string"},
-            "resource_url": {"type": "string"}
-          }
-        }
-      },
-      "next_check_in": {
-        "type": "string",
-        "description": "When to follow up (e.g., '3 hari', '1 minggu')"
-      }
-    },
-    "required": ["user_id", "plan_title", "plan_type", "plan_steps"]
-  }
-}
-\end{lstlisting}
-\caption{JSON Schema for the \texttt{create\_intervention\_plan} tool.}
-\label{fig:tool_schema_example}
-\end{figure}
-
-The schema serves dual purposes: (1) it provides structured documentation to the LLM's function-calling mechanism, enabling the model to generate syntactically valid tool invocations, and (2) it enforces runtime validation to reject malformed requests before execution.
-
-\subsubsection{Tool Execution Workflow}
-
-The tool invocation lifecycle consists of five stages:
-
-\begin{enumerate}
-    \item \textbf{LLM Generation:} Based on conversation context and the agent's system prompt, the LLM generates a function call with tool name and parameter values. Figure~\ref{fig:tool_llm_generation} shows an example of LLM-generated function call.
-
-\begin{figure}[htbp]
-\centering
-\begin{lstlisting}[language=json, basicstyle=\scriptsize\ttfamily, breaklines=true, frame=single, captionpos=b]
-{
-  "function_call": {
-    "name": "create_intervention_plan",
-    "args": {
-      "user_id": 123,
-      "plan_title": "Strategi Mengatasi Kecemasan Ujian",
-      "plan_type": "calm_down",
-      "plan_steps": ["..."]
-    }
-  }
-}
-\end{lstlisting}
-\caption{Example of LLM-generated function call for tool invocation.}
-\label{fig:tool_llm_generation}
-\end{figure}
-    
-    \item \textbf{Schema Validation:} The backend validates the generated parameters against the tool's JSON Schema. Type mismatches (e.g., passing a string where an integer is required) or missing required fields are rejected with descriptive error messages.
-    
-    \item \textbf{Permission Check:} The system verifies that the invoking agent has access to the requested tool category. If the STA attempts to call \code{create_intervention_plan} (an \code{intervention} category tool it should not have access to), the call is rejected with an authorization error.
-    
-    \item \textbf{Execution:} The validated tool executes its logic, which may involve:
-    \begin{itemize}
-        \item Database queries (e.g., get user profile fetches user demographics)
-        \item Database writes (e.g., \code{log_risk_assessment} creates TriageAssessment record)
-        \item External API calls (e.g., \code{get_weather} queries weather service)
-        \item Business logic (e.g., \code{assign_counselor} implements workload balancing algorithm)
-    \end{itemize}
-    
-    \item \textbf{Result Integration:} The tool returns a structured result (success response or error object), which is appended to the LLM's context for the next generation step. The LLM uses this feedback to generate the final user-facing response.
-\end{enumerate}
-
-Error handling is implemented with \textit{graceful degradation}: if a tool execution fails (e.g., database timeout, external API unavailable), the system returns an error object rather than crashing. The LLM's prompt instructs it to handle errors by apologizing to the user and suggesting alternative actions.
-
-\subsubsection{Example: Complete Tool Calling Flow}
-
-Consider a scenario where a student says, \textit{"Aku stres banget dengan tugas akhir semester"} (I'm so stressed about final semester assignments). The TCA's tool calling flow proceeds as follows:
-
-\begin{enumerate}
-    \item \textbf{Context Analysis:} The TCA receives the message along with conversation history and user profile from the shared state.
-    
-    \item \textbf{Tool Decision:} The LLM recognizes this as a request for structured support and generates a call to \code{create_intervention_plan} with parameters:
-    \begin{verbatim}
-    {
-      plan_title: "Strategi Mengelola Stres Akademik",
-      plan_type: "break_down_problem",
-      plan_steps: [
-        {
-          step_title: "Identifikasi Tugas Prioritas",
-          step_description: "Buat daftar semua tugas dan ranking berdasarkan deadline",
-          duration_minutes: 10
-        },
-        ...
-      ]
-    }
-    \end{verbatim}
-    
-    \item \textbf{Execution:} The backend validates the schema, creates an InterventionPlanRecord in the database, and returns:
-    \begin{verbatim}
-    {
-      success: true,
-      plan_id: "plan_456",
-      message: "Intervention plan created successfully"
-    }
-    \end{verbatim}
-    
-    \item \textbf{Response Generation:} The LLM receives the success result and generates an empathetic response incorporating the plan:
-    \begin{quote}
-    \textit{"Aku paham stres tugas akhir itu berat. Aku buatkan rencana 5 langkah untuk mengelola beban kamu. Mari kita mulai dari mengidentifikasi tugas prioritas..."}
-    \end{quote}
-\end{enumerate}
-
-This workflow demonstrates how tool calling transforms the LLM from a passive text generator into an active agent capable of executing structured interventions.
-
-\subsubsection{Security and Safety Constraints}
-
-Several constraints ensure safe tool execution:
-
-\begin{itemize}
-    \item \textbf{Idempotency for Critical Operations:} Tools that create database records (e.g., \code{create_case}, \code{escalate_crisis}) implement idempotency checks to prevent duplicate submissions from LLM retries.
-    
-    \item \textbf{Rate Limiting:} External API tools (e.g., \code{get_weather}) are rate-limited to prevent abuse from malicious or malfunctioning agents.
-    
-    \item \textbf{Audit Logging:} All tool invocations are logged with timestamps, invoking agent, user ID, and parameters for security audits and debugging.
-    
-    \item \textbf{Human-in-the-Loop for Destructive Actions:} Tools that modify user-facing state (e.g., \code{send_notification}) include a \code{preview_mode} flag that returns a preview without executing, allowing counselor review before confirmation.
-\end{itemize}
-
-The tool architecture thus provides a robust, secure foundation for agent autonomy while maintaining human oversight over safety-critical operations.
-
-\subsection{Prompt Engineering and LLM Interaction Strategy}
-\label{sec:prompt_engineering}
-
-The behavior of each agent in the Safety Agent Suite is fundamentally governed by its \textbf{system prompt}---a carefully crafted natural language specification that defines the agent's role, capabilities, constraints, and reasoning patterns. This section presents the prompt engineering methodology employed to ensure safety, empathy, and task alignment across agents, with particular focus on the STA's crisis classification prompts and the TCA's therapeutic coaching prompts.
-
-\subsubsection{Prompt Engineering as Behavioral Specification}
-
-In LLM-based agent systems, the system prompt serves as the \textit{primary behavioral specification mechanism} \cite{wei2022chainofthought, kojima2022largelanguagemodelszeroshot}. Unlike traditional software where behavior is encoded in deterministic control flow, agent behavior emerges from the probabilistic interpretation of natural language instructions. Effective prompt engineering thus requires:
-
-\begin{enumerate}
-    \item \textbf{Role Definition:} Clearly specify the agent's identity, expertise, and authority boundaries.
-    \item \textbf{Task Specification:} Enumerate expected inputs, required outputs, and decision criteria.
-    \item \textbf{Constraint Enforcement:} Explicitly state prohibited actions, safety guardrails, and ethical principles.
-    \item \textbf{Reasoning Guidance:} Provide examples, decision trees, or chain-of-thought templates to structure the agent's internal reasoning process.
-\end{enumerate}
-
-\subsubsection{Safety Triage Agent (STA) Prompt Design}
-
-The STA's primary task is \textit{binary crisis classification with high recall}: it must detect all potential crisis situations (minimizing false negatives) while tolerating some false positives (which are resolved by downstream human counselors). The STA system prompt implements a multi-tiered classification strategy:
-
-\begin{figure}[htbp]
-\centering
-\begin{lstlisting}[language=Python, basicstyle=\tiny\ttfamily, breaklines=true, frame=single, caption={Excerpt from STA's crisis classification system prompt.}, label={lst:sta_prompt}]
-You are the Safety Triage Agent (STA), an expert mental health crisis detector.
-
-TASK: Classify user messages into risk levels (0-3):
-- Level 0 (Minimal): Casual conversation, no distress indicators
-- Level 1 (Low): Mild stress/worry, manageable without intervention
-- Level 2 (Moderate): Significant distress, may benefit from counseling
-- Level 3 (Critical): IMMEDIATE DANGER - self-harm/suicide indicators
-
-CLASSIFICATION CRITERIA:
-
-Level 3 (CRITICAL) - Immediate Escalation Required:
-- Explicit statements of self-harm intent: "ingin bunuh diri", "mau mengakhiri hidup"
-- Active suicide planning: mentions of methods, timing, preparations
-- Statements of hopelessness with despair: "tidak ada jalan keluar", "hidup tidak berarti"
-- Acute panic/dissociation: severe emotional dysregulation
-
-Level 2 (HIGH) - Human Counselor Recommended:
-- Persistent negative thoughts without acute crisis
-- Social withdrawal patterns
-- Academic/relationship stressors with impaired functioning
-- Sleep/appetite disturbances
-
-IMPORTANT SAFETY RULES:
-1. When uncertain between levels, ALWAYS classify higher (err on the side of caution)
-2. Multiple moderate indicators (Level 1 + Level 1) -> escalate to Level 2
-3. ANY explicit self-harm language -> ALWAYS Level 3
-4. Cultural context: Indonesian students may express distress indirectly - look for implicit cues
-
-OUTPUT FORMAT: Return JSON with:
-{
-  "risk_level": <0-3>,
-  "severity": <"minimal"|"low"|"moderate"|"critical">,
-  "reasoning": "<brief explanation>",
-  "intent": "<classified_intent>",
-  "next_step": <"resource"|"coach"|"human">
-}
-\end{lstlisting}
-\end{figure}
-
-Key design elements:
-
-\begin{itemize}
-    \item \textbf{Explicit Level Definitions:} The prompt provides concrete examples for each risk level, reducing classification ambiguity.
-    \item \textbf{Safety-First Heuristics:} Rules like "when uncertain, classify higher" encode a conservative bias toward false positives, prioritizing student safety over system efficiency.
-    \item \textbf{Cultural Sensitivity:} The prompt acknowledges that Indonesian students may express distress indirectly due to cultural stigma around mental health, instructing the LLM to detect implicit cues.
-    \item \textbf{Structured Output:} Requiring JSON format ensures parseable, machine-readable responses that integrate cleanly with downstream workflow logic.
-\end{itemize}
-
-\subsubsection{Two-Tier Risk Monitoring Architecture}
-\label{sec:two_tier_risk}
-
-To optimize both clinical accuracy and operational cost, the Safety Agent Suite implements a \textbf{two-tier risk monitoring architecture} that distinguishes between immediate per-message screening (Tier 1) and comprehensive conversation-level analysis (Tier 2). This architectural pattern addresses a fundamental tension in mental health AI systems: the need for real-time crisis detection versus the need for holistic assessment of student well-being over multi-turn conversations.
-
-\paragraph{Tier 1: Immediate Per-Message Risk Screening (Aika Meta-Agent)}
-
-Tier 1 operates synchronously as part of the **Aika Meta-Agent's orchestration logic** on every incoming student message. Rather than invoking a separate STA agent call, Aika's enhanced system prompt instructs the LLM to include immediate risk assessment in its JSON response alongside routing decisions. This integrated approach provides:
-
-\begin{itemize}
-    \item \textbf{Real-Time Crisis Detection:} The Aika Meta-Agent evaluates each message for immediate crisis indicators (explicit self-harm statements, suicidal ideation, severe distress keywords) and returns a structured JSON response containing:
-    \begin{verbatim}
-{
-  "immediate_risk": "none|low|moderate|high|critical",
-  "crisis_keywords": ["keyword1", "keyword2", ...],
-  "risk_reasoning": "Brief explanation of risk classification",
-  "next_agent": "tca|cma",
-  ...
-}
-    \end{verbatim}
-    \item \textbf{Automatic CMA Escalation:} Messages classified as `high` or `critical` trigger immediate routing to the Case Management Agent (CMA) for SLA-bound human counselor assignment (2-hour first contact for critical cases, 24-hour for high-risk).
-    \item \textbf{Fast Routing Decisions:} Integrated risk screening (median 150ms) avoids the latency overhead of a separate STA API call, enabling routing to TCA or CMA without perceptible delay.
-    \item \textbf{Shallow Context Window:} Tier 1 analysis operates on the current message plus short-term conversation history (last 10 turns) to minimize token consumption and maintain real-time performance.
-\end{itemize}
-
-The Aika Meta-Agent's Tier 1 prompt includes explicit risk level definitions with crisis keyword detection for both English and Indonesian (e.g., "bunuh diri", "mengakhiri hidup", "suicide", "self-harm"), ensuring culturally appropriate screening for UGM's student population.
-
-However, Tier 1 has inherent limitations: isolated message-level analysis cannot capture gradual deterioration patterns, cumulative stressors across multiple sessions, or subtle behavioral changes indicative of worsening mental health trajectories. A student might exhibit individually moderate-risk messages over several weeks that, when viewed holistically, reveal a concerning downward spiral requiring proactive intervention.
-
-\paragraph{Tier 2: Conversation-Level Background Analysis (STA)}
-
-Tier 2 addresses these limitations through \textbf{asynchronous conversation-level risk assessment performed by the Safety Triage Agent (STA)}, triggered automatically when conversations end (explicit goodbye, inactivity timeout $>$ 5 minutes, or new conversation initiation). This tier performs:
-
-\begin{itemize}
-    \item \textbf{Comprehensive Contextual Analysis:} STA re-analyzes the complete conversation history (all messages, not just recent turns) using an extended prompt that captures:
-    \begin{itemize}
-        \item \textbf{Risk Trend Analysis:} Identifying whether student mood/risk is improving, stable, or deteriorating across conversation trajectory
-        \item \textbf{Stressor Accumulation:} Detecting multiple concurrent stressors (academic + financial + relationship) that compound risk
-        \item \textbf{Protective Factors:} Assessing coping skills demonstrated, social support mentioned, and help-seeking behaviors
-        \item \textbf{Clinical Concerns:} Flagging persistent symptoms (e.g., sustained anhedonia, chronic insomnia) requiring human counselor attention
-    \end{itemize}
-    \item \textbf{Proactive CMA Escalation:} If overall conversation risk exceeds thresholds despite no individual critical messages, Tier 2 triggers CMA case creation with lower urgency SLA (24-48 hour follow-up) for preventive counselor outreach.
-    \item \textbf{Data-Driven Insights:} Conversation assessments feed into the Insights Agent (IA) for population-level trend analysis, informing institutional resource allocation.
-\end{itemize}
-
-The Tier 2 analysis employs the same Gemini 2.5 Flash model as Tier 1 but invokes the **Safety Triage Agent (STA)** with an extended prompt template optimized for comprehensive conversation analysis (temperature=0.5 for nuanced reasoning) that structures output as:
-
-\begin{verbatim}
-{
-  "overall_risk_level": <0-3>,
-  "risk_trend": <"improving"|"stable"|"deteriorating">,
-  "conversation_summary": "<100-word summary>",
-  "user_context": {
-    "stressors": ["academic overload", "financial strain"],
-    "coping_strategies": ["exercise", "friend support"],
-    "protective_factors": ["strong family ties", "academic goals"]
-  },
-  "concerns": ["sustained low mood for 3+ weeks", "sleep disruption"],
-  "recommended_actions": ["schedule counselor check-in", "monitor weekly"],
-  "should_invoke_cma": true|false,
-  "reasoning": "<clinical rationale for recommendations>"
-}
-\end{verbatim}
-
-\paragraph{Cost Optimization Through Two-Tier Design}
-
-The two-tier architecture achieves \textbf{45-60\% reduction in LLM API costs} compared to running full conversation analysis on every message:
-
-\begin{itemize}
-    \item \textbf{API Call Reduction:} Tier 1's immediate risk screening is integrated into Aika's existing orchestration call (no additional API overhead), while Tier 2 performs a single comprehensive STA analysis at conversation end. Instead of analyzing complete conversation history at each turn ($n$ messages $\times$ full-context STA analysis), the system now performs $n$ lightweight Aika orchestration calls (which already include routing decisions) + 1 comprehensive STA analysis.
-    \item \textbf{Quantitative Savings:} For a 10-message conversation:
-    \begin{itemize}
-        \item Baseline (hypothetical full STA per message): 10 full-context STA analyses
-        \item Two-tier: 10 Aika orchestration calls (with integrated Tier 1 screening) + 1 comprehensive STA analysis
-        \item Reduction: 45\% fewer tokens processed for risk assessment
-    \end{itemize}
-    \item \textbf{Scaling Benefits:} Cost savings increase linearly with conversation length. For 30-message conversations (not uncommon for complex student issues), savings approach 60\%.
-\end{itemize}
-
-This optimization does not compromise safety: Tier 1 (Aika's immediate screening) maintains zero false-negative tolerance for acute crises (every critical message still triggers instant CMA escalation), while Tier 2 (STA's conversation analysis) enhances clinical accuracy by capturing patterns invisible to per-message analysis.
-
-\paragraph{Implementation via Fire-and-Forget Async Background Tasks}
-
-Tier 2 analysis is implemented as a \textit{fire-and-forget} asynchronous background task using Python's \code{asyncio.create_task()}, ensuring STA conversation analysis does not block user-facing responses. When a conversation end is detected, Aika Meta-Agent:
-
-\begin{enumerate}
-    \item Packages conversation state (all messages, user context, Tier 1 immediate risk assessments)
-    \item Invokes \code{trigger_sta_conversation_analysis_background(state)} without awaiting completion
-    \item Returns immediately to proceed with user response generation
-\end{enumerate}
-
-The background task:
-\begin{enumerate}
-    \item Calls STA's \code{analyze_conversation_risk()} function with full conversation history
-    \item Persists the \code{ConversationAssessment} result to database
-    \item If \code{should_invoke_cma=True}, creates a CMA case with "proactive monitoring" flag
-\end{enumerate}
-
-This pattern prevents Tier 2 latency (typically 2-4 seconds for comprehensive STA analysis) from degrading user experience, maintaining the system's $<$2s p95 response time target.
-
-\paragraph{Clinical Validation and Ethical Considerations}
-
-The two-tier design aligns with clinical best practices in mental health monitoring \cite{PLACEHOLDER_CITE_clinical_monitoring}:
-
-\begin{itemize}
-    \item \textbf{Screening + Assessment Paradigm:} Mirrors standard practice where brief screening tools (e.g., PHQ-2) triage patients for comprehensive assessment (e.g., PHQ-9). Tier 1 is the screening layer; Tier 2 is the assessment layer.
-    \item \textbf{Continuous Monitoring:} Tier 2's conversation-level analysis enables longitudinal tracking of student mental health trajectories, supporting early intervention before crises escalate.
-    \item \textbf{Transparency:} Students are informed via UI that "conversations are periodically reviewed to ensure your well-being," with clear opt-out mechanisms for those uncomfortable with background monitoring.
-\end{itemize}
-
-However, this approach introduces ethical considerations around automated surveillance that must be addressed through institutional oversight, robust consent processes, and human-in-the-loop case review before any proactive counselor outreach.
-
-\subsubsection{Therapeutic Coach Agent (TCA) Prompt Design}
-
-The TCA's prompts are designed to deliver \textbf{empathetic, CBT-informed therapeutic support} while maintaining strict ethical boundaries. Unlike the STA's classification-focused prompt, the TCA's prompt emphasizes \textit{conversational quality}, \textit{therapeutic alignment}, and \textit{evidence-based intervention strategies}. The system uses \textit{dynamic prompt selection} based on intervention type:
-
-\begin{table}[htbp]
-    \centering
-    \caption{TCA prompt variants by intervention type.}
-    \label{tab:tca_prompts}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.5cm}p{5.0cm}p{4.0cm}}
-        \toprule
-        \textbf{Intervention Type} & \textbf{Prompt Focus} & \textbf{Example Technique} \\
-        \midrule
-        \code{calm_down} & Anxiety and panic management, grounding techniques & "Guide user through 5-4-3-2-1 sensory grounding exercise" \\
-        \code{break_down_problem} & Problem-solving, task decomposition & "Help user create prioritized action plan with concrete first steps" \\
-        \code{general_coping} & Stress management, self-care strategies & "Suggest evidence-based coping skills: deep breathing, progressive muscle relaxation" \\
-        \code{cognitive_restructuring} & CBT thought challenging & "Identify cognitive distortions (all-or-nothing thinking, catastrophizing) and generate balanced alternatives" \\
-        \code{behavioral_activation} & Depression and low motivation & "Schedule small, achievable activities to break cycle of avoidance" \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-An excerpt from the \code{calm_down} prompt illustrates the empathy-focused therapeutic coaching style:
-
-\begin{figure}[htbp]
-\centering
-\begin{lstlisting}[language=Python, basicstyle=\tiny\ttfamily, breaklines=true, frame=single, caption={Excerpt from TCA's anxiety management prompt.}, label={lst:tca_prompt}]
-You are the Therapeutic Coach Agent (TCA), an expert mental health support coach specializing in anxiety and panic management using Cognitive Behavioral Therapy (CBT) principles.
-
-PERSONALITY:
-- Warm, calming, and non-judgmental
-- Use simple, clear Indonesian (avoid jargon)
-- Validate user's feelings: "Perasaan kamu wajar dan bisa dikelola"
-- Express confidence in their ability to cope
-
-INTERVENTION APPROACH (Evidence-based techniques):
-1. Normalize the anxiety: Explain that anxiety is the body's natural alarm system
-2. Provide immediate grounding: Guide through 5-4-3-2-1 technique or box breathing
-3. Gentle problem-solving: Once calm, explore triggers and coping strategies
-4. Encourage practice: Suggest repeating techniques when anxiety rises again
-
-CONVERSATION STYLE:
-- Start with empathy: "Aku mengerti kecemasan ini terasa berat"
-- Use open questions: "Apa yang kamu rasakan di tubuh saat cemas?"
-- Provide hope: "Teknik ini sudah membantu banyak orang, dan akan membantu kamu juga"
-- Avoid: Dismissing feelings ("jangan cemas"), giving medical advice, diagnosing disorders
-
-STRICT BOUNDARIES:
-- NEVER prescribe medication or provide medical diagnoses
-- NEVER claim to replace professional therapy
-- ALWAYS encourage seeking professional help for persistent symptoms
-- ESCALATE if user shows suicidal ideation (though STA should catch this)
-
-TOOL USAGE:
-When appropriate, use create_intervention_plan tool to generate structured 4-6 step action plans.
-\end{lstlisting}
-\end{figure}
-
-The TCA prompt balances multiple objectives: (1) delivering evidence-based psychological techniques rooted in CBT, (2) maintaining warmth and therapeutic rapport, (3) respecting scope boundaries (not providing medical diagnosis or prescribing medication), and (4) integrating tool-calling for structured therapeutic intervention plans.
-
-\subsubsection{Aika Meta-Agent Role-Specific Prompts}
-
-Aika employs \textbf{three distinct system prompts} depending on the authenticated user's role (student, counselor, admin), each optimized for role-appropriate interactions:
-
-\begin{itemize}
-    \item \textbf{Student Prompt:} Emphasizes empathy, informal language ("kamu"), and proactive tool usage to provide personalized support. Encourages journaling, mood tracking, and intervention plan creation.
-    
-    \item \textbf{Admin Prompt:} Adopts professional, data-driven tone, focuses on analytics queries and administrative actions. Includes safety protocols requiring explicit confirmation for bulk communications.
-    
-    \item \textbf{Counselor Prompt:} Uses clinical terminology, provides case summaries and treatment recommendations. Maintains patient confidentiality and respects counselor's clinical authority (suggests rather than prescribes).
-\end{itemize}
-
-This role-based prompt switching allows Aika to maintain a consistent agent identity while adapting conversational style and capability exposure to user context.
-
-\subsubsection{Prompt Optimization and Iteration Process}
-
-Prompt development followed an iterative refinement process:
-
-\begin{enumerate}
-    \item \textbf{Initial Prototype:} Draft prompts based on clinical psychology literature (CBT protocols, crisis intervention guidelines) and multi-agent system best practices.
-    
-    \item \textbf{Synthetic Testing:} Evaluate prompts against 50 synthetic crisis scenarios (detailed in Chapter~\ref{chap:evaluation}) to measure classification accuracy (STA) and response quality (TCA).
-    
-    \item \textbf{Failure Analysis:} Identify edge cases where agents produced undesired behaviors (e.g., STA under-classifying implicit crisis signals, TCA providing overly generic advice).
-    
-    \item \textbf{Refinement:} Add explicit constraint clauses, expand example sets, and clarify ambiguous instructions. For instance, the STA prompt initially lacked the "multiple moderate indicators $\rightarrow$ escalate" rule, which was added after observing missed detections.
-    
-    \item \textbf{Validation:} Re-test refined prompts to verify improved performance. The final STA prompt achieved 96\% sensitivity on critical cases (RQ1 results in Chapter~\ref{sec:rq1}).
-\end{enumerate}
-
-\subsubsection{Limitations and Future Work}
-
-Current prompt engineering limitations include:
-
-\begin{itemize}
-    \item \textbf{Language Mixing:} Prompts are primarily in English (for LLM comprehension) but instruct agents to respond in Indonesian. This creates code-switching overhead and potential translation artifacts.
-    
-    \item \textbf{Few-Shot Learning:} The STA prompt could benefit from few-shot examples (e.g., 3-5 example classifications) to improve edge case handling, but token budget constraints currently limit this.
-    
-    \item \textbf{Persona Consistency:} Aika's role-switching prompts may exhibit minor persona leakage (e.g., using admin-style language when addressing students). Future work will explore techniques like prompt chaining or fine-tuning to improve consistency.
-\end{itemize}
-
-Despite these limitations, the current prompt engineering approach successfully operationalizes the system's core behavioral requirements within the constraints of an undergraduate thesis project.
-
+Collectively, these specialized agents operationalize the two proactive loops described in Section 3.2. The STA and TCA are the primary actors in the \textbf{Real-Time Interaction Loop}, enabling proactive individual support through immediate risk detection and the asynchronous delivery of therapeutic content. The IA is the engine of the \textbf{Strategic Oversight Loop}, providing the institution with proactive, population-level insights. The CMA acts as a crucial bridge between these loops, translating automated insights (from STA or IA) into concrete administrative actions, such as case creation or counselor notification. This functional separation ensures that each component is optimized for its specific role within the broader proactive ecosystem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SECTION 3.4 - TECHNICAL ARCHITECTURE %%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \section{Technical Architecture}
-\label{chap:technical_architecture}
+\label{sec:technical_architecture}
 
-This section details the technical implementation of the agentic AI framework, focusing on the architectural components that enable multi-agent orchestration, reasoning, and decision-making. The system follows a service-oriented architecture with three primary components: a Next.js frontend for user interaction, a FastAPI backend housing the agentic core, and a PostgreSQL database for persistent storage. The backend service is the cognitive engine of the framework, responsible for orchestrating the five agents (STA, TCA, CMA, IA, and Aika Meta-Agent) through a LangGraph state machine, managing LLM interactions with Google Gemini API, and coordinating tool executions. The following subsections focus on the agent-specific architectural decisions that distinguish this system from conventional web applications.
+This section details the technical blueprint of the Safety Agent Suite, translating the conceptual and functional designs into a concrete implementation strategy. The architecture is built upon a modern, cloud-native technology stack, selected to ensure modularity, scalability, and maintainability, which are critical for a system of this nature.
 
-\subsection{Backend Service: The Agentic Core}
-\label{sec:backend_service}
+\subsection{Technology Stack}
 
-The backend service implements the multi-agent orchestration logic and agent reasoning capabilities. Built with FastAPI to support asynchronous LLM inference and concurrent conversation handling, the backend exposes a REST API for frontend communication. Key endpoints supporting agent interactions are summarized in Table~\ref{tab:api_endpoints}.
+The selection of technologies was guided by the need for asynchronous performance, robust data management, and stateful agent orchestration. The core components are:
 
-\begin{table}[htbp]
-    \centering
-    \caption{Key REST API endpoints for agent interactions.}
-    \label{tab:api_endpoints}
-    \small
-    \begin{tabular}{lll}
-        \toprule
-        \textbf{Method} & \textbf{Endpoint} & \textbf{Description} \\
-        \midrule
-        \code{POST} & \code{/api/chat/message} & Submits a user message for processing by the agentic core. \\
-        \code{GET} & \code{/api/insights/latest} & Fetches the latest strategic report from the Insights Agent. \\
-        \code{POST} & \code{/api/appointments} & Creates a new appointment with a counselor via the CMA. \\
-        \code{GET} & \code{/api/admin/cases} & Retrieves all flagged cases for the admin dashboard. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsubsection{Agent Orchestration: LangGraph}
-
-To manage the complex, cyclical, and stateful interactions between the agents, the framework employs \textbf{LangGraph}. LangGraph extends the linear "chain" paradigm of LangChain by modeling agentic workflows as a state graph, which is essential for building robust multi-agent systems \cite{mathew2025largelanguagemodelagents, barua2024llmagentsreview}.
-
-The core of the orchestration is a central \textbf{State Graph}, where the application's state is explicitly defined and passed between nodes. This state object, implemented as a Pydantic class, contains all relevant information for a given workflow, such as the full \code{conversation_history}, the \code{current_risk_level} as determined by the STA, and the \code{active_case_id}. 
-
-The workflow is structured as follows:
 \begin{itemize}
-    \item \textbf{Nodes:} Each of the five framework components (Aika Meta-Agent for routing, plus the four specialist agents: STA, TCA, CMA, IA) and their associated tools are implemented as nodes in the graph. A node is a function that receives the current state, performs its task (e.g., makes an LLM call, queries the database), and returns a dictionary of updates to be merged back into the state.
-    \item \textbf{Edges:} The flow of control between nodes is managed by edges. Crucially, the framework uses \textbf{conditional edges} to implement the agentic logic. After a node executes, a routing function inspects the updated state to decide which node to call next. For example, after the STA node classifies a message, a conditional edge checks the \code{current_risk_level} in the state. If the level is `CRITICAL`, the edge routes the workflow to the CMA node to create a case; otherwise, it routes to the TCA node to continue the conversation. This structure is visualized in Figure \ref{fig:langgraph_conceptual}.
+    \item \textbf{Backend Framework: FastAPI.} The backend is implemented in Python using FastAPI. This choice was motivated by FastAPI's high performance and its native support for asynchronous operations. For a conversational AI system where multiple I/O-bound tasks occur (e.g., database queries, external API calls to LLMs), asynchronous handling is paramount to prevent blocking and ensure a responsive user experience.
+
+    \item \textbf{Agent Orchestration: LangGraph.} The complex, conditional logic of the multi-agent system is managed using LangGraph. LangGraph provides a stateful, graph-based framework for composing agents. This is a significant improvement over stateless LLM calls, as it allows the system to maintain a coherent state across multiple turns of a conversation and multiple agent invocations. It directly enables the implementation of the agentic loops and decision points described in the functional architecture.
+
+    \item \textbf{Data Persistence: PostgreSQL and SQLAlchemy.} A PostgreSQL database serves as the primary data store for all persistent information, including user profiles, conversation histories, and agent execution logs. Interaction with the database is managed through the SQLAlchemy Object-Relational Mapper (ORM). This combination provides a robust, transactional, and scalable foundation for data management, while the ORM simplifies data handling in the Python application code.
+
+    \item \textbf{Containerization: Docker.} The entire application stack, including the FastAPI backend, database, and other services, is containerized using Docker. This ensures a consistent, reproducible, and isolated environment for development, testing, and potential deployment, simplifying dependency management and enhancing system reliability.
 \end{itemize}
 
-This stateful, cyclical approach allows for sophisticated agentic behaviors, such as retrying failed tool calls, handing off tasks between agents, and maintaining a durable memory of the interaction, which are critical for the reliability and safety of the system.
+\subsection{Data Model and Persistence}
+
+The system's data model is designed to support its core functions: tracking conversations, managing user data, and logging agent behavior for analysis and auditing. While a full database schema is extensive, the core entities include:
+
+\begin{itemize}
+    \item \textbf{User and Profile Tables:} Store essential user information, preferences, and consent status, forming the basis for personalized interaction.
+    \item \textbf{Conversation and Message Tables:} Log every user interaction, providing the raw data for the Insights Agent and a history for contextual conversations.
+    \item \textbf{Case Management Tables:} Store structured data for escalated cases, including risk level, summary, and assigned counselor, enabling the HITL workflow.
+    \item \textbf{LangGraph Execution Logs:} A critical component for fulfilling RQ2, these tables (\texttt{LangGraphExecution} and \texttt{LangGraphNodeExecution}) capture detailed traces of every agent orchestration. They log which nodes (agents) were executed, the transitions between them, their inputs and outputs, and any errors encountered. This provides an invaluable audit trail for debugging and evaluating the orchestration logic.
+\end{itemize}
+
+\subsection{Stateful Orchestration with LangGraph}
+
+The heart of the technical architecture is the LangGraph state machine, which operationalizes the agentic behavior. The orchestration is not a simple linear chain but a cyclical graph where the flow is determined by the contents of a shared \texttt{AgentState} object.
+
+The process is as follows:
+\begin{enumerate}
+    \item A user message initializes the \texttt{AgentState}.
+    \item The graph routes the state to the first node, the \textbf{Safety Triage Agent (STA)}.
+    \item The STA executes its logic and updates the \texttt{AgentState} with a risk assessment and a routing decision (e.g., \texttt{next\_step: "tca"}).
+    \item A conditional edge reads the \texttt{next\_step} from the state and routes it to the appropriate next node, which could be the \textbf{Therapeutic Coach Agent (TCA)}, the \textbf{Case Management Agent (CMA)}, or the end of the graph.
+    \item This process repeats, with each agent modifying the shared state, until a terminal node is reached.
+\end{enumerate}
+
+This stateful, graph-based approach provides a robust and explicit way to manage the complex, non-deterministic nature of a multi-agent conversational system. A high-level visualization of this state machine is presented in Figure \ref{fig:langgraph_state_machine}.
 
 \begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
-        state/.style={rectangle, rounded corners=4pt, draw=ugmBlue, thick, align=center, fill=ugmBlue!6, minimum width=3.0cm, minimum height=1.1cm, font=\footnotesize},
-        decision/.style={diamond, draw=ugmGold!80!black, thick, fill=ugmGold!20, aspect=2, align=center, font=\footnotesize},
-        arrow/.style={-Latex, thick, ugmBlue},
-        riskarrow/.style={-Latex, thick, ugmGold}
+        scale=0.9,
+        transform shape,
+        node distance=2.5cm and 1.5cm,
+        agent/.style={rectangle, draw, fill=ugmBlue!10, rounded corners, thick, minimum height=1.2cm, minimum width=2.8cm, text centered, align=center, font=\small},
+        meta_agent/.style={rectangle, draw, fill=ugmGold!20, rounded corners, thick, minimum height=1.5cm, minimum width=3.5cm, text centered, align=center, font=\small\bfseries},
+        decision/.style={diamond, draw, fill=gray!10, aspect=1.5, inner sep=0pt, minimum size=1.5cm, text centered, font=\scriptsize},
+        io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw, fill=gray!5, minimum height=1cm, text centered, align=center, font=\small},
+        arrow/.style={-Stealth, thick},
+        line/.style={thick}
     ]
-        \node[state] (entry) {User Message\\(turn $t$)};
-        \node[state, right=2.6cm of entry] (sta) {Safety Triage Agent\\(risk assessment)};
-        \node[decision, right=2.5cm of sta] (risk) {Risk Level?};
-        \node[state, above right=1.6cm and 2.1cm of risk] (tca) {Therapeutic Coach Agent\\(CBT intervention)};
-        \node[state, below right=1.6cm and 2.1cm of risk] (cma) {Case Management Agent\\(case actions)};
-        \node[state, right=3.1cm of tca] (userout) {Response to Student};
-        \node[state, right=3.1cm of cma] (adminout) {Admin Dashboard\\Escalation Record};
 
-        \draw[arrow] (entry) -- node[above, font=\footnotesize]{contextual state} (sta);
-        \draw[arrow] (sta) -- node[above, font=\footnotesize]{risk score $R_t$} (risk);
-        \draw[riskarrow] (risk) -- node[above, font=\footnotesize]{Low/Moderate} (tca);
-        \draw[riskarrow] (risk) -- node[below, font=\footnotesize]{Critical} (cma);
-        \draw[arrow] (tca) -- node[above, font=\footnotesize]{CBT coaching} (userout);
-        \draw[arrow] (cma) -- node[above, font=\footnotesize]{case ticket, alert} (adminout);
-        \draw[arrow, looseness=1.1, out=170, in=190] (tca.west) to node[above, font=\footnotesize]{next turn} (sta.north);
-        \draw[arrow, looseness=1.1, out=-170, in=-190] (cma.west) to node[below, font=\footnotesize]{status updates} (sta.south);
-        \draw[arrow, dashed, very thick, color=ugmBlue!70] (tca.south) -- node[right, font=\footnotesize]{escalation request} (cma.north);
+        % Nodes
+        \node[io] (user_input) {User Message};
+        \node[meta_agent, right=of user_input] (meta_agent) {Aika Meta-Agent \\ (Orchestrator)};
+        \node[agent, below=of meta_agent] (sta) {Safety Triage Agent \\ (STA)};
+        \node[decision, below=of sta] (risk_decision) {Risk Level?};
+        
+        \node[agent, right=of risk_decision] (cma) {Case Management Agent \\ (CMA)};
+        \node[agent, left=of risk_decision] (tca) {Therapeutic Coach Agent \\ (TCA)};
+        
+        \node[io, below=of tca] (tca_output) {Therapeutic Response};
+        \node[io, below=of cma] (cma_output) {Escalation \& \\ Counselor Notification};
+        \node[io, below=of risk_decision, yshift=-0.5cm] (low_risk_output) {Standard Response};
+
+        % Edges
+        \draw[arrow] (user_input) -- (meta_agent);
+        \draw[arrow] (meta_agent) -- (sta);
+        \draw[arrow] (sta) -- (risk_decision);
+
+        \draw[arrow] (risk_decision) -- node[above, font=\scriptsize] {Low} (low_risk_output);
+        \draw[arrow] (risk_decision) -- node[above, font=\scriptsize] {Moderate} (tca);
+        \draw[arrow] (risk_decision) -- node[above, font=\scriptsize] {Critical} (cma);
+        
+        \draw[arrow] (tca) -- (tca_output);
+        \draw[arrow] (cma) -- (cma_output);
+
+        % Feedback loops to Meta-Agent for synthesis (optional, for clarity)
+        \draw[arrow, dashed] (tca_output) -| ([xshift=-1.5cm]meta_agent.south) node[pos=0.95, left, font=\tiny] {Synthesize};
+        \draw[arrow, dashed] (cma_output) -| ([xshift=1.5cm]meta_agent.south) node[pos=0.95, right, font=\tiny] {Synthesize};
+        \draw[arrow, dashed] (low_risk_output) -- (meta_agent.south) node[pos=0.8, right, font=\tiny] {Synthesize};
+
     \end{tikzpicture}
-    \caption{Conceptual LangGraph state machine showing how conversation turns pass through the Safety Triage Agent before branching to the Therapeutic Coach or Case Management agents, with feedback loops preserving state. The Aika Meta-Agent orchestrates entry into this workflow based on user role and intent classification (see Figure~\ref{fig:aika_orchestration}).}
-    \label{fig:langgraph_conceptual}
+    \caption{High-level visualization of the LangGraph agent orchestration state machine. The Aika Meta-Agent routes user input to the STA for risk assessment, then conditionally invokes the TCA for therapeutic coaching or the CMA for crisis escalation based on the outcome.}
+    \label{fig:langgraph_state_machine}
 \end{figure}
 
-To enable the Insights Agent's proactive analysis capabilities (part of the dual-loop architecture described in Section~\ref{sec:aika_meta_agent}), the backend integrates task scheduling functionality. The IA executes its NLP pipeline on a fixed schedule (e.g., weekly) to generate strategic reports and aggregate insights, closing the strategic oversight loop without manual intervention.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% SECTION 3.5 - CROSS-CUTTING CONCERNS %%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\subsubsection{Monitoring and Observability Infrastructure}
+\section{Cross-Cutting Concerns}
+\label{sec:cross_cutting_concerns}
 
-To enable comprehensive evaluation of agent performance (detailed in Chapter~\ref{chap:evaluation}), the backend incorporates an observability stack focused on agent reasoning and decision-making. The infrastructure serves dual purposes: operational monitoring during development and systematic data collection for research question evaluation.
+Beyond the core functional and technical architecture, a production-worthy system, particularly in a sensitive domain like mental health, must address several system-wide, non-functional requirements. These "cross-cutting concerns" ensure the system is secure, responsive, and safe.
 
-\textbf{Prometheus Metrics for Agent Performance.} The backend exposes custom metrics tracking agent-specific performance indicators: processing time histograms by agent type (\code{agent_processing_time_seconds}), tool execution success rates (\code{tool_calls_total}), and safety-critical metrics such as crisis escalation counters (\code{crisis_escalations_total}). These metrics enable quantitative evaluation of agent orchestration correctness (RQ2) and safety triage performance (RQ1). Metrics are scraped at 15-second intervals, providing high-resolution time-series data for statistical analysis.
+\subsection{Security and Privacy by Design}
 
-\textbf{Langfuse LLM Tracing.} All LLM invocations and agent state transitions are traced using Langfuse \cite{PLACEHOLDER_CITE_langfuse}, capturing:
-
-\begin{itemize}[leftmargin=*]
-    \item The full conversation context passed to the LLM
-    \item System prompts and user messages
-    \item LLM response generation (including token counts and latency)
-    \item Tool calls initiated by the agent
-    \item State transitions in the LangGraph workflow
-\end{itemize}
-
-These traces provide detailed execution logs that enable debugging of agent reasoning failures, validation of orchestration correctness (RQ2), and identification of failure modes in multi-agent coordination logic. The evaluation methodology (Chapter~\ref{chap:evaluation}) leverages Langfuse traces for manual inspection of orchestration flows and Prometheus metrics for quantitative performance analysis.
-
-\subsection{State Schema and Memory Management}
-\label{sec:state_schema}
-
-Multi-agent coordination in the Safety Agent Suite is enabled by a \textbf{shared state graph} that serves as the system's working memory. This state flows through the LangGraph workflow, allowing each agent to perceive context from prior agents, execute its logic, and update the state with its results. This section details the state schema design, memory management strategies, and the tradeoffs between context retention and computational efficiency.
-
-\subsubsection{State-Based Coordination in LangGraph}
-
-LangGraph operationalizes agent workflows as \textit{state machines}, where nodes represent agent computations and edges represent state transitions \cite{langgraph2024docs}. Unlike message-passing architectures (where agents communicate via explicit inter-agent messages) or blackboard systems (where agents write to a shared unstructured memory), LangGraph's state-based coordination uses a \textbf{typed dictionary} that propagates through the graph.
-
-Formally, at each node execution, an agent function receives the current state $S_t$ and returns a state update $\Delta S$, which is merged into the state for the next node:
-\begin{equation}
-S_{t+1} = S_t \oplus \Delta S
-\end{equation}
-where $\oplus$ is the state merge operator (typically dictionary update with field-level overwriting).
-
-This design provides several advantages:
-\begin{itemize}
-    \item \textbf{Explicit Data Contracts:} The state schema (implemented as a Python TypedDict) enforces type safety and documents which fields each agent reads/writes.
-    \item \textbf{Deterministic Coordination:} Unlike asynchronous message passing, state-based coordination ensures that Agent B \textit{always} sees Agent A's outputs if A executes before B in the graph.
-    \item \textbf{Debuggability:} The complete execution trace (state at each node) is stored by LangGraph's checkpointing system and logged to Langfuse, enabling post-hoc debugging of orchestration failures.
-\end{itemize}
-
-\subsubsection{SafetyAgentState Schema Definition}
-
-The core state schema, \code{SafetyAgentState}, defines the data contract for the STA $\rightarrow$ TCA $\rightarrow$ CMA orchestration workflow. Table~\ref{tab:state_schema} presents the key fields grouped by functional category.
-
-\begin{table}[htbp]
-    \centering
-    \caption{SafetyAgentState schema with field descriptions and owning agents.}
-    \label{tab:state_schema}
-    \small
-    \setlength{\tabcolsep}{3pt}
-    \begin{tabular}{p{3.5cm}p{2.0cm}p{4.5cm}p{2.5cm}}
-        \toprule
-        \textbf{Field Name} & \textbf{Type} & \textbf{Description} & \textbf{Written By} \\
-        \midrule
-        \multicolumn{4}{l}{\textit{Input Context (provided at workflow start)}} \\
-        \code{user_id} & \code{int} & User ID from database & Orchestrator \\
-        \code{message} & \code{str} & User's input message & Orchestrator \\
-        \code{session_id} & \code{str} & Session identifier & Orchestrator \\
-        \code{conversation_id} & \code{int} & Conversation ID & Orchestrator \\
-        \midrule
-        \multicolumn{4}{l}{\textit{STA Outputs (risk assessment)}} \\
-        \code{risk_level} & \code{int} & Risk level 0-3 (0=low, 3=critical) & STA \\
-        \code{severity} & \code{Literal} & Human-readable severity (low|moderate|high|critical) & STA \\
-        \code{intent} & \code{str} & Detected user intent (e.g., "crisis", "academic\_stress") & STA \\
-        \code{next_step} & \code{str} & Routing decision: "tca"|"cma"|"end" & STA \\
-        \code{triage_assessment_id} & \code{int} & Database ID of TriageAssessment record & STA \\
-        \midrule
-        \multicolumn{4}{l}{\textit{TCA Outputs (therapeutic intervention planning)}} \\
-        \code{intervention_plan} & \code{Dict} & Generated CBT-based intervention plan with steps and resources & TCA \\
-        \code{intervention_type} & \code{str} & Plan type: "calm\_down"|"break\_down\_problem"|etc. & TCA \\
-        \code{should_intervene} & \code{bool} & Flag indicating if intervention was created & TCA \\
-        \code{intervention_plan_id} & \code{int} & Database ID of InterventionPlanRecord & TCA \\
-        \midrule
-        \multicolumn{4}{l}{\textit{CMA Outputs (case management)}} \\
-        \code{case_id} & \code{int} & Database ID of created Case (if escalated) & CMA \\
-        \code{case_created} & \code{bool} & Flag indicating case creation & CMA \\
-        \code{assigned_counsellor_id} & \code{int} & ID of assigned counselor (if auto-assigned) & CMA \\
-        \code{sla_breach_at} & \code{str} & ISO timestamp of SLA deadline & CMA \\
-        \midrule
-        \multicolumn{4}{l}{\textit{Execution Metadata (tracking and monitoring)}} \\
-        \code{execution_id} & \code{str} & Unique ID for this graph execution & Orchestrator \\
-        \code{execution_path} & \code{List[str]} & List of node IDs executed (for tracing) & Graph Runtime \\
-        \code{errors} & \code{List[str]} & Error messages encountered & Any Agent \\
-        \code{started_at} & \code{datetime} & Workflow start timestamp & Orchestrator \\
-        \code{completed_at} & \code{datetime} & Workflow completion timestamp & Orchestrator \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-All fields are declared with \code{total=False} in the TypedDict, making them optional. This supports incremental state building: the state begins with only \code{user_id}, \code{message}, and metadata, then accumulates fields as agents execute.
-
-\subsubsection{Conversation History Management}
-
-While the state schema above captures \textit{workflow-level context}, the system also maintains \textit{conversation history} for contextual LLM prompting. This history is stored separately in the \code{AikaState} (used by the Aika Meta-Agent) and managed with the following strategies:
-
-\begin{enumerate}
-    \item \textbf{Rolling Window:} Conversation history is limited to the most recent 50 dialogue turns (25 user messages + 25 agent responses). This bounds token consumption to approximately 4,000 tokens, well within Gemini's 128K context window but avoiding unnecessary prompt bloat.
-    
-    \item \textbf{Summarization for Long Conversations:} When conversation length exceeds 50 turns, older messages are compressed into a summary paragraph (e.g., "User initially discussed exam stress, then transitioned to relationship concerns"). This preserves thematic continuity while reclaiming token budget.
-    
-    \item \textbf{Critical Context Pinning:} Messages flagged by STA as high or critical risk are \textit{always} retained in full, regardless of the rolling window policy. This ensures counselors reviewing escalated cases have complete context about crisis indicators.
-\end{enumerate}
-
-\subsubsection{State Persistence and Checkpointing}
-
-LangGraph provides built-in checkpointing that snapshots the state after each node execution. The system leverages this for:
+Security and privacy are not afterthoughts but are foundational to the system's design, earning user trust and ensuring ethical operation.
 
 \begin{itemize}
-    \item \textbf{Fault Tolerance:} If a node crashes mid-execution (e.g., database timeout), the workflow can resume from the last checkpoint rather than restarting from the beginning.
+    \item \textbf{Role-Based Access Control (RBAC):} The system enforces strict access control based on user roles (e.g., student, counselor, administrator). For instance, counselors can only view cases assigned to them, and administrators can access aggregated analytics from the Insights Agent but not individual, non-anonymized conversation logs. This is managed through authentication middleware in the FastAPI backend.
     
-    \item \textbf{Execution Replay:} For debugging, developers can load a checkpoint from a failed run and replay the workflow with modified logic or inputs.
-    
-    \item \textbf{Observability:} Checkpoints are exported to Langfuse, enabling trace visualization that shows exactly which fields each agent read/wrote.
+    \item \textbf{Data Encryption:} All data is encrypted both in-transit, using TLS for all API communications, and at-rest in the PostgreSQL database. This protects sensitive conversation data from unauthorized access even in the event of a direct infrastructure breach.
+
+    \item \textbf{Privacy-Preserving Analytics:} The Insights Agent is architecturally constrained to protect student privacy. As stated in RQ4, its SQL queries are designed to enforce k-anonymity by including clauses that prevent data from being returned for any group smaller than a predefined threshold (k=5). This ensures that analytics can reveal population-level trends without ever exposing data that could be traced back to an individual student.
 \end{itemize}
 
-Checkpoints are stored in PostgreSQL with the following schema:
-\begin{verbatim}
-CREATE TABLE langchain_checkpoints (
-  checkpoint_id UUID PRIMARY KEY,
-  thread_id VARCHAR,  -- conversation_id
-  checkpoint_ns VARCHAR,  -- namespace (e.g., "safety_workflow")
-  checkpoint JSONB,  -- serialized state
-  metadata JSONB,  -- execution metadata
-  created_at TIMESTAMP DEFAULT NOW()
-);
-\end{verbatim}
+\subsection{Architectural Provisions for Responsiveness}
 
-\subsubsection{Memory Management Tradeoffs}
+While formal performance benchmarking is outside the scope of this thesis, the architecture was explicitly designed to support a responsive, real-time conversational experience. This is a critical functional requirement for user engagement.
 
-The state management architecture balances several competing concerns:
+\begin{itemize}
+    \item \textbf{Asynchronous Processing:} The choice of FastAPI was deliberate for its native \texttt{async/await} support. This allows the application to handle long-running I/O operations, such as calling the Gemini API or querying the database, without blocking the main execution thread. This ensures the system can manage multiple concurrent conversations smoothly.
 
-\begin{table}[htbp]
-    \centering
-    \caption{State management tradeoffs and design decisions.}
-    \label{tab:state_tradeoffs}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.5cm}p{5.0cm}p{4.0cm}}
-        \toprule
-        \textbf{Concern} & \textbf{Tradeoff} & \textbf{Design Decision} \\
-        \midrule
-        Context richness vs. token cost & More conversation history improves LLM reasoning but increases API costs & 50-turn rolling window + summarization \\
-        \midrule
-        State schema flexibility vs. type safety & Unstructured state (Dict[str, Any]) is flexible but error-prone & TypedDict with explicit field types \\
-        \midrule
-        Checkpoint granularity vs. storage overhead & Checkpointing after every node enables debugging but consumes database storage & Checkpoint after each node, prune checkpoints older than 30 days \\
-        \midrule
-        Privacy vs. observability & Storing complete state enables debugging but risks exposing PII in logs & Redact PII fields (user\_hash instead of user\_id) in checkpoints exported to Langfuse \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+    \item \textbf{Optimized Language Models:} The system employs a two-tier model strategy to balance capability with latency. For the initial, real-time safety screening performed by the STA, a low-latency model (Gemini 2.5 Flash) is used to ensure sub-second response times. For more complex, asynchronous tasks like generating detailed narrative summaries in the Insights Agent, a more powerful model (Gemini 2.5 Pro) is used, as latency is less critical for these background tasks.
+\end{itemize}
 
-The current design prioritizes \textit{debuggability} and \textit{type safety} over absolute minimalism, reflecting the reality that an undergraduate thesis project benefits more from explicit contracts and logging than from hyper-optimized token usage.
+\subsection{Human-in-the-Loop (HITL) Workflow for Safety}
 
-\subsubsection{State Schema Evolution and Extensibility}
+No fully automated system can or should replace human clinical judgment in crisis situations. The framework is designed with a robust Human-in-the-Loop (HITL) workflow as its ultimate safety net.
 
-As agent capabilities expand, the state schema must evolve. Two mechanisms support backward-compatible extensions:
-
+The escalation path is deterministic and auditable:
 \begin{enumerate}
-    \item \textbf{Optional Fields:} All fields are optional (\code{total=False}), so adding new fields (e.g., \code{sentiment_score} from future sentiment analysis) does not break existing code that doesn't read these fields.
-    
-    \item \textbf{Agent-Specific State Extensions:} Agents can define subclasses of \code{SafetyAgentState} with additional fields. For example, \code{CMAState} extends the base schema with \code{assigned_to} and \code{assignment_reason} fields used internally by the CMA but ignored by upstream agents.
+    \item The \textbf{STA} detects a message with "Critical" risk.
+    \item This immediately triggers the \textbf{Case Management Agent (CMA)}.
+    \item The CMA executes its \texttt{create\_crisis\_case} tool, which creates a structured, high-priority ticket in the database.
+    \item Simultaneously, the CMA invokes a notification service (e.g., via email or a secure messaging integration) that sends an alert to the on-call human counselor(s). This alert contains the case ID and a link to a secure dashboard where they can review the conversation.
+    \item The system then presents the user with immediate, static help resources (e.g., emergency hotline numbers) while the human counselor takes over the case management.
 \end{enumerate}
 
-This extensibility pattern, inspired by domain-driven design's \textit{bounded contexts} \cite{evans2003domaindrivendesign}, allows each agent to maintain its own state view while preserving a shared core contract.
-
-\subsection{Data Persistence and Evaluation Data Collection}
-\label{sec:data_persistence_evaluation}
-
-PostgreSQL serves as the data persistence layer, storing conversation history, user data (anonymized), clinical cases, and agent-generated reports. The backend mediates all database access, enforcing business logic and authorization before executing transactions.
-
-The evaluation methodology described in Chapter~\ref{chap:evaluation} relies on \textbf{external Python scripts and test files} rather than dedicated database tables for storing evaluation results. This design decision reflects the thesis's focus on controlled evaluation experiments (50 crisis scenarios, 10 orchestration flows, 10 coaching scenarios, 5 unit tests) rather than continuous production monitoring. The evaluation data is collected and analyzed through:
-
-\textbf{RQ1 (Safety Triage Agent Performance):} The \code{rq1_evaluate_sta.py} script generates 50 crisis scenarios and collects classification results directly from the STA API. Results (true positives, false negatives, latency measurements) are stored in CSV files for statistical analysis using Python's \code{pandas} and \code{scikit-learn} libraries.
-
-\textbf{RQ2 (Orchestration Correctness):} Orchestration validation is performed through manual inspection of Langfuse traces. The backend's existing \code{langgraph_node_executions} table (part of the production schema in \code{langgraph_tracking.py}) logs state transitions, which are queried during evaluation to validate the 10 predefined orchestration flows against expected patterns.
-
-\textbf{RQ3 (Coaching Quality Assessment):} Dual-rater assessment (researcher + GPT-4) is conducted using the \code{coaching_scenarios.py} script, which generates 10 coaching scenarios. Rubric scores (clarity, empathy, actionability, boundary respect, appropriateness) are recorded in structured JSON files and analyzed using descriptive statistics to compute mean scores and inter-rater observations.
-
-\textbf{RQ4 (Privacy Compliance Validation):} K-anonymity validation is performed through \code{pytest} execution of \code{test_ia_k_anonymity.py}, which contains 5 unit tests with controlled cohort seeding. Test results (pass/fail, assertion details) are captured in pytest's standard output and CI logs, not stored in database tables.
-
-This evaluation design prioritizes \textbf{reproducibility} (all evaluation data and scripts are version-controlled in the \code{research_evaluation/} directory) and \textbf{simplicity} (avoiding the overhead of maintaining separate evaluation database schemas). For production deployment scenarios requiring continuous evaluation, the following database tables could be implemented:
-
-\begin{table}[htbp]
-    \centering
-    \caption{Proposed evaluation database schema for future production monitoring (not implemented in thesis prototype).}
-    \label{tab:evaluation_schema}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{4.5cm}p{8cm}}
-        \toprule
-        \textbf{Table Name} & \textbf{Purpose} \\
-        \midrule
-        \code{evaluation_triage_results} & Store STA classification outcomes (predicted/actual labels, confidence scores, latency) for confusion matrix calculation and sensitivity/specificity tracking. \\
-        \midrule
-        \code{tool_execution_log} & Record all tool calls initiated by Aika with success/failure status, retry counts, and execution times to compute tool success rates. \\
-        \midrule
-        \code{coach_response_evaluation} & Store dual-rater rubric scores (1-5 scale) for each coaching response across five evaluation dimensions to enable longitudinal coaching quality tracking. \\
-        \midrule
-        \code{insights_aggregates} & Log cohort sizes and suppression events from Insights Agent queries to validate k-anonymity enforcement and detect suppression threshold violations. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\begin{figure}[htbp]
-    \centering
-    \fbox{\textit{[PLACEHOLDER FIGURE: Entity-relationship diagram showing proposed evaluation schema tables with relationships to production tables (users, conversations, cases). Dashed lines indicate tables not implemented in thesis prototype.]}}
-    \caption{Proposed evaluation database schema (conceptual design for production deployment).}
-    \label{fig:evaluation_erd}
-\end{figure}
-
-\noindent The current implementation demonstrates that rigorous evaluation can be conducted using lightweight scripting approaches (\code{rq1_evaluate_sta.py}, pytest, Langfuse inspection) without requiring complex database infrastructure, making the evaluation methodology more accessible for replication and adaptation in future research.
-
+This HITL design ensures that the AI's role is to act as a high-speed, scalable detection and triage system, but the ultimate responsibility for crisis intervention remains with trained human professionals.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SECTION 3.4 - ETHICAL CONSIDERATIONS & LIMITATIONS %%%

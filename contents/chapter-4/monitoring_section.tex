@@ -1,0 +1,23 @@
+
+\section{Monitoring and Observability Infrastructure}
+\label{sec:monitoring_infra}
+
+To enable a rigorous and transparent evaluation of the agentic framework, a dual-stack observability infrastructure was implemented. This infrastructure is foundational to the Design Science methodology, providing the empirical data required to validate the research questions outlined in Chapter 1. The stack combines quantitative performance monitoring with deep, qualitative trace analysis, ensuring a holistic view of the system's operational behavior.
+
+\subsection{Prometheus for Quantitative Performance Metrics}
+For high-level, real-time performance monitoring, the backend exposes custom metrics to a Prometheus time-series database. This allows for the quantitative analysis of system health and efficiency. Key metrics include:
+\begin{itemize}
+    \item \textbf{Agent Processing Time (\code{agent\_processing\_time\_seconds}):} A histogram metric that tracks the reasoning latency for each agent, crucial for evaluating the performance aspect of RQ1 (Proactive Safety).
+    \item \textbf{Tool Call Outcomes (\code{tool\_calls\_total}):} A counter that tracks the success and failure rates of tool invocations, directly measuring the functional correctness of the orchestration logic for RQ2.
+    \item \textbf{Crisis Escalation Events (\code{crisis\_escalations\_total}):} A counter for safety-critical events, providing a quantitative measure of the Safety Triage Agent's intervention frequency (RQ1).
+\end{itemize}
+These metrics are scraped at 15-second intervals, providing the statistical basis for the performance results reported in subsequent sections.
+
+\subsection{Langfuse for Qualitative Trace Analysis}
+While Prometheus provides the "what" of system performance, Langfuse provides the "why." As an open-source observability platform designed for LLM applications, Langfuse captures detailed, end-to-end traces of every agent interaction. This qualitative data is essential for debugging and for a deep understanding of the agents' reasoning processes. For each user request, Langfuse logs:
+\begin{itemize}
+    \item \textbf{State Transitions:} The complete path of execution through the LangGraph state machine, which is used to manually verify state transition accuracy for RQ2.
+    \item \textbf{LLM Invocations:} The exact prompts, model parameters, and generated outputs for every call to the Gemini models, enabling analysis of response quality for RQ3.
+    \item \textbf{Tool Calls:} The inputs and outputs of every tool used by the agents, which helps diagnose failures in the orchestration flow (RQ2).
+\end{itemize}
+This detailed tracing capability provides the ground truth for analyzing agent behavior, validating the correctness of the multi-agent coordination, and understanding the root cause of any failures or unexpected outcomes. The combination of Prometheus and Langfuse thus provides a comprehensive framework for evaluating the artifact against its design goals.

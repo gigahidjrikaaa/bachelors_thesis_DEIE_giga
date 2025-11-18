@@ -88,13 +88,12 @@ The primary objectives of this thesis are:
 To keep the scope concrete and measurable, this thesis addresses the following research questions (RQs):
 
 \begin{enumerate}
-    \item \textbf{RQ1 (Safety):} Can the Safety Triage Agent detect crisis intent with high sensitivity while keeping false negatives minimal, and escalate within an acceptable time budget?
-    \item \textbf{RQ2 (Orchestration Correctness):} How reliably does the LangGraph orchestration execute agent reasoning loops, validate tool-call schemas, and handle transient failures through retry and fallback logic?
-    \item \textbf{RQ3 (Quality):} Do Support Coach responses meet a basic standard of CBT-informed guidance and appropriateness as rated by human evaluators on a small, blinded set?
-    \item \textbf{RQ4 (Insights, minimal):} Can the Insights Agent produce stable, aggregate-only summaries under privacy thresholds without exposing individual data?
+    \item \textbf{RQ1 (Proactive Safety):} Can the agentic framework reliably distinguish between crisis and non-crisis user states to trigger a timely and appropriate safety protocol?
+    \item \textbf{RQ2 (Functional Correctness):} Does the multi-agent framework correctly execute its core automated workflows, such as routing users to the appropriate specialized agent and invoking necessary tools?
+    \item \textbf{RQ3 (Output Quality \& Privacy):} Can the framework generate outputs (coaching advice, institutional insights) that are both appropriate for their purpose and compliant with privacy-preserving principles?
 \end{enumerate}
 
-These questions directly inform the evaluation in Chapter IV through scenario-based tests and simple, transparent metrics (e.g., sensitivity/specificity, tool-call success rate, latency percentiles, rubric scores), with human oversight preserved for safety-critical cases.
+These questions directly inform the evaluation in Chapter IV through scenario-based tests and transparent metrics (e.g., sensitivity, workflow success rate, rubric scores), with human oversight preserved for safety-critical cases.
 
 %-------------------------------------------------	
 

@@ -1,0 +1,45 @@
+\chapter*{Appendix C\\Tool Registry, Schemas, and API Contracts}
+\addcontentsline{toc}{chapter}{Appendix C -- Tool Registry and Schemas}
+
+Tools are the only way Gemini outputs mutate state in the UGM-AICare backend. The registry is defined in \texttt{\detokenize{UGM-AICare/backend/app/agents/aika/tool_definitions.py}} and executed by FastAPI services under \texttt{\detokenize{app/domains/mental_health/services}}. This appendix catalogues the most frequently referenced tools so that Chapter~\ref{chap:system_design} can remain agnostic of JSON minutiae while still giving reviewers a reproducible map.
+
+\section{Tool Families and Responsibilities}
+
+\begin{table}[htbp]
+    \centering
+    \caption{Subset of the tool registry. The full JSON Schema definitions are available in \texttt{tool\_definitions.py}; only the salient validation hooks are reproduced here.}
+    \label{tab:tool_registry}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{p{3.0cm}p{4.0cm}p{5.0cm}p{3.0cm}}
+        \toprule
+        \textbf{Tool Family} & \textbf{Representative Functions} & \textbf{Typical Invocation Criteria} & \textbf{Key Validation Hooks} \\
+        \midrule
+        Safety and escalation & \texttt{run\_safety\_triage\_agent}, \texttt{run\_case\_management\_agent} & STA is called only when crisis indicators emerge; CMA triggers when students request humans or STA labels are high/critical. & Enum-validated \texttt{urgency\_override}, \texttt{service\_type}, and SLA priority mapping; justification string required for audit trail. \\
+        Coaching and wellness & \texttt{run\_therapeutic\_coach\_agent}, \texttt{create\_intervention\_plan}, \texttt{get\_user\_intervention\_plans} & Invoked when students ask for structured plans or the prompt detects overwhelm. & Intervention hints constrained to \{stress, anxiety, depression, wellness\}; plan creation requires explicit \texttt{plan\_title} and \texttt{concern\_type}. \\
+        Appointment workflow & \texttt{get\_available\_counselors}, \texttt{suggest\_appointment\_times}, \texttt{book\_appointment}, \texttt{cancel\_appointment}, \texttt{reschedule\_appointment} & Triggered after explicit consent to schedule or modify sessions. & ISO-8601 timestamps, counsellor IDs checked against availability, confirmation flags enforced before destructive actions. \\
+        Analytics and admin & \texttt{get\_platform\_analytics}, \texttt{get\_trending\_topics}, \texttt{generate\_report} (admin-only) & Accessible only to authenticated staff via RBAC checks in \texttt{\detokenize{app/domains/mental_health/routes/aika_stream.py}}. & Queries mapped to allow-listed IDs; parameters validated against k-anonymity thresholds before SQL runs. \\
+        Context and journaling & \texttt{get\_user\_profile}, \texttt{get\_user\_progress}, \texttt{log\_mood\_entry}, \texttt{get\_recent\_conversations} & Used to personalize replies or continue CBT assignments. & UUID/user-hash pair must match authenticated session; mood entries capped per hour to avoid spam. \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{Schema Patterns}
+
+\begin{itemize}
+    \item \textbf{JSON Schema as contract.} Every tool definition declares a JSON Schema consumed directly by Gemini's function-calling interface. Required fields are strictly enumerated, and enums double as documentation (e.g., $\texttt{service\_type} \in \{\texttt{counseling}, \texttt{psychiatry}, \texttt{crisis\_intervention}, \texttt{general\_inquiry}\}$). This keeps the prompt short while guaranteeing backend validation.
+    \item \textbf{Shared metadata.} All tools implicitly accept \texttt{execution\_id}, \texttt{session\_id}, and \texttt{user\_id} because \texttt{tool\_router.py} appends them before invocation. This metadata powers the execution tracker and Langfuse traces referenced in Chapter~IV.
+    \item \textbf{Idempotency hints.} Mutation-heavy tools (\texttt{run\_case\_management\_agent}, \texttt{book\_appointment}) inject idempotency tokens derived from conversation IDs. If the same tool call is replayed due to a network retry, the underlying service detects the duplicate and returns the previous result.
+\end{itemize}
+
+\section{Observability and Failure Handling}
+
+\begin{enumerate}
+    \item \textbf{Centralised logging.} The \texttt{execution\_tracker} wrapper records input parameters, duration, and outcome for every tool invocation. These records feed both Prometheus (latency histograms) and Langfuse (span annotations) so that evaluation notebooks can attribute slowdowns to specific actions.
+    \item \textbf{Fallback semantics.} If Gemini emits an invalid payload, the FastAPI layer rejects the call with a structured error that Aika surfaces to the user ("aku belum dapat data lengkap, boleh ulangi?"). Safety-critical tools (STA, CMA) default to human escalation rather than silently failing.
+    \item \textbf{Preview-first actions.} Administrative tools default to \texttt{execute=false} and require explicit confirmation (mirroring the admin prompt). This guardrail prevents accidental broadcasts or bulk edits, aligning with the RBAC constraints discussed in Section~\ref{sec:aika_meta_agent}.
+\end{enumerate}
+
+\section{Alignment with Evaluation Assets}
+
+Synthetic evaluations reference the registry directly. For instance, \texttt{\detokenize{research_evaluation/rq2_orchestration/test_tool_success.py}} replays representative conversations to ensure every tool returns HTTP~200 and produces schema-compliant bodies. Maintaining this appendix therefore keeps the cross-chapter narrative defensible: Chapter~III can cite the table; Chapter~IV can cite the test logs.

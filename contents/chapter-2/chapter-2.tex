@@ -32,20 +32,13 @@ These tools offer several key advantages:
 \end{itemize}
 
 \subsubsection{The Dominant Reactive Paradigm and Its Limitations}
-Despite their technological sophistication and therapeutic potential, the fundamental operational model of these applications remains overwhelmingly \textbf{reactive and user-initiated}. They are designed as standalone tools that depend on the student to possess the self-awareness to recognize their distress, the motivation to seek help, and the knowledge of the tool's existence.
+Despite their technological sophistication and therapeutic potential, the fundamental operational model of modern mental health applications remains overwhelmingly \textbf{reactive}. This model, common in service design, operates on a "break-fix" basis, where service delivery is initiated only after a user—in this case, a student—self-identifies a problem and actively seeks a solution \cite{freeman2025competitionalgorithms}. They are designed as standalone tools that depend on the student to possess the self-awareness to recognize their distress, the motivation to seek help, and the knowledge of the tool's existence.
 
-This paradigm fails to account for significant, well-documented barriers to help-seeking. Research shows that many individuals, particularly young adults, do not seek professional help for mental health issues due to factors including self-stigma, fear of judgment, and a desire for self-reliance \cite{corrigan2009stigmahelpseeking,patel2022helpseekingcollege}. Furthermore, the very symptoms of mental health conditions, such as the anhedonia and executive dysfunction associated with depression, can severely impair an individual's ability to initiate action and seek support \cite{liu2023distresshelpseeking}.
+Critically, this limitation is not unique to technology; \textbf{the traditional, in-person counseling model is equally reactive}. The standard university mental health service operates on an appointment-based system where students must: (1) recognize their own distress, (2) navigate the institutional referral process, (3) schedule an appointment (often facing multi-week waitlists), and (4) attend the session during limited office hours \cite{baik2019universities, gallagher2023counselor}. 
 
-A systematic review of mental health chatbots for university students concluded that while these tools are promising, their primary limitation is their passive nature; they do not and cannot initiate contact or intervene based on a student's changing needs unless the student opens the app \cite{adhikari2023chatbotsreview}. This leaves the most vulnerable students, those who are not actively seeking help, unsupported, creating a critical gap in the continuum of care that this thesis aims to address.
+This places the entire burden of initiation on the student, creating the same fundamental barrier across both technological and traditional systems: \textbf{it assumes students will self-identify their distress and actively seek help}. Research demonstrates that this assumption is systematically violated. Stigma, lack of mental health literacy, and a desire for self-reliance all contribute to low help-seeking rates \cite{corrigan2009stigmahelpseeking, patel2022helpseekingcollege}. More critically, the very symptoms of conditions like depression—including anhedonia, executive dysfunction, and social withdrawal—actively impair the cognitive and motivational capacities required to initiate help-seeking behavior \cite{liu2023distresshelpseeking, PLACEHOLDER_CITE_depression_helpseeking}.
 
-\paragraph{The Equally Reactive Nature of Traditional Counseling Services}
-While the preceding discussion has focused on the limitations of conversational AI, it is critical to recognize that \textbf{the traditional, in-person counseling model is equally reactive in nature}. The standard university mental health service operates on an appointment-based system where students must: (1) recognize their own distress, (2) navigate the institutional referral process, (3) schedule an appointment (often facing multi-week waitlists due to insufficient counselor-to-student ratios), and (4) attend the session during limited office hours \cite{baik2019universities, gallagher2023counselor}. 
-
-This model places the entire burden of initiation on the student, creating the same fundamental barrier as reactive chatbots: \textbf{it assumes students will self-identify their distress and actively seek help}. Research demonstrates that this assumption is systematically violated by the majority of students experiencing mental health crises. Stigma, lack of mental health literacy, fear of judgment, and the desire for self-reliance all contribute to low help-seeking rates \cite{corrigan2009stigmahelpseeking, patel2022helpseekingcollege}. More critically, the very symptoms of conditions like depression—including anhedonia, executive dysfunction, and social withdrawal—actively impair the cognitive and motivational capacities required to initiate help-seeking behavior \cite{liu2023distresshelpseeking, PLACEHOLDER_CITE_depression_helpseeking}.
-
-Therefore, \textbf{both traditional and chatbot-based reactive models fail to serve the most vulnerable population}: those who are in distress but do not initiate contact. A student experiencing suicidal ideation may lack the energy or hope to schedule an appointment; a student with severe social anxiety may find the act of reaching out to be itself insurmountably distressing. The technological sophistication of AI chatbots, while improving accessibility and reducing stigma for those who do engage, does nothing to address this fundamental gap. 
-
-This thesis proposes that the solution requires a \textbf{paradigm shift to proactive, automated monitoring and intervention} that does not depend on student-initiated help-seeking behavior. By continuously analyzing anonymized interaction patterns and employing automated risk detection, the proposed multi-agent framework can identify students in distress and initiate supportive contact \textit{before} they reach a crisis threshold, thereby addressing the systemic failure of reactive support models across both traditional and technological implementations.
+Therefore, both traditional and chatbot-based reactive models fail to serve the most vulnerable population: those who are in distress but do not initiate contact. A student experiencing suicidal ideation may lack the energy to schedule an appointment; a student with severe social anxiety may find the act of reaching out to be itself insurmountably distressing. This thesis proposes that a solution requires a \textbf{paradigm shift to a proactive support model} that aims to anticipate needs and intervene before a problem escalates. Drawing from principles in preventative healthcare and proactive customer relationship management, this model uses data to identify patterns and risk factors, enabling the institution to offer timely, relevant support to at-risk cohorts \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. By continuously analyzing interaction patterns and employing automated risk detection, the proposed multi-agent framework can identify students in distress and initiate supportive contact \textit{before} they reach a crisis threshold, thereby addressing the systemic failure of all reactive support models.
 
 
 \subsection{Data Analytics for Proactive Student Support}
@@ -65,7 +58,7 @@ A more direct, and arguably more ethical, source of data is the language student
 \subsubsection{The Insight-to-Action Gap}
 Whether based on academic, behavioral, or textual data, a critical limitation plagues nearly all current analytical systems in higher education: the \textbf{insight-to-action gap} \cite{jorno2018actionableinsight}. The output of these systems is almost universally a dashboard, a report, or an alert delivered to a human administrator (e.g., a counselor, dean, or advisor) \cite{susnjak2022dashboard}. This administrator must then manually interpret the data, decide on an appropriate intervention strategy, and execute it.
 
-This manual process creates a severe bottleneck that fundamentally limits the scalability, speed, and personalization of any proactive effort \cite{kaliisa2023hypedashboards}. An administrator may be able to respond to a handful of individual alerts, but they cannot manually orchestrate a personalized outreach campaign to hundreds of students who may be exhibiting early signs of exam-related stress identified by a topic model. The manual-execution step prevents the institution from fully capitalizing on the proactive insights generated by its analytical systems. It is this specific gap that the proposed \textbf{Safety Coaching Agent} and \textbf{Safety Triage Agent} is designed to close by automating the link between data-driven insight and scalable, targeted outreach.
+This manual process creates a severe bottleneck that fundamentally limits the scalability, speed, and personalization of any proactive effort \cite{kaliisa2023hypedashboards}. An administrator may be able to respond to a handful of individual alerts, but they cannot manually orchestrate a personalized outreach campaign to hundreds of students who may be exhibiting early signs of exam-related stress identified by a topic model. The manual-execution step prevents the institution from fully capitalizing on the proactive insights generated by its analytical systems. It is this specific gap that the proposed \textbf{agentic framework} is designed to close. By having the Aika Meta-Agent orchestrate the proactive generation of therapeutic plans (via the TCA) and automated administrative workflows (via the CMA), the system automates the link between data-driven insight and scalable, targeted action.
 
 % ============================================================
 % ============================================================
@@ -86,35 +79,9 @@ To address the limitations of reactive, disconnected support systems, a new arch
 
 Beyond the technical architecture, the proposed framework is grounded in several key strategic and ethical principles that justify its design and purpose. These concepts from service design, management science, and data ethics provide the theoretical motivation for shifting how institutional support is delivered.
 
-\subsubsection{Proactive vs. Reactive Support Models}
-The traditional approach to institutional support, particularly in mental health, is predominantly \textbf{reactive}. This model, common in service design, operates on a "break-fix" basis, where the service delivery is initiated only after a user (in this case, a student) self-identifies a problem and actively seeks a solution \cite{freeman2025competitionalgorithms}. This places the onus of initiation entirely on the individual, creating significant barriers to access such as stigma, lack of awareness, or the inability to act during a crisis. In contrast, a \textbf{proactive support model} aims to anticipate needs and intervene before a problem escalates. Drawing from principles in preventative healthcare and proactive customer relationship management, this model uses data to identify patterns and risk factors, enabling the institution to offer timely, relevant support to at-risk cohorts \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. This thesis is an explicit attempt to architect a system that facilitates this strategic shift from a reactive to a proactive support paradigm.
-
-\paragraph{Formalization of Support Models}
-To formalize this distinction, a reactive support system operates conditionally based on user initiation:
-\begin{equation}
-\text{Support}(t) = \begin{cases}
-f(\text{request}_t) & \text{if student initiates} \\
-\emptyset & \text{otherwise}
-\end{cases}
-\end{equation}
-
-In contrast, a proactive system continuously monitors and responds to indicators of need:
-\begin{equation}
-\text{Support}(t) = g(\text{risk}(t), H_{t-\Delta t:t}, \text{trends}_t)
-\end{equation}
-where $H_{t-\Delta t:t}$ represents recent interaction history and $\text{trends}_t$ captures population-level signals from analytics.
-
-The help-seeking barrier can be modeled as:
-\begin{equation}
-P(\text{seek help}) = f(\text{severity}) - \beta(\text{stigma}, \text{awareness}, \text{fatigue})
-\end{equation}
-where $\beta$ captures systemic barriers such as stigma, lack of awareness, and decision fatigue. When $P(\text{seek help}) < 0$, students in crisis remain silent, justifying the need for proactive intervention that does not depend on self-initiation.
-
 \subsubsection{Data-Driven Decision-Making in Higher Education}
 The concept of \textbf{Data-Driven Decision-Making (DDDM)} posits that strategic decisions should be based on objective data analysis and interpretation rather than solely on intuition or tradition \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. In higher education, this has manifested as the field of learning analytics, where student data is used to improve learning outcomes and retention. This framework extends that principle to student well-being. The \textbf{Insights Agent} is the core enabler of DDDM for the university's support services. By autonomously processing anonymized interaction data to identify trends, sentiment shifts, and emerging topics of concern, it provides administrators with actionable, empirical evidence. This allows the institution to move beyond anecdotal evidence and allocate resources, such as workshops, counselors, or targeted information campaigns, to where they are most needed, thereby optimizing the efficiency and impact of its support ecosystem \cite{popoola2025privacyawareframework}.
 
-\subsubsection{Privacy by Design (PbD)}
-Given the highly sensitive nature of mental health data, the framework's architecture is guided by the principles of \textbf{Privacy by Design (PbD)}. PbD is an internationally recognized framework, formalized in ISO 31700, which dictates that privacy should be the default, embedded into the design and architecture of systems from the outset rather than being an add-on feature \cite{guarda2024certificationsprivacy,atabey2024ethicsinedtech}. Key principles include being proactive not reactive, making privacy the default setting, and providing end-to-end security. A direct implementation of PbD within this framework is the Data Anonymization Pipeline. This process ensures that Personally Identifiable Information (PII) is identified and redacted from all chat logs before they are stored for analysis. Furthermore, access to the administrative dashboard is controlled by a strict Role-Based Access Control (RBAC) mechanism, ensuring that only authorized personnel can view sensitive data. These measures, combined with standard security practices like data encryption, embed privacy and security directly into the system's architecture from the outset \cite{popoola2025privacyawareframework, guarda2024certificationsprivacy}. This demonstrates a commitment to building a system that is not only effective but also fundamentally ethical and secure. While this thesis focuses on the multi-agent architecture itself, these privacy-preserving design principles inform the overall framework context in which the agents operate.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Agentic AI, Multi-Agent Systems, and LLMs
@@ -545,53 +512,6 @@ This cyclical, stateful approach provides several key advantages for this framew
 
 By using LangGraph to orchestrate the \textbf{Safety Agent Suite}, this framework moves beyond simple, linear agentic loops and implements a true multi-agent system capable of complex, stateful, and collaborative problem-solving \cite{yang2025aiagentprotocols, tran2025multiagentcollaboration}.
 
-\subsubsection{Real-Time Performance Requirements for Safety-Critical Applications}
-\label{subsubsec:performance_requirements}
-
-For mental health support systems, response latency directly impacts user experience and, critically, the effectiveness of crisis intervention. To formalize these requirements, Service Level Objectives (SLOs) define the maximum acceptable latency for each agent operation.
-
-Let $T_{agent}$ denote the response time random variable for an agent. The p95 SLO (95th percentile) ensures that 95\% of requests are handled within the target latency:
-\begin{equation}
-\Pr[T_{agent} \leq T_{target}] \geq 0.95
-\end{equation}
-
-\paragraph{Agent-Specific Latency Targets}
-Different agents have different latency requirements based on their role:
-
-\textbf{Safety Triage Agent (STA):} As the first-line crisis detection system, the STA requires near-instantaneous response:
-\begin{equation}
-T_{STA} \leq 250\text{ms} \quad (p95)
-\end{equation}
-This target ensures crisis indicators are identified within human perceptual thresholds, enabling immediate escalation when necessary.
-
-\textbf{End-to-End User Experience:} The complete interaction flow from user message to final response must maintain acceptable responsiveness:
-\begin{equation}
-T_{E2E} = T_{STA} + T_{routing} + T_{TCA} + T_{network} \leq 1500\text{ms} \quad (p95)
-\end{equation}
-where $T_{routing}$ represents orchestration overhead, $T_{TCA}$ is the Therapeutic Coach Agent's response generation time, and $T_{network}$ accounts for transmission delays.
-
-\paragraph{Performance Monitoring and Alerting}
-Node-level latency is continuously monitored through execution tracking:
-\begin{equation}
-T_{node}(i) = t_{complete}(i) - t_{start}(i)
-\end{equation}
-where $t_{start}(i)$ and $t_{complete}(i)$ are timestamps for node initiation and completion, respectively.
-
-Critical alerts are triggered when latency exceeds threshold values:
-\begin{equation}
-\text{alert}(i) = \begin{cases}
-\text{WARNING} & \text{if } T_{node}(i) > \theta_{warning} \\
-\text{CRITICAL} & \text{if } T_{node}(i) > \theta_{critical}
-\end{cases}
-\end{equation}
-where typical thresholds are $\theta_{warning} = 30\text{s}$ and $\theta_{critical} = 2\text{min}$ for backend operations.
-
-\paragraph{Capacity Planning}
-The system must maintain performance under load. Throughput requirements specify the range of concurrent sessions the system must handle:
-\begin{equation}
-\lambda_{concurrent} \in [500, 1000] \text{ sessions}
-\end{equation}
-This capacity ensures the system scales to institutional needs while maintaining the latency targets defined above. Capacity testing validates these requirements through simulated load scenarios, as detailed in Chapter 3.
 
 % ============================================================
 % ============================================================
