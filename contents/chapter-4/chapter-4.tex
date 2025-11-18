@@ -1,4 +1,5 @@
 \chapter{Implementation and Evaluation}
+\label{chap:evaluation}
 
 This chapter reports how the prototype was exercised and what we learned from it. The focus is on the agents and their behavior in safety‑relevant scenarios. We keep the scope practical and transparent so results can be reproduced and audited.
 
@@ -129,74 +130,56 @@ This section documents the evaluation protocol that links the Design Science sta
     \label{fig:evaluation_pipeline}
 \end{figure}
 
-\section{Metrics Calculation Methodology}
-\label{sec:metrics_methodology}
+\section{Evaluation Metrics}
+\label{sec:evaluation_metrics}
 
-This section documents the precise calculation methods for all quantitative metrics.
+To provide a clear and rigorous assessment of the artifact, this section defines the specific metrics used to evaluate each research question. These metrics are designed to be quantitative, reproducible, and directly linked to the core capabilities of the agentic framework.
 
-\subsection{RQ1: Proactive Safety Metrics}
+\begin{description}
+    \item[Sensitivity (Recall)] for RQ1 measures the proportion of actual crisis prompts that are correctly identified. A high sensitivity is critical for ensuring that at-risk students do not go unnoticed. It is calculated as:
+    \[ \text{Sensitivity} = \frac{\text{True Positives (TP)}}{\text{TP} + \text{False Negatives (FN)}} \]
 
-\subsubsection*{Classification Performance Metrics}
-Given the crisis corpus, we define:
-\begin{itemize}
-    \item \textbf{True Positives (TP)}: Crisis messages correctly classified as crisis.
-    \item \textbf{True Negatives (TN)}: Non-crisis messages correctly classified as non-crisis.
-    \item \textbf{False Positives (FP)}: Non-crisis messages incorrectly classified as crisis.
-    \item \textbf{False Negatives (FN)}: Crisis messages incorrectly classified as non-crisis.
-\end{itemize}
+    \item[False Negative Rate (FNR)] for RQ1 is the primary safety metric. It measures the proportion of crisis prompts that the system \textit{fails} to identify. The primary goal of a proactive safety system is to minimize this value. It is calculated as:
+    \[ \text{FNR} = \frac{\text{FN}}{\text{TP} + \text{FN}} = 1 - \text{Sensitivity} \]
 
-\textbf{Primary Metrics:}
-\begin{align*}
-    \text{Sensitivity (Recall)} &= \frac{TP}{TP + FN} \\
-    \text{Specificity} &= \frac{TN}{TN + FP} \\
-    \text{False Negative Rate (FNR)} &= \frac{FN}{TP + FN} = 1 - \text{Sensitivity}
-\end{align*}
+    \item[Agent Reasoning Latency] for RQ1 measures the time in milliseconds (ms) from when a user message is received to when the Safety Triage Agent makes a classification decision. This is crucial for ensuring a fluid conversational experience. The median (p50) and 95th percentile (p95) values are reported.
 
-\subsubsection*{Agent Reasoning Latency}
-Calculated from the \lstinline{processing_time_ms} field in the \lstinline{TriageAssessment} table, measuring the time from request receipt to classification decision.
+    \item[Tool Call Success Rate] for RQ2 measures the reliability of the agentic orchestration. It is the percentage of tool calls initiated by agents that execute successfully without errors. It is calculated as:
+    \[ \text{Tool Success Rate} = \frac{\text{Successful Tool Invocations}}{\text{Total Tool Invocations}} \]
 
-\subsection{RQ2: Functional Correctness Metrics}
+    \item[State Transition Accuracy] for RQ2 is a qualitative metric determined by manually inspecting the execution traces in Langfuse. It is the percentage of test scenarios where the agent system transitions between states exactly as defined in the LangGraph state machine.
 
-\subsubsection*{Tool Call Success Rate}
-\[
-\text{Tool Success Rate} = \frac{\text{Successful Tool Invocations}}{\text{Total Tool Invocations}}
-\]
-Data is sourced from the \lstinline{langgraph_node_execution} table.
+    \item[Mean Rubric Score] for RQ3 measures the quality of the Therapeutic Coach Agent's generated responses. Each response is scored on a 1-5 scale across multiple dimensions (e.g., empathy, relevance), and the mean score across all prompts and dimensions is reported.
 
-\subsubsection*{State Transition Accuracy}
-Validated by manually inspecting execution traces against the expected state graph topology for the 10 orchestration scenarios.
-
-\subsection{RQ3: Output Quality and Privacy Metrics}
-
-\subsubsection*{Rubric-Based Quality Scoring}
-Responses from the Therapeutic Coach Agent are scored using a 5-dimension rubric (see Appendix~\ref{app:coaching_prompts}). The final metric is the mean score across all dimensions and prompts.
-
-\subsubsection*{K-Anonymity Compliance}
-Verified through code review and unit tests. The metric is a binary pass/fail, where pass requires that all queries in the \texttt{InsightsAgentService} include a \texttt{HAVING COUNT(DISTINCT user\_id) >= 5} clause and that all related unit tests pass.
+    \item[K-Anonymity Compliance] for RQ3 is a binary (Pass/Fail) metric. It passes only if a code review confirms that all relevant SQL queries in the \texttt{InsightsAgentService} contain the required k-anonymity clause and all associated unit tests pass.
+\end{description}
 
 \section{RQ1: Proactive Safety Evaluation}
 \label{sec:rq1}
 
 \subsection{Evaluation Design}
-\textbf{Objective:} Validate the Safety Triage Agent's ability to accurately classify crisis vs. non-crisis messages.
-\begin{itemize}
-    \item \textbf{Test Dataset:} 50 synthetic prompts (25 crisis, 25 non-crisis).
-    \item \textbf{Procedure:} Each prompt is sent to the agent, and the classification output is compared against the ground truth label. Latency is recorded.
-    \item \textbf{Success Criteria:} Achieve a False Negative Rate (FNR) of 10\% or less, ensuring most crisis situations are correctly identified.
-\end{itemize}
+The primary objective of this evaluation was to validate the Safety Triage Agent's (STA) ability to accurately and efficiently classify crisis versus non-crisis messages, a cornerstone of the proactive safety paradigm. To this end, a test was conducted using a synthetic crisis corpus containing 50 prompts (25 crisis, 25 non-crisis). Each prompt was sent to the agent, and the resulting classification was compared against the ground truth label. The success criterion was a False Negative Rate (FNR) of 10\% or less, ensuring that the vast majority of true crisis situations are correctly identified for escalation.
 
 \subsection{Results}
-\textbf{Classification Performance:}
-\begin{itemize}
-    \item Sensitivity (True Positive Rate): [REPORT VALUE]
-    \item Specificity (True Negative Rate): [REPORT VALUE]
-    \item False Negative Rate (FNR): [REPORT VALUE]
-\end{itemize}
-\textbf{Agent Reasoning Latency:}
-\begin{itemize}
-    \item p50 classification time: [REPORT VALUE]
-    \item p95 classification time: [REPORT VALUE]
-\end{itemize}
+The agent's performance in classification accuracy and reasoning latency is summarized in Table~\ref{tab:rq1_results}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{RQ1: Proactive Safety Evaluation Results.}
+    \label{tab:rq1_results}
+    \begin{tabular}{l l c}
+        \toprule
+        \textbf{Category} & \textbf{Metric} & \textbf{Value} \\
+        \midrule
+        \multirow{3}{*}{Classification Performance} & Sensitivity (Recall) & [REPORT VALUE] \\
+                                                  & Specificity & [REPORT VALUE] \\
+                                                  & False Negative Rate (FNR) & [REPORT VALUE] \\
+        \midrule
+        \multirow{2}{*}{Agent Reasoning Latency} & p50 Classification Time & [REPORT VALUE] ms \\
+                                                 & p95 Classification Time & [REPORT VALUE] ms \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsection{Discussion}
 This section will analyze any misclassifications, especially false negatives, to understand their root causes (e.g., linguistic ambiguity, implicit distress signals). It will also discuss the trade-off between detection speed and accuracy.
@@ -205,20 +188,25 @@ This section will analyze any misclassifications, especially false negatives, to
 \label{sec:rq2}
 
 \subsection{Evaluation Design}
-\textbf{Objective:} Assess the reliability of the LangGraph orchestration in executing multi-agent workflows.
-\begin{itemize}
-    \item \textbf{Test Scenarios:} 10 conversation flows designed to test different paths through the agent system (e.g., successful triage to coaching, triage to case management, handling of invalid user inputs).
-    \item \textbf{Procedure:} Each scenario is executed, and the system's behavior (tool calls, agent transitions) is logged and compared against the expected workflow.
-    \item \textbf{Success Criteria:} Achieve a tool call success rate of 95\% or higher and 100\% state transition accuracy.
-\end{itemize}
+This evaluation aimed to assess the reliability of the LangGraph-based orchestration in executing multi-agent workflows. A test suite of 10 structured conversation flows was designed to exercise various paths through the agent system, including successful triage-to-coaching handoffs, escalations to case management, and error handling. Each scenario was executed, and the system's behavior, including all tool calls and state transitions, was logged via Langfuse and compared against the expected workflow. The success criteria were a tool call success rate of 95\% or higher and 100\% state transition accuracy.
 
 \subsection{Results}
-\textbf{Workflow Reliability:}
-\begin{itemize}
-    \item Overall tool-call success rate: [REPORT VALUE]
-    \item State transition accuracy: [REPORT VALUE]
-    \item Retry and recovery success rate for injected failures: [REPORT VALUE]
-\end{itemize}
+The reliability of the agentic workflow orchestration is summarized in Table~\ref{tab:rq2_results}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{RQ2: Functional Correctness Evaluation Results.}
+    \label{tab:rq2_results}
+    \begin{tabular}{l c}
+        \toprule
+        \textbf{Metric} & \textbf{Value} \\
+        \midrule
+        Overall Tool-Call Success Rate & [REPORT VALUE] \\
+        State Transition Accuracy & [REPORT VALUE] \\
+        Retry and Recovery Success Rate & [REPORT VALUE] \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsection{Discussion}
 This section will discuss any observed failures in orchestration, such as incorrect routing or failed tool calls. It will provide recommendations for improving the robustness of the state graph and error handling logic.
@@ -227,32 +215,41 @@ This section will discuss any observed failures in orchestration, such as incorr
 \label{sec:rq3}
 
 \subsection{Evaluation Design}
-\textbf{Objective:} Evaluate the quality of agent-generated content and verify the implementation of privacy safeguards.
+This evaluation had a dual objective: to assess the quality of the agent-generated therapeutic content and to verify the implementation of the system's privacy safeguards. 
 
-\textbf{Part 1: Response Quality}
-\begin{itemize}
-    \item \textbf{Test Dataset:} 10 coaching prompts covering common student issues (e.g., academic stress, motivation).
-    \item \textbf{Procedure:} The Therapeutic Coach Agent generates a response for each prompt. The responses are then scored by the primary researcher using a 5-point rubric assessing empathy, appropriateness, and adherence to basic CBT principles.
-    \item \textbf{Success Criteria:} Achieve an average rubric score of 3.5 or higher.
-\end{itemize}
+For response quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching prompts covering common student issues (e.g., academic stress, motivation). These responses were then scored by the primary researcher using a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. The success criterion was an average rubric score of 3.5 or higher.
 
-\textbf{Part 2: Privacy Compliance}
-\begin{itemize}
-    \item \textbf{Procedure:} A code review of the \texttt{InsightsAgentService} is performed to ensure all SQL queries that aggregate user data contain a k-anonymity clause (\texttt{HAVING COUNT(...) >= 5}). Additionally, unit tests are run to confirm that queries on small user groups (n < 5) are correctly suppressed.
-    \item \textbf{Success Criteria:} 100\% of relevant queries must include the k-anonymity clause, and all privacy-related unit tests must pass.
-\end{itemize}
+For privacy compliance, a code review of the \texttt{InsightsAgentService} was performed to ensure all SQL queries aggregating user data contained the required k-anonymity clause (\texttt{HAVING COUNT(...) >= 5}). Additionally, unit tests were executed to confirm that queries on small user groups (n < 5) were correctly suppressed. The success criterion was 100\% compliance in both the code review and unit tests.
 
 \subsection{Results}
-\textbf{Response Quality:}
-\begin{itemize}
-    \item Mean rubric score for TCA responses: [REPORT VALUE]
-    \item Examples of high-quality and low-quality responses with analysis.
-\end{itemize}
-\textbf{Privacy Compliance:}
-\begin{itemize}
-    \item Code review result: [PASS/FAIL]
-    \item Unit test pass rate: [REPORT VALUE]
-\end{itemize}
+The results for response quality and privacy compliance are presented in Table~\ref{tab:rq3_quality_results} and Table~\ref{tab:rq3_privacy_results}, respectively.
+
+\begin{table}[htbp]
+    \centering
+    \caption{RQ3: Response Quality Evaluation Results.}
+    \label{tab:rq3_quality_results}
+    \begin{tabular}{l c}
+        \toprule
+        \textbf{Metric} & \textbf{Value} \\
+        \midrule
+        Mean Rubric Score for TCA Responses & [REPORT VALUE] / 5.0 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[htbp]
+    \centering
+    \caption{RQ3: Privacy Compliance Evaluation Results.}
+    \label{tab:rq3_privacy_results}
+    \begin{tabular}{l c}
+        \toprule
+        \textbf{Metric} & \textbf{Value} \\
+        \midrule
+        K-Anonymity Code Review & [PASS/FAIL] \\
+        Privacy Unit Test Pass Rate & [REPORT VALUE] \% \\
+        \bottomrule
+    \end{tabular}
+\end{table}
 
 \subsection{Discussion}
 This section will discuss the strengths and weaknesses of the agent's coaching abilities, linking them to prompt engineering strategies. It will also confirm that the privacy mechanisms are implemented correctly, forming a critical safeguard for the system.
