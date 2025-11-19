@@ -61,6 +61,45 @@ The artifact proposed and developed in this research is a novel agentic AI frame
 
 The system's primary entities and their designated interaction points are illustrated in the conceptual context diagram in Figure \ref{fig:context_diagram}. This diagram shows how all users interact with a single, unified \textbf{Aika Meta-Agent}, which then coordinates the various specialist agents (STA, TCA, CMA, IA) that operate as background services.
 
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=1.5cm and 1.5cm,
+        actor/.style={circle, draw=black, thick, fill=gray!10, minimum size=1.2cm, align=center, font=\small},
+        meta/.style={rectangle, draw=ugmGold, very thick, fill=ugmGold!10, rounded corners, minimum width=4cm, minimum height=1.5cm, align=center, font=\bfseries},
+        agent/.style={rectangle, draw=ugmBlue, thick, fill=ugmBlue!5, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center, font=\small},
+        arrow/.style={-Latex, thick},
+        biarrow/.style={Latex-Latex, thick}
+    ]
+        % Central Meta-Agent
+        \node[meta] (aika) {Aika Meta-Agent \\ (Unified Interface)};
+
+        % Users
+        \node[actor, above left=of aika] (student) {Student};
+        \node[actor, above right=of aika] (admin) {Admin / \\ Counselor};
+
+        % Specialist Agents
+        \node[agent, below left=of aika, xshift=-0.5cm] (sta) {Safety Triage \\ Agent (STA)};
+        \node[agent, below right=of aika, xshift=0.5cm] (tca) {Therapeutic \\ Coach (TCA)};
+        \node[agent, below=of sta] (cma) {Case Mgmt \\ Agent (CMA)};
+        \node[agent, below=of tca] (ia) {Insights \\ Agent (IA)};
+
+        % Connections
+        \draw[biarrow] (student) -- (aika);
+        \draw[biarrow] (admin) -- (aika);
+        
+        \draw[arrow] (aika) -- (sta);
+        \draw[arrow] (aika) -- (tca);
+        \draw[arrow] (aika) -- (cma);
+        \draw[arrow] (aika) -- (ia);
+
+    \end{tikzpicture}%
+    }
+    \caption{Conceptual Context Diagram: The Aika Meta-Agent acts as the unified interface for all user roles, orchestrating the background specialist agents.}
+    \label{fig:context_diagram}
+\end{figure}
+
 \begin{table}[htbp]
     \centering
     \caption{Agent descriptions and their primary roles in the Safety Agent Suite.}
@@ -83,9 +122,16 @@ The system's primary entities and their designated interaction points are illust
 Conceptually, the framework's architecture is best understood as two distinct but integrated operational loops:
 
 \begin{enumerate}
-    \item \textbf{The Real-Time Interaction Loop:} This loop handles immediate, synchronous interactions with individual students through a unified conversational interface. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---students interact exclusively with Aika, never directly accessing the specialist agents. When a student sends a message, Aika processes it via a single Gemini API call that returns a structured JSON response containing: (1) the conversational reply, (2) immediate risk assessment (Tier 1: \texttt{none}|\texttt{low}|\texttt{moderate}|\texttt{high}|\texttt{critical}), (3) detected crisis keywords, (4) risk reasoning, (5) intent classification, and (6) a decision on whether specialist agents are needed. This unified response architecture ensures sub-second latency while embedding safety screening directly into every interaction. 
+    \item \textbf{The Real-Time Interaction Loop:} This loop handles immediate, synchronous interactions with individual students through a unified conversational interface. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---students interact exclusively with Aika, never directly accessing the specialist agents. When a student sends a message, Aika processes it via a single Gemini API call that returns a structured JSON response containing immediate risk assessment (Tier 1) and intent classification.
     
-    If \texttt{immediate\_risk} is \texttt{high} or \texttt{critical}, Aika enters an information-gathering mode, collecting necessary details (location, immediate danger status, contact consent) before invoking the \textbf{Case Management Agent (CMA)} to escalate the case with structured crisis documentation for SLA-bound counselor assignment. The \textbf{Therapeutic Coach Agent (TCA)} operates entirely in the background, asynchronously generating CBT-based intervention plans and coping strategies that students can access via their dashboard---TCA does not participate in real-time conversations. At conversation end (detected via explicit goodbye signals or 5-minute inactivity), the \textbf{Safety Triage Agent (STA)} performs comprehensive conversation-level analysis (Tier 2) to identify cumulative risk patterns and recommend proactive follow-up interventions. This loop is designed for high-availability, low-latency responses (<300ms for Aika's direct replies), ensuring students receive immediate, contextually appropriate support through a single, consistent conversational persona.
+    Based on this initial assessment, Aika acts as a dispatcher to the background specialist agents:
+    \begin{itemize}
+        \item \textbf{Therapeutic Coach Agent (TCA):} Triggered by Aika when the risk is assessed as \texttt{moderate} or \texttt{low}. It works in the background to generate CBT-based intervention plans.
+        \item \textbf{Case Management Agent (CMA):} Triggered directly by Aika when the user explicitly requests administrative actions (e.g., scheduling). It is also triggered by the STA if a critical risk is detected.
+        \item \textbf{Safety Triage Agent (STA):} Operates primarily in the background. It is triggered by the Aika Meta-Agent when the initial Tier 1 screening detects ambiguous safety signals or requires a deeper, context-aware analysis (Tier 2).
+    \end{itemize}
+    
+    This loop is designed for high-availability and low-latency, ensuring students receive immediate support while complex reasoning occurs asynchronously in the background.
     
     \item \textbf{The Strategic Oversight Loop:} This loop operates on a longer, asynchronous timescale to enable proactive, institution-wide strategy. The \textbf{Insights Agent (IA)} works entirely in the background, periodically analyzing anonymized, aggregated data from all student interactions. However, administrators and counselors can invoke IA through Aika by requesting analytics queries (e.g., "show trending topics this week", "case statistics for November"), at which point Aika routes the request to IA and synthesizes the analytics report into a user-friendly response. IA generates reports on population-level well-being trends, sentiment analysis, and emerging topics of concern, delivered via both scheduled batch processing and on-demand queries through Aika's conversational interface. These insights provide empirical evidence for data-driven resource allocation, such as commissioning new workshops or adjusting counseling staff schedules. This loop directly addresses the "insight-to-action" gap that plagues current systems \cite{nwoke2025insightautomation, jorno2018actionableinsight}.
 \end{enumerate}
@@ -182,10 +228,10 @@ The returned JSON object's schema is detailed in Table~\ref{tab:aika_json_schema
         \textbf{Field} & \textbf{Type} & \textbf{Description} \\
         \midrule
         \code{reply} & string & The empathetic, context-aware conversational response to be displayed to the user. \\
-        \code{immediate\_risk} & string & A five-level risk classification (\texttt{none}, \texttt{low}, \texttt{moderate}, \texttt{high}, \texttt{critical}) for the single message, enabling instantaneous safety screening. \\
+        \code{immediate\_risk} & string & A five-level risk classification (\code{none}, \code{low}, \code{moderate}, \code{high}, \code{critical}) for the single message, enabling instantaneous safety screening. \\
         \code{crisis\_keywords} & array & A list of detected keywords from a predefined crisis lexicon (e.g., "bunuh diri," "menyakiti diri sendiri"). \\
         \code{risk\_reasoning} & string & A model-generated explanation for the assigned risk level, providing transparency for human oversight. \\
-        \code{intent} & string & The classified user intent (e.g., \texttt{request\_support}, \texttt{schedule\_appointment}), which dictates subsequent routing logic. \\
+        \code{intent} & string & The classified user intent (e.g., \code{request\_support}, \code{schedule\_appointment}), which dictates subsequent routing logic. \\
         \code{needs\_agents} & boolean & A flag indicating whether the query requires routing to a background specialist agent. \\
         \code{reasoning} & string & A brief explanation of why specialist agents are or are not needed, justifying the routing decision. \\
         \code{suggested\_response} & string & An optional, complete response for simple interactions, allowing the system to bypass agent orchestration and reduce latency. \\
@@ -193,38 +239,61 @@ The returned JSON object's schema is detailed in Table~\ref{tab:aika_json_schema
     \end{tabular}
 \end{table}
 
-This unified response schema yields several architectural benefits. First, it facilitates \textbf{latency optimization}; by consolidating response generation and risk assessment into one call, the system can achieve sub-300ms response times, which is critical for maintaining conversational fluidity. Second, it enables \textbf{embedded safety}, as risk assessment is an integral and non-negotiable part of every interaction loop. Third, the schema ensures \textbf{transparent oversight} by providing a clear audit trail for the system's reasoning. Finally, the \code{needs_agents} flag allows for \textbf{conditional agent invocation}, an efficient resource management strategy that reduces backend compute costs by bypassing complex orchestration for simple queries.
+This unified response schema yields several architectural benefits. First, it facilitates \textbf{latency optimization}; by consolidating response generation and risk assessment into one call, the system can achieve faster response times, which is critical for maintaining conversational fluidity. Second, it enables \textbf{embedded safety}, as risk assessment is an integral and non-negotiable part of every interaction loop. Third, the schema ensures \textbf{transparent oversight} by providing a clear audit trail for the system's reasoning. Finally, the \code{needs\_agents} flag allows for \textbf{conditional agent invocation}, an efficient resource management strategy that reduces backend compute costs by bypassing complex orchestration for simple queries.
 
-An example of this schema in practice is shown in Listing~\ref{lst:json_moderate_stress}, where a user expresses moderate, non-imminent distress. In contrast, Listing~\ref{lst:json_greeting} shows the optimized response for a simple greeting. This structure operationalizes the principle that Aika is the sole user-facing component, synthesizing conversational intelligence and safety screening into a single, coherent interface layer.
+An example of this schema in practice is shown in Figure~\ref{fig:json_moderate_stress}, where a user expresses moderate, non-imminent distress. In contrast, Figure~\ref{fig:json_greeting} shows the optimized response for a simple greeting. This structure operationalizes the principle that Aika is the sole user-facing component, synthesizing conversational intelligence and safety screening into a single, coherent interface layer.
 
-\begin{lstlisting}[style=jsonStyle,caption={Example Aika JSON response for moderate stress scenario},label={lst:json_moderate_stress}]
+\begin{figure}[htbp]
+    \centering
+\begin{lstlisting}[style=academicStyle, language=json]
 {
   "reply": "Saya mengerti kamu merasa tertekan dengan ujian yang akan datang. Wajar banget kok merasa cemas. Yuk, kita coba teknik grounding bersama untuk menenangkan pikiran.",
-  "immediate_risk": "moderate",
-  "crisis_keywords": ["ujian", "stres"],
-  "risk_reasoning": "User expresses feelings of pressure and anxiety related to upcoming exams, indicating moderate, non-imminent distress.",
-  "intent": "request_emotional_support",
+  "immediate_risk": "low",
+  "crisis_keywords": [],
+  "risk_reasoning": "User expresses anxiety about exams but no self-harm or severe distress indicators.",
+  "intent": "express_distress",
   "needs_agents": true,
+  "suggested_agent": "TCA",
   "reasoning": "Requires TCA for CBT coping strategies and intervention plan"
 }
 \end{lstlisting}
+    \caption{Example Aika JSON response for moderate stress scenario. The response includes a supportive reply, a low risk assessment, and a routing decision to the Therapeutic Coach Agent (TCA).}
+    \label{fig:json_moderate_stress}
+\end{figure}
 
 In contrast, a simple greeting would return:
 
-\begin{lstlisting}[style=jsonStyle,caption={Example Aika JSON response for casual greeting},label={lst:json_greeting}]
+\begin{figure}[htbp]
+    \centering
+\begin{lstlisting}[style=academicStyle, language=json]
 {
-  "reply": "Halo! Saya Aika, asisten kesehatan mental UGM. Saya di sini untuk mendengarkan dan membantu kamu. Ada yang ingin kamu ceritakan?",
+  "reply": "Halo! Saya Aika, asisten kesehatan mentalmu. Ada yang bisa saya bantu hari ini?",
   "immediate_risk": "none",
   "crisis_keywords": [],
-  "risk_reasoning": "Casual greeting with no indicators of distress.",
-  "intent": "casual_greeting",
+  "risk_reasoning": "Standard greeting, no risk detected.",
+  "intent": "greeting",
   "needs_agents": false,
-  "reasoning": "Simple greeting, no specialist agent required.",
-  "suggested_response": "Halo! Saya Aika, asisten kesehatan mental UGM. Saya di sini untuk mendengarkan dan membantu kamu. Ada yang ingin kamu ceritakan?"
+  "suggested_agent": null,
+  "reasoning": "Simple greeting handled by meta-agent directly."
 }
 \end{lstlisting}
+    \caption{Example Aika JSON response for casual greeting. The system detects no risk and handles the interaction directly without invoking specialist agents, optimizing latency.}
+    \label{fig:json_greeting}
+\end{figure}
 
-This response structure operationalizes the architectural principle that Aika is the sole user-facing component, synthesizing both conversational intelligence and safety screening into a single, coherent interface layer.
+\subsection{The Strategic Oversight Loop: Data-Driven Institutional Insight}
+
+The Strategic Oversight Loop is designed to empower administrators with actionable insights derived from aggregated student interaction data. This loop addresses the systemic issues of delayed awareness and reactionary planning that currently plague mental health support services in higher education.
+
+Key features of this loop include:
+
+\begin{itemize}
+    \item \textbf{Proactive Analytics:} The Insights Agent (IA) autonomously analyzes trends and generates reports on student well-being, identifying potential issues before they escalate into crises.
+    \item \textbf{On-Demand Reporting:} Administrators can request custom reports or updates on specific metrics (e.g., "Show me the trend of moderate to high-risk cases over the past month"), which the IA fulfills by querying the latest data and synthesizing it into a clear, actionable format.
+    \item \textbf{Scheduled Briefings:} The system can be configured to send regular, automated briefings to administrators, summarizing key metrics and highlighting any areas of concern that require attention.
+\end{itemize}
+
+This loop ensures that institutional leaders are not only reactive but also proactive, using real data to drive decisions and allocate resources where they are most needed.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% SECTION 3.3 - FUNCTIONAL ARCHITECTURE %%%
@@ -235,37 +304,37 @@ This response structure operationalizes the architectural principle that Aika is
 
 The functional architecture of the framework is designed as a Multi-Agent System (MAS), where the system's overall intelligence and capability emerge from the coordinated actions of its five components: four specialized agents and one meta-agent orchestrator. This section details the "what" of the system by defining the specific role, operational logic, and capabilities of each component within the \textbf{Safety Agent Suite}. Each specialist agent functions as a distinct component within the LangGraph state machine, perceiving its environment through the shared state, executing its logic, and updating the state with its results, while the Aika Meta-Agent coordinates their invocation and synthesizes their outputs.
 
-\subsection{The Safety Triage Agent (STA): The Real-Time Guardian}
+\subsection{The Safety Triage Agent (STA): The Background Guardian}
 
-The Safety Triage Agent (STA) serves as the system's frontline safety monitor. Its primary function is to analyze every incoming student message to assess the immediate risk level and update the shared system state accordingly. This ensures that no high-risk message proceeds to a therapeutic agent without a safety intervention, enforcing the system's foundational "safety-first" principle.
+The Safety Triage Agent (STA) serves as the system's comprehensive safety monitor. Unlike Aika's immediate Tier 1 screening, the STA performs deep-dive, asynchronous analysis (Tier 2). It is triggered by the Aika Meta-Agent when the initial Tier 1 screening detects ambiguous safety signals or requires a deeper, context-aware analysis (Tier 2). While it can operate in the background to analyze full conversation histories, its primary role in the real-time loop is to provide a rigorous safety check for inputs that Aika flags as potentially risky but not immediately critical.
 
 The agentic behavior of the STA can be understood through the BDI model:
 \begin{itemize}
-    \item \textbf{Beliefs:} The STA's beliefs are formed from the raw text of the user's message and the structured output of the Gemini 2.5 Flash model, which provides a risk classification (\texttt{low}, \texttt{moderate}, \texttt{critical}) and detected crisis keywords.
-    \item \textbf{Desires:} Its fundamental desire is to ensure user safety by correctly identifying and escalating any potential crisis.
-    \item \textbf{Intentions:} Based on its beliefs, the STA forms a clear intention. If the belief is that the risk is \texttt{critical}, its intention becomes to update the agent state to trigger the "escalate\_to\_cma" edge in the LangGraph. Otherwise, its intention is to pass control to the next appropriate agent.
+    \item \textbf{Beliefs:} The STA's beliefs are formed from the full conversation history and the structured output of its analysis model.
+    \item \textbf{Desires:} Its fundamental desire is to ensure user safety by correctly identifying latent risks that may have been missed during real-time exchange.
+    \item \textbf{Intentions:} If the STA identifies a \texttt{critical} risk during its analysis, its intention is to immediately trigger the \textbf{Case Management Agent (CMA)} for escalation. Otherwise, it updates the user's risk profile in the database.
 \end{itemize}
 
 \subsection{The Therapeutic Coach Agent (TCA): The Empathetic Guide}
 
-The Therapeutic Coach Agent (TCA) acts as the primary conversational partner for students in non-crisis situations. Once the STA has cleared a message as safe, the TCA takes over to provide empathetic listening, emotional support, and evidence-based therapeutic guidance.
+The Therapeutic Coach Agent (TCA) acts as the background support engine for students in non-crisis situations. It is triggered by Aika when the initial risk assessment indicates \texttt{moderate} or \texttt{low} distress. The TCA does not converse directly with the user; instead, it generates structured therapeutic content (e.g., CBT exercises, coping strategies) that is delivered to the user's dashboard or via Aika.
 
 Its agentic model is as follows:
 \begin{itemize}
-    \item \textbf{Beliefs:} The TCA's beliefs include the user's message history, the STA's "safe" classification, and any previously generated intervention plans stored in the agent state.
-    \item \textbf{Desires:} Its core desire is to reduce user distress and build coping skills by providing helpful, evidence-based guidance.
-    \item \textbf{Intentions:} If the user's message indicates a need for coping strategies, the TCA forms the intention to execute its \texttt{generate\_intervention\_plan} tool. This tool call is a committed action to fulfill its desire. If the user is simply venting, its intention is to generate an empathetic, listening-oriented response.
+    \item \textbf{Beliefs:} The TCA's beliefs include the user's current message and Aika's risk assessment.
+    \item \textbf{Desires:} Its core desire is to reduce user distress by providing actionable, evidence-based guidance.
+    \item \textbf{Intentions:} Upon invocation, the TCA forms the intention to execute its \texttt{generate\_intervention\_plan} tool to create a personalized support plan.
 \end{itemize}
 
 \subsection{The Case Management Agent (CMA): The Procedural Coordinator}
 
-The Case Management Agent (CMA) serves as the system's administrative backbone, responsible for all procedural and operational tasks. It is activated under two conditions: following a critical risk escalation from the STA, or when a user directly expresses an intent for administrative action.
+The Case Management Agent (CMA) serves as the system's administrative backbone. It is activated under two distinct conditions: (1) by the \textbf{STA} (or Aika) following a critical risk detection, or (2) directly by \textbf{Aika} when a user explicitly requests an administrative action (e.g., "I want to book an appointment").
 
 Its BDI breakdown is highly procedural:
 \begin{itemize}
-    \item \textbf{Beliefs:} The CMA believes the state of the world requires administrative action. This belief is triggered by either a \texttt{critical} flag from the STA or a direct user request for a service like booking an appointment.
+    \item \textbf{Beliefs:} The CMA believes the state of the world requires administrative action, triggered by a risk flag or a user intent.
     \item \textbf{Desires:} Its primary desire is to execute administrative workflows reliably and accurately.
-    \item \textbf{Intentions:} When triggered by a crisis escalation, it forms the intention to execute the \texttt{create\_crisis\_case} tool. When triggered by a user request, it forms the intention to use the \texttt{schedule\_appointment} tool. Each intention maps directly to a deterministic, procedural tool call.
+    \item \textbf{Intentions:} When triggered by a crisis, it intends to execute \texttt{create\_crisis\_case}. When triggered by a user request, it intends to execute \texttt{schedule\_appointment}.
 \end{itemize}
 
 \subsection{The Insights Agent (IA): The Strategic Analyst}
@@ -322,15 +391,21 @@ The system's data model is designed to support its core functions: tracking conv
 
 \subsection{Stateful Orchestration with LangGraph}
 
-The heart of the technical architecture is the LangGraph state machine, which operationalizes the agentic behavior. The orchestration is not a simple linear chain but a cyclical graph where the flow is determined by the contents of a shared \texttt{AgentState} object.
+The heart of the technical architecture is the LangGraph state machine, which operationalizes the agentic behavior. The orchestration follows a "dispatcher" pattern where the Aika Meta-Agent serves as the central decision node, routing control to specialist agents only when specific conditions are met.
 
 The process is as follows:
 \begin{enumerate}
     \item A user message initializes the \texttt{AgentState}.
-    \item The graph routes the state to the first node, the \textbf{Safety Triage Agent (STA)}.
-    \item The STA executes its logic and updates the \texttt{AgentState} with a risk assessment and a routing decision (e.g., \texttt{next\_step: "tca"}).
-    \item A conditional edge reads the \texttt{next\_step} from the state and routes it to the appropriate next node, which could be the \textbf{Therapeutic Coach Agent (TCA)}, the \textbf{Case Management Agent (CMA)}, or the end of the graph.
-    \item This process repeats, with each agent modifying the shared state, until a terminal node is reached.
+    \item The graph routes the state to the first node, the \textbf{Aika Meta-Agent}.
+    \item Aika analyzes the input using its system prompt and updates the \texttt{AgentState} with a Tier 1 risk assessment and a routing decision (e.g., \texttt{needs\_agents: true}, \texttt{next\_step: "sta"}).
+    \item A conditional edge reads the \texttt{next\_step} from the state and routes it to the appropriate next node:
+    \begin{itemize}
+        \item \textbf{Safety Triage Agent (STA):} For background risk analysis (Tier 2).
+        \item \textbf{Therapeutic Coach Agent (TCA):} For generating coping strategies (Moderate/Low risk).
+        \item \textbf{Case Management Agent (CMA):} For immediate crisis escalation or administrative requests.
+        \item \textbf{End:} For direct replies where no specialist agent is required.
+    \end{itemize}
+    \item Specialist agents, if invoked, execute their logic, update the shared state, and the flow converges to the end of the graph.
 \end{enumerate}
 
 This stateful, graph-based approach provides a robust and explicit way to manage the complex, non-deterministic nature of a multi-agent conversational system. A high-level visualization of this state machine is presented in Figure \ref{fig:langgraph_state_machine}.
@@ -338,49 +413,45 @@ This stateful, graph-based approach provides a robust and explicit way to manage
 \begin{figure}[htbp]
     \centering
     \begin{tikzpicture}[
-        scale=0.9,
-        transform shape,
-        node distance=2.5cm and 1.5cm,
-        agent/.style={rectangle, draw, fill=ugmBlue!10, rounded corners, thick, minimum height=1.2cm, minimum width=2.8cm, text centered, align=center, font=\small},
-        meta_agent/.style={rectangle, draw, fill=ugmGold!20, rounded corners, thick, minimum height=1.5cm, minimum width=3.5cm, text centered, align=center, font=\small\bfseries},
-        decision/.style={diamond, draw, fill=gray!10, aspect=1.5, inner sep=0pt, minimum size=1.5cm, text centered, font=\scriptsize},
-        io/.style={trapezium, trapezium left angle=70, trapezium right angle=110, draw, fill=gray!5, minimum height=1cm, text centered, align=center, font=\small},
-        arrow/.style={-Stealth, thick},
-        line/.style={thick}
+        node distance=1.5cm and 2.5cm,
+        auto,
+        % Styles
+        startstop/.style={circle, draw=black, thick, fill=black!5, minimum size=0.8cm, font=\footnotesize},
+        agent/.style={rectangle, draw=black, thick, fill=white, text width=2.8cm, align=center, rounded corners=2pt, minimum height=1.2cm, font=\small\bfseries},
+        decision/.style={diamond, draw=black, thick, fill=gray!10, aspect=2, text width=1.8cm, align=center, inner sep=0pt, font=\footnotesize},
+        line/.style={draw, -latex, thick},
+        label_node/.style={font=\scriptsize, fill=white, inner sep=1pt, align=center}
     ]
 
         % Nodes
-        \node[io] (user_input) {User Message};
-        \node[meta_agent, right=of user_input] (meta_agent) {Aika Meta-Agent \\ (Orchestrator)};
-        \node[agent, below=of meta_agent] (sta) {Safety Triage Agent \\ (STA)};
-        \node[decision, below=of sta] (risk_decision) {Risk Level?};
+        \node [startstop] (start) {Start};
+        \node [agent, below=of start] (aika) {Aika Meta-Agent\\(Dispatcher)};
         
-        \node[agent, right=of risk_decision] (cma) {Case Management Agent \\ (CMA)};
-        \node[agent, left=of risk_decision] (tca) {Therapeutic Coach Agent \\ (TCA)};
+        % Specialist Agents arranged below Aika
+        \node [agent, below left=of aika, xshift=-0.5cm, yshift=-1cm] (sta) {Safety Triage\\(STA)};
+        \node [agent, below=of aika, yshift=-1cm] (tca) {Therapeutic Coach\\(TCA)};
+        \node [agent, below right=of aika, xshift=0.5cm, yshift=-1cm] (cma) {Case Mgmt\\(CMA)};
         
-        \node[io, below=of tca] (tca_output) {Therapeutic Response};
-        \node[io, below=of cma] (cma_output) {Escalation \& \\ Counselor Notification};
-        \node[io, below=of risk_decision, yshift=-0.5cm] (low_risk_output) {Standard Response};
+        \node [startstop, below=of tca, yshift=-1cm] (end) {End};
 
-        % Edges
-        \draw[arrow] (user_input) -- (meta_agent);
-        \draw[arrow] (meta_agent) -- (sta);
-        \draw[arrow] (sta) -- (risk_decision);
+        % Edges from Start
+        \path [line] (start) -- (aika);
 
-        \draw[arrow] (risk_decision) -- node[above, font=\scriptsize] {Low} (low_risk_output);
-        \draw[arrow] (risk_decision) -- node[above, font=\scriptsize] {Moderate} (tca);
-        \draw[arrow] (risk_decision) -- node[above, font=\scriptsize] {Critical} (cma);
+        % Routing from Aika
+        \path [line] (aika) -| node [label_node, near start] {Safety Check} (sta);
+        \path [line] (aika) -- node [label_node] {Coaching} (tca);
+        \path [line] (aika) -| node [label_node, near start] {Admin/Crisis} (cma);
         
-        \draw[arrow] (tca) -- (tca_output);
-        \draw[arrow] (cma) -- (cma_output);
+        % Direct Reply path (curved to avoid crossing)
+        \path [line] (aika.east) -- ++(1.5,0) |- node [label_node, near start] {Direct Reply} (end);
 
-        % Feedback loops to Meta-Agent for synthesis (optional, for clarity)
-        \draw[arrow, dashed] (tca_output) -| ([xshift=-1.5cm]meta_agent.south) node[pos=0.95, left, font=\tiny] {Synthesize};
-        \draw[arrow, dashed] (cma_output) -| ([xshift=1.5cm]meta_agent.south) node[pos=0.95, right, font=\tiny] {Synthesize};
-        \draw[arrow, dashed] (low_risk_output) -- (meta_agent.south) node[pos=0.8, right, font=\tiny] {Synthesize};
+        % Convergence to End
+        \path [line] (sta) |- (end);
+        \path [line] (tca) -- (end);
+        \path [line] (cma) |- (end);
 
     \end{tikzpicture}
-    \caption{High-level visualization of the LangGraph agent orchestration state machine. The Aika Meta-Agent routes user input to the STA for risk assessment, then conditionally invokes the TCA for therapeutic coaching or the CMA for crisis escalation based on the outcome.}
+    \caption{LangGraph State Machine Visualization. Aika acts as the central dispatcher, routing the conversation to specialist agents (STA, TCA, CMA) or responding directly based on the context.}
     \label{fig:langgraph_state_machine}
 \end{figure}
 
@@ -412,7 +483,7 @@ While formal performance benchmarking is outside the scope of this thesis, the a
 \begin{itemize}
     \item \textbf{Asynchronous Processing:} The choice of FastAPI was deliberate for its native \texttt{async/await} support. This allows the application to handle long-running I/O operations, such as calling the Gemini API or querying the database, without blocking the main execution thread. This ensures the system can manage multiple concurrent conversations smoothly.
 
-    \item \textbf{Optimized Language Models:} The system employs a two-tier model strategy to balance capability with latency. For the initial, real-time safety screening performed by the STA, a low-latency model (Gemini 2.5 Flash) is used to ensure sub-second response times. For more complex, asynchronous tasks like generating detailed narrative summaries in the Insights Agent, a more powerful model (Gemini 2.5 Pro) is used, as latency is less critical for these background tasks.
+    \item \textbf{Optimized Language Models:} The system employs a two-tier model strategy to balance capability with latency. For the initial, real-time safety screening performed by the \textbf{Aika Meta-Agent}, a low-latency model (Gemini 2.5 Flash) is used to ensure sub-second response times. For more complex, asynchronous tasks like generating detailed narrative summaries in the Insights Agent, a more powerful model (Gemini 2.5 Pro) is used, as latency is less critical for these background tasks.
 \end{itemize}
 
 \subsection{Human-in-the-Loop (HITL) Workflow for Safety}
@@ -421,7 +492,7 @@ No fully automated system can or should replace human clinical judgment in crisi
 
 The escalation path is deterministic and auditable:
 \begin{enumerate}
-    \item The \textbf{STA} detects a message with "Critical" risk.
+    \item The \textbf{Aika Meta-Agent} (immediate) or \textbf{STA} (background) detects a message with "Critical" risk.
     \item This immediately triggers the \textbf{Case Management Agent (CMA)}.
     \item The CMA executes its \texttt{create\_crisis\_case} tool, which creates a structured, high-priority ticket in the database.
     \item Simultaneously, the CMA invokes a notification service (e.g., via email or a secure messaging integration) that sends an alert to the on-call human counselor(s). This alert contains the case ID and a link to a secure dashboard where they can review the conversation.
@@ -445,16 +516,16 @@ The UGM-AICare framework is designed with the principle that users must have cle
 
 \subsection{Human-in-the-Loop for Safety and Ethical Safeguards}
 
-The framework is explicitly designed as a tool that assists, but does not replace, human counselors. Every critical risk escalation from the Safety Triage Agent (STA) creates a case that requires mandatory review and action by a qualified human professional. The system automates the detection and reporting, but the final clinical judgment and intervention remain firmly in human hands.
+The framework is explicitly designed as a tool that assists, but does not replace, human counselors. Every critical risk escalation from the \textbf{Aika Meta-Agent} or \textbf{Safety Triage Agent (STA)} creates a case that requires mandatory review and action by a qualified human professional. The system automates the detection and reporting, but the final clinical judgment and intervention remain firmly in human hands.
 
 This human oversight is not merely procedural—it addresses the fundamental ethical limitation of LLMs in safety-critical contexts. While models like Gemini 2.5 Flash demonstrate strong performance in text understanding, they can still misinterpret nuanced emotional states or linguistic cues. The human-in-the-loop design ensures that no automated risk classification leads directly to intervention without expert clinical validation.
 
-Given the high-stakes nature of mental health triage, the Safety Triage Agent is designed with explicit ethical safeguards:
+Given the high-stakes nature of mental health triage, the system is designed with explicit ethical safeguards:
 
 \begin{itemize}
-    \item \textbf{Conservative Risk Classification:} The agent employs a "safety-first" bias, erring on the side of escalation when ambiguous risk indicators are detected. This prevents false negatives in critical situations.
-    \item \textbf{Human-in-the-Loop for Critical Cases:} All cases flagged as "critical" by the STA trigger immediate notifications to human counselors. The agent does not make autonomous decisions about crisis intervention; it serves as a detection and escalation mechanism only.
-    \item \textbf{Transparency in Agent Responses:} The Support Coach Agent explicitly discloses its non-human nature and limitations in its initial greeting, ensuring users have informed consent about the conversational context.
+    \item \textbf{Conservative Risk Classification:} The agents employ a "safety-first" bias, erring on the side of escalation when ambiguous risk indicators are detected. This prevents false negatives in critical situations.
+    \item \textbf{Human-in-the-Loop for Critical Cases:} All cases flagged as "critical" trigger immediate notifications to human counselors. The agents do not make autonomous decisions about crisis intervention; they serve as detection and escalation mechanisms only.
+    \item \textbf{Transparency in Agent Responses:} The Aika Meta-Agent explicitly discloses its non-human nature and limitations in its initial greeting, ensuring users have informed consent about the conversational context.
 \end{itemize}
 
 Technology alone is insufficient to guarantee ethical operation. Therefore, the system is designed with procedural safeguards that ensure human oversight for all critical functions, ensuring the framework operates as a support tool rather than as an autonomous clinical actor.

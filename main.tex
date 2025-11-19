@@ -56,6 +56,7 @@
 \usetikzlibrary{arrows.meta, positioning, shapes.geometric}
 \usepackage{tocloft}
 \usepackage{tabularx}
+\usepackage{longtable} % Added for long tables
 
 % Define colors for a professional and clean code listing style
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -87,7 +88,29 @@
     tabsize=2,
 }
 
-% Define the style for the code listings
+% Define a clean, academic style for code listings
+\lstdefinestyle{academicStyle}{
+    backgroundcolor=\color{white},   % No background color for academic papers
+    commentstyle=\itshape\color{gray},
+    keywordstyle=\bfseries\color{black},
+    numberstyle=\tiny\color{gray},
+    stringstyle=\color{black},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                
+    captionpos=b,                    
+    keepspaces=true,                
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single,                    % Frame around the code
+    rulecolor=\color{black},
+}
+
+% Define the style for the code listings (Legacy style, keeping just in case)
 \lstdefinestyle{jsonStyle}{
     language=json,
     backgroundcolor=\color{backcolour},
@@ -129,8 +152,8 @@
 
 % Use url package for better line breaking in code/monospace text
 \usepackage{url}
-% Define \code command as alias for \path (allows line breaks)
-\def\code{\path}
+% Define \code command as alias for \texttt (standard academic monospace)
+\newcommand{\code}[1]{\texttt{#1}}
 
 \begin{document}
 %======================================
@@ -264,7 +287,7 @@
 \chapterappendixadd{contents/appendix/appendix-tools}
 % \chapterappendixadd{contents/appendix/appendix-latex}
 % \chapterappendixadd{contents/appendix/appendix-penulisan-referensi}
-% \chapterappendixadd{contents/appendix/appendix-code}
+\chapterappendixadd{contents/appendix/appendix-code}
 
 
 

@@ -1,115 +1,280 @@
-\chapter*{Appendix A\\Design Science Research Assets}
-\addcontentsline{toc}{chapter}{Appendix A -- Design Science Research Assets}
+\chapter*{APPENDIX}
+\label{appendix:agent-orchestration}
 
-\section{DSR Methodology Justifications}
+\section{Agent Orchestration \& State Machines}
 
-\begin{table}[htbp]
-    \centering
-    \caption{Justifications for adopting Design Science Research methodology.}
-    \label{tab:dsr_rationale}
-    \small
-    \setlength{\tabcolsep}{4pt}
-    \begin{tabular}{p{3.5cm}p{5.0cm}p{4.5cm}}
-        	oprule
-        	extbf{DSR Characteristic} & \textbf{Relevance to This Research} & \textbf{Contrast with Alternative Methodologies} \\
-        \midrule
-        Artifact-centric problem solving & The core contribution is the Safety Agent Suite framework itself---a novel multi-agent system architecture. DSR provides the appropriate epistemological stance for research where the primary output is a designed artifact \cite{dsr_methodology_hevner_2004}. & Descriptive research methodologies focus on understanding phenomena; purely experimental approaches test hypotheses in controlled settings but do not emphasize artifact creation as the primary contribution. \\
-        \midrule
-        Practical relevance and real-world impact & The reactive mental health support problem identified in Chapter~\ref{chap:introduction} is a genuine organizational challenge in Higher Education Institutions worldwide. DSR bridges academic rigor and practical utility by requiring artifacts address real problems \cite{dsr_methodology_peers_2006}. & A purely theoretical approach fails to deliver actionable solutions; a purely engineering approach lacks systematic evaluation rigor. DSR offers a middle ground ensuring both practical applicability and scholarly rigor. \\
-        \midrule
-        Iterative development and refinement & The DSR process explicitly incorporates feedback loops between design, demonstration, and evaluation stages, aligning naturally with agentic AI development where agent behaviors must be iteratively refined based on testing results. & Waterfall-style experimental research and ethnographic studies do not accommodate this iterative, build-evaluate-refine cycle as seamlessly. The cyclic nature of DSR is essential for complex system development. \\
-        \midrule
-        Compatibility with evaluation constraints & DSR accommodates scenario-based evaluation using synthetic or controlled test cases---essential when working with sensitive mental health data where live human trials require extensive ethical approvals and pose potential risks. Detailed in Chapter~IV. & Traditional empirical methodologies typically require access to real subjects and naturalistic data, which are infeasible given ethical constraints and undergraduate thesis scope. \\
-        \midrule
-        Knowledge contribution through design & DSR explicitly recognizes that designing, building, and evaluating artifacts generates generalizable design knowledge beyond specific instantiation \cite{dsr_methodology_hevner_2004}. This thesis contributes design principles, architectural patterns (dual-loop proactive-reactive model), and evaluation criteria. & Alternative methodologies may produce case-specific findings without explicit mechanisms for abstracting generalizable design knowledge applicable to future systems in the same problem domain. \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+This appendix provides the core LangGraph definitions that orchestrate the behavior of the specialist agents. These state machines define the flow of data, validation steps, and decision logic for each agent.
 
-\section{Synthetic Evaluation Assets}
+\subsection{Safety Triage Agent (STA) Graph}
+The Safety Triage Agent (STA) is responsible for detecting crisis signals and routing them appropriately.
 
-\begin{table}[htbp]
-	\centering
-	\caption{Rationale for synthetic data in evaluation.}
-	\label{tab:synthetic_data_rationale}
-	\small
-	\setlength{\tabcolsep}{4pt}
-	\begin{tabular}{p{3.5cm}p{4.0cm}p{5.0cm}}
-			oprule
-			extbf{Consideration} & \textbf{Constraint with Real Data} & \textbf{Advantage of Synthetic Data} \\
-		\midrule
-		Ethical approval & Collecting genuine mental health crisis conversations from students requires extensive ethical review board (ERB) approval, informed consent processes, and participant safeguarding mechanisms beyond the scope of an undergraduate thesis. & Eliminates need for ERB approval as no human participants are involved; allows research to proceed within feasible timeline. \\
-		\midrule
-		Privacy and safety risks & Even anonymized mental health disclosures carry re-identification risks and potential psychological harm to participants if data is breached or mishandled. & Removes risk of harm to real individuals; no sensitive personal data is collected or stored. \\
-		\midrule
-		Systematic coverage & Real conversational data is opportunistic and may not include rare but critical crisis scenarios (e.g., explicit self-harm statements, acute distress patterns). & Enables controlled, systematic testing of edge cases and boundary conditions essential for safety validation \cite{FIND_CITATION_PLACEHOLDER}. \\
-		\midrule
-		Reproducibility & Access to real student data is typically restricted and cannot be shared for replication purposes. & Synthetic datasets can be documented, versioned, and shared with evaluators, enhancing reproducibility and transparency. \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+\begin{lstlisting}[language=Python, caption={STA LangGraph Definition (sta\_graph.py)}]
+"""LangGraph state machine for Safety Triage Agent (STA).
 
-\begin{table}[htbp]
-	\centering
-	\caption{Test corpus design and coverage for proof-of-concept validation.}
-	\label{tab:test_corpus}
-	\small
-	\setlength{\tabcolsep}{4pt}
-	\begin{tabular}{p{3.2cm}p{2.5cm}p{3.5cm}p{3.3cm}}
-			oprule
-			extbf{Corpus} & \textbf{Size} & \textbf{Content Coverage} & \textbf{Primary Evaluation Target} \\
-		\midrule
-		Crisis detection corpus (RQ1) & 50 synthetic prompts (25 crisis, 25 non-crisis) & Explicit/implicit crisis indicators (suicidal ideation, self-harm, severe distress) plus emotionally charged non-crisis messages to test classification boundaries. Generated via GPT-4 with researcher validation. & Safety Triage Agent (STA): sensitivity, specificity, false negative rate, classification latency. Validates core crisis detection capability. \\
-		\midrule
-		Orchestration test suite (RQ2) & 10 representative conversation flows & Coverage of critical agent routing patterns: STA→TCA (crisis to coaching), TCA→CMA (escalation), IA queries, multi-turn coaching, boundary refusals. Focus on workflow correctness via Langfuse trace analysis. & LangGraph orchestration: workflow completion rate, state transition accuracy, trace quality. Validates multi-agent coordination reliability. \\
-		\midrule
-		Coaching evaluation set (RQ3) & 10 coaching scenarios & Student concerns spanning stress management (3), motivation (3), academics (2), boundary-testing (2). Dual-rater assessment: researcher + GPT-4 using structured rubric. & Therapeutic Coach Agent (TCA): CBT adherence, empathy, appropriateness, actionability (1-5 Likert scale). Validates response quality and boundary behavior. \\
-		\midrule
-		Privacy validation (RQ4) & Code review + 5 unit tests & Inspection of 6 allow-listed IA SQL queries for k-anonymity enforcement (\code{HAVING COUNT(DISTINCT user_id) >= 5}). Unit tests: small cohort suppression, compliant publication, individual query blocking, boundary condition (k=5), multi-date selective suppression. & Insights Agent (IA): k-anonymity implementation correctness. Validates privacy safeguards function as designed without requiring synthetic log generation. \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+This module implements the STA workflow as a LangGraph StateGraph:
+    ingest_message -> apply_redaction -> assess_risk -> decide_routing
 
-\section{Instrumentation and Validity Frameworks}
+The graph integrates with existing SafetyTriageService for classification
+and ExecutionStateTracker for real-time monitoring.
+"""
+from __future__ import annotations
 
-\begin{table}[htbp]
-	\centering
-	\caption{Instrumentation strategy for evaluation reproducibility.}
-	\label{tab:instrumentation}
-	\small
-	\setlength{\tabcolsep}{4pt}
-	\begin{tabular}{p{3.0cm}p{4.5cm}p{5.0cm}}
-			oprule
-			extbf{Instrumentation Type} & \textbf{Implementation} & \textbf{Purpose} \\
-		\midrule
-		Distributed tracing (Langfuse) & Complete trace capture for all agent executions, exposing: agent node sequences, state transitions, tool invocations with input/output, execution timestamps, and error details. Accessible via web interface for qualitative workflow analysis. & Primary instrumentation for RQ2 orchestration evaluation: enables visual inspection of conversation flows, validation of agent routing correctness, and identification of state transition errors. Supports reproducibility through persistent trace storage. \\
-		\midrule
-		Latency measurement & Python \code{perf_counter()} timing for agent reasoning phases (LLM inference + classification logic), recorded at millisecond precision. Stored in database for percentile calculation (p50/p95/p99). & Supports RQ1 classification latency analysis and RQ2 performance characterization. Enables identification of bottlenecks and validation that agents meet real-time conversation requirements ($<$ 300ms for triage). \\
-		\midrule
-		Structured logging & All agent interactions, state transitions, and decision points logged in JSON format with ISO-8601 timestamps and correlation IDs. Captures: user messages, agent classifications, tool execution results, escalation decisions. & Facilitates replay of evaluation scenarios, supports auditing of agent behavior, and enables post-hoc analysis of failure cases (e.g., false negative root cause analysis for RQ1). \\
-		\midrule
-		Database persistence & All evaluation data persisted in PostgreSQL: crisis corpus labels, TCA response scores (researcher + GPT-4), Langfuse trace references, unit test results. Schema-versioned for reproducibility. & Enables statistical analysis across test runs, longitudinal comparison of agent performance, and verification that evaluation procedures were followed correctly. Supports future replication studies. \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+import logging
+from typing import Callable
+from datetime import datetime
 
-\begin{table}[htbp]
-	\centering
-	\caption{Validity and limitations framework for the evaluation methodology.}
-	\label{tab:validity_framework}
-	\small
-	\setlength{\tabcolsep}{4pt}
-	\begin{tabular}{p{2.8cm}p{5.0cm}p{5.2cm}}
-			oprule
-			extbf{Validity Type} & \textbf{Strengths in This Research} & \textbf{Limitations and Mitigation Strategies} \\
-		\midrule
-		Internal validity & High internal validity ensured through: (1) systematically designed test scenarios with controlled variables; (2) standardized execution platform (containerized environment); (3) minimized confounding variables through consistent test harnesses; (4) automated metrics reducing measurement subjectivity. & Potential for evaluation-to-evaluation variance in LLM outputs due to non-deterministic generation. Mitigated through: temperature=0 for classification tasks, multiple test runs with statistical aggregation, seed-based reproducibility where supported. \\
-		\midrule
-		External validity & Limited but explicitly acknowledged. The controlled evaluation demonstrates proof-of-concept functionality and validates design decisions under idealized conditions. & \textbf{Primary limitation}: Synthetic test data, while carefully designed, cannot fully capture the complexity, variability, and cultural nuances of authentic student conversations. Findings may not generalize to real-world deployment without field validation. Future work requires pilot studies with appropriate ethical oversight (discussed in Chapter~V). \\
-		\midrule
-		Construct validity & Strong construct validity: selected metrics (sensitivity, specificity, false negative rate, latency percentiles, tool success rates, rubric scores, k-anonymity compliance) are well-established constructs in AI system evaluation and mental health screening literature. Each metric directly measures intended system properties. & Risk of metric misalignment with real-world user experience. For example, high sensitivity may come at the cost of user trust if false positives are frequent. Mitigated through multi-dimensional evaluation (not relying on single metric) and stakeholder validation of acceptance criteria. \\
-		\midrule
-		Reliability & High measurement reliability ensured through: (1) automated instrumentation (OpenTelemetry, structured logging) providing consistent data collection; (2) deterministic evaluation scripts with version-controlled test datasets; (3) dual-rater assessment (researcher + GPT-4) for subjective coaching quality evaluations with structured rubric guidelines. & Human rating subjectivity for coaching quality (CBT rubric scores). Mitigated through: explicit rubric criteria (1-5 Likert scale), detailed scoring guidelines, and GPT-4 validation as independent reference point for consistency checking. Inter-rater agreement analysis with multiple clinical experts remains future work. \\
-		\bottomrule
-	\end{tabular}
-\end{table}
+from langgraph.graph import StateGraph, END
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.agents.graph_state import STAState
+from app.agents.sta.service import get_safety_triage_service
+from app.agents.sta.schemas import STAClassifyRequest
+from app.agents.execution_tracker import execution_tracker
+from app.core.redaction import redact_pii_regex
+
+logger = logging.getLogger(__name__)
+
+
+async def ingest_message_node(state: STAState) -> STAState:
+    """Node: Ingest and validate user message."""
+    execution_id = state.get("execution_id")
+    if execution_id:
+        execution_tracker.start_node(execution_id, "sta:ingest_message", "sta")
+    
+    # Validate required fields
+    if not state.get("message"):
+        state["errors"].append("No message provided")
+        if execution_id:
+            execution_tracker.fail_node(execution_id, "sta:ingest_message", "No message")
+        return state
+    
+    state["execution_path"].append("ingest_message")
+    
+    if execution_id:
+        execution_tracker.complete_node(execution_id, "sta:ingest_message")
+    
+    logger.info(f"STA ingested message for user {state.get('user_hash', 'unknown')}")
+    return state
+
+
+async def apply_redaction_node(state: STAState, db: AsyncSession) -> STAState:
+    """Node: Apply PII redaction to message."""
+    execution_id = state.get("execution_id")
+    if execution_id:
+        execution_tracker.start_node(execution_id, "sta:apply_redaction", "sta")
+    
+    try:
+        original_message = state["message"]
+        
+        # Use existing redaction service (returns tuple of redacted_text, counts)
+        redacted_message, redaction_counts = redact_pii_regex(original_message)
+        state["redacted_message"] = redacted_message
+        state["execution_path"].append("apply_redaction")
+        
+        if execution_id:
+            execution_tracker.complete_node(execution_id, "sta:apply_redaction")
+        
+        logger.info(f"STA redacted PII from message (original length: {len(original_message)}, redactions: {sum(redaction_counts.values())})")
+        
+    except Exception as e:
+        error_msg = f"Redaction failed: {str(e)}"
+        state["errors"].append(error_msg)
+        logger.error(error_msg, exc_info=True)
+        
+        if execution_id:
+            execution_tracker.fail_node(execution_id, "sta:apply_redaction", str(e))
+    
+    return state
+\end{lstlisting}
+
+\subsection{Therapeutic Coach Agent (TCA) Graph}
+The Therapeutic Coach Agent (TCA) generates personalized intervention plans based on the user's intent and severity.
+
+\begin{lstlisting}[language=Python, caption={TCA LangGraph Definition (tca\_graph.py)}]
+"""LangGraph state machine for Therapeutic Coach Agent (TCA).
+
+This module implements the TCA workflow as a LangGraph StateGraph:
+    ingest_triage_signal -> determine_intervention_type -> generate_plan -> 
+    safety_review -> persist_plan
+
+The graph integrates with TherapeuticCoachService and uses Gemini AI for 
+personalized intervention plan generation.
+"""
+from __future__ import annotations
+
+import logging
+from datetime import datetime
+
+from langgraph.graph import StateGraph, END
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.agents.graph_state import SCAState
+from app.agents.tca.service import TherapeuticCoachService
+from app.agents.tca.schemas import SCAInterveneRequest
+from app.agents.execution_tracker import execution_tracker
+from app.domains.mental_health.models import InterventionPlanRecord
+
+logger = logging.getLogger(__name__)
+
+
+async def ingest_triage_signal_node(state: SCAState) -> SCAState:
+    """Node: Ingest triage signal from STA."""
+    execution_id = state.get("execution_id")
+    if execution_id:
+        execution_tracker.start_node(execution_id, "tca::ingest_triage_signal", "tca")
+    
+    # Validate STA outputs are present
+    if not state.get("severity") or not state.get("intent"):
+        state["errors"].append("Missing STA risk assessment data")
+        if execution_id:
+            execution_tracker.fail_node(
+                execution_id, 
+                "tca::ingest_triage_signal", 
+                "Missing STA data"
+            )
+        return state
+    
+    state["execution_path"].append("ingest_triage_signal")
+    
+    if execution_id:
+        execution_tracker.complete_node(execution_id, "tca::ingest_triage_signal")
+    
+    logger.info(
+        f"TCA ingested triage signal: severity={state.get('severity')}, "
+        f"intent={state.get('intent')}"
+    )
+    return state
+
+
+async def determine_intervention_type_node(state: SCAState) -> SCAState:
+    """Node: Determine appropriate intervention type."""
+    execution_id = state.get("execution_id")
+    if execution_id:
+        execution_tracker.start_node(execution_id, "tca::determine_intervention_type", "tca")
+    
+    try:
+        intent = state.get("intent", "").lower()
+        severity = state.get("severity", "low").lower()
+        
+        # Map intent to intervention type
+        if intent in ("crisis", "panic", "anxiety", "acute_stress"):
+            intervention_type = "calm_down"
+        elif intent in ("overwhelmed", "stuck", "confused", "academic_stress"):
+            intervention_type = "break_down_problem"
+        else:
+            intervention_type = "general_coping"
+        
+        state["intervention_type"] = intervention_type
+        state["should_intervene"] = True
+        state["execution_path"].append("determine_intervention_type")
+        
+        if execution_id:
+            execution_tracker.complete_node(execution_id, "tca::determine_intervention_type")
+            
+    except Exception as e:
+        # Error handling omitted for brevity
+        pass
+        
+    return state
+\end{lstlisting}
+
+\subsection{Case Management Agent (CMA) Graph}
+The Case Management Agent (CMA) handles high-severity cases that require human escalation.
+
+\begin{lstlisting}[language=Python, caption={CMA LangGraph Definition (cma\_graph.py)}]
+async def ingest_escalation_node(state: SDAState) -> SDAState:
+    """Node: Ingest escalation signal from STA."""
+    execution_id = state.get("execution_id")
+    if execution_id:
+        execution_tracker.start_node(execution_id, "cma::ingest_escalation", "cma")
+    
+    # Validate this should be escalated
+    severity = state.get("severity", "low")
+    if severity not in ("high", "critical"):
+        errors = state.get("errors", [])
+        errors.append(
+            f"CMA should only handle high/critical cases, got severity={severity}"
+        )
+        state["errors"] = errors
+        if execution_id:
+            execution_tracker.fail_node(
+                execution_id, 
+                "cma::ingest_escalation", 
+                f"Invalid severity: {severity}"
+            )
+        return state
+    
+    execution_path = state.get("execution_path", [])
+    execution_path.append("ingest_escalation")
+    state["execution_path"] = execution_path
+    
+    if execution_id:
+        execution_tracker.complete_node(execution_id, "cma::ingest_escalation")
+    
+    logger.info(
+        f"CMA ingested escalation: severity={severity}, "
+        f"user_hash={state.get('user_hash')}"
+    )
+    return state
+\end{lstlisting}
+
+\subsection{Insights Agent (IA) Graph}
+The Insights Agent (IA) performs privacy-preserving analytics on the system data.
+
+\begin{lstlisting}[language=Python, caption={IA LangGraph Definition (ia\_graph.py)}]
+"""LangGraph state machine for Insights Agent (IA).
+
+This module implements the IA workflow as a LangGraph StateGraph:
+    Phase 1 (Data Collection):
+        ingest_query -> validate_consent -> apply_k_anonymity -> execute_analytics
+    Phase 2 (Intelligence Layer):
+        interpret_results -> generate_narrative -> create_recommendations -> export_pdf
+"""
+
+def ingest_query_node(state: IAState) -> IAState:
+    """Node: Validate and ingest analytics query request."""
+    execution_id = state.get("execution_id")
+    if execution_id:
+        execution_tracker.start_node(execution_id, "ia:ingest_query", "ia")
+    
+    try:
+        # Validate required fields
+        if not state.get("question_id"):
+            raise ValueError("question_id is required")
+        
+        if not state.get("start_date") or not state.get("end_date"):
+            raise ValueError("start_date and end_date are required")
+        
+        # Validate date range (prevent excessive historical queries)
+        start = state.get("start_date")
+        end = state.get("end_date")
+        
+        if not start or not end:
+            raise ValueError("start_date and end_date must be provided")
+        
+        if start >= end:
+            raise ValueError("start_date must be before end_date")
+        
+        max_days = 365  # Maximum 1 year of data
+        delta = end - start
+        if delta.days > max_days:
+            raise ValueError(f"Date range too large. Maximum {max_days} days allowed.")
+        
+        state.setdefault("execution_path", []).append("ia:ingest_query")
+        state["query_validated"] = True
+        
+        if execution_id:
+            execution_tracker.complete_node(execution_id, "ia:ingest_query")
+        
+        logger.info(f"IA ingested query: question_id={state.get('question_id')}, range={delta.days} days")
+        
+    except Exception as e:
+        error_msg = f"Query ingestion failed: {str(e)}"
+        logger.error(error_msg)
+        state.setdefault("errors", []).append(error_msg)
+        
+        if execution_id:
+            execution_tracker.fail_node(execution_id, "ia:ingest_query", error_msg)
+    
+    return state
+\end{lstlisting}
