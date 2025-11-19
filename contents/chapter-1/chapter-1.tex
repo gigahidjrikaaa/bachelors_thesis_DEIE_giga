@@ -29,11 +29,11 @@ To clarify the paradigm shift this research proposes, Table~\ref{tab:support_par
         \toprule
         \textbf{Characteristic} & \textbf{Traditional In-Person Counseling} & \textbf{Reactive AI Chatbots} & \textbf{Proposed Multi-Agent Framework (UGM-AICare)} \\
         \midrule
-        \textbf{Initiation Model} & Student must self-refer and schedule appointment & Student must open app and initiate conversation & Continuous monitoring with automated outreach capability; system-initiated intervention \\
+        \textbf{Initiation Model} & Student must self-refer and schedule appointment \cite{baik2019universities} & Student must open app and initiate conversation \cite{fulmer2018artificial} & Continuous monitoring with automated outreach capability; system-initiated intervention \\
         \midrule
-        \textbf{Availability} & Limited office hours (typically 9am-5pm); multi-week waitlists common & 24/7 availability; instant response & 24/7 availability with proactive intervention triggers; automated escalation protocols \\
+        \textbf{Availability} & Limited office hours (typically 9am-5pm); multi-week waitlists common \cite{gallagher2023counselor} & 24/7 availability; instant response & 24/7 availability with proactive intervention triggers; automated escalation protocols \\
         \midrule
-        \textbf{Scalability} & Constrained by counselor-to-student ratio (1:1500 average); unsustainable at scale & Scales to unlimited concurrent users & Scales through automated triage and routing; human oversight reserved for critical cases \\
+        \textbf{Scalability} & Constrained by counselor-to-student ratio (1:1500 average); unsustainable at scale \cite{lipson2022healthy} & Scales to unlimited concurrent users & Scales through automated triage and routing; human oversight reserved for critical cases \\
         \midrule
         \textbf{Data Utilization} & Manual case notes; no population-level trend analysis & Individual conversation logs; limited cross-user insights & Population-level analytics with privacy-preserving aggregation; automated intervention routing based on trends \\
         \midrule
@@ -41,7 +41,7 @@ To clarify the paradigm shift this research proposes, Table~\ref{tab:support_par
         \midrule
         \textbf{Administrative Integration} & Manual case management; human-dependent scheduling and follow-up workflows & No administrative integration; standalone conversational interface & Automated case creation, appointment scheduling, resource allocation, and counselor notification \\
         \midrule
-        \textbf{Key Limitation} & \textbf{Relies entirely on student help-seeking behavior}; barriers include stigma, lack of awareness, symptom-induced apathy & \textbf{Still requires student to initiate contact}; does not reach students who avoid seeking help & Requires validation through controlled testing before clinical deployment; performance not yet validated on live student populations \\
+        \textbf{Key Limitation} & \textbf{Relies entirely on student help-seeking behavior}; barriers include stigma, lack of awareness, symptom-induced apathy \cite{PLACEHOLDER_CITE_help_seeking_barriers} & \textbf{Still requires student to initiate contact}; does not reach students who avoid seeking help & Requires validation through controlled testing before clinical deployment; performance not yet validated on live student populations \\
         \midrule
         \textbf{Human Oversight} & Direct human delivery of all services & Minimal oversight; no clinical escalation path & Human-in-the-loop for all critical decisions; automated triage with mandatory counselor review \\
         \bottomrule
@@ -59,11 +59,11 @@ The critical insight from this comparison is that technological advancement alon
 The inefficiency and reactive nature of current university mental health support systems present a complex problem. To move towards a proactive and scalable model, this research addresses the following core challenges:
 
 \begin{enumerate}
-    \item The primary challenge is the \textbf{design of a cohesive, safety-oriented agentic AI framework} capable of automating key institutional processes. This requires a shift from a monolithic chatbot to a multi-agent system where specialized agents handle distinct tasks, including real-time crisis detection, personalized coaching, clinical case management, and privacy-preserving analytics.
+    \item \textbf{Architectural Design for Proactivity:} How can an agentic AI framework be designed to shift mental health support from a reactive to a proactive model while ensuring strict safety protocols? This involves investigating the necessary components for a system that can autonomously detect risk and initiate intervention, rather than waiting for user requests.
 
-    \item The technical challenge of \textbf{orchestrating a heterogeneous multi-agent system} in a robust, scalable, and secure cloud-native architecture. This involves managing stateful, long-running interactions and ensuring reliable communication between agents powered by external, non-deterministic LLMs.
+    \item \textbf{Reliable Multi-Agent Orchestration:} How can a heterogeneous system of specialized agents be orchestrated to execute complex, stateful mental health workflows reliably? This addresses the research problem of coordinating non-deterministic LLM-based agents to perform deterministic, safety-critical administrative and clinical tasks.
 
-    \item The methodological challenge of \textbf{validating the framework's functional capabilities and potential for impact in the absence of a full-scale clinical trial}. This requires developing meaningful, scenario-based testing protocols that can effectively demonstrate the agentic workflows and their advantages over static systems.
+    \item \textbf{Pre-Clinical Validation Methodology:} How can the efficacy and safety of such an autonomous system be rigorously validated in a pre-clinical context? This addresses the need for a robust evaluation framework that can demonstrate technical feasibility and safety compliance without putting real human subjects at risk in early development stages.
 \end{enumerate}
 
 To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Therapeutic Coach Agent (TCA)}, a \textbf{Case Management Agent (CMA)}, and an \textbf{Insights Agent (IA)}, coordinated through an \textbf{Aika Meta-Agent} (orchestrator) that provides unified, role-based orchestration and ensures coherent, safety-first interactions across all user roles.
@@ -85,7 +85,7 @@ The primary objectives of this thesis are:
 \section{Research Questions}
 \label{sec:research_questions}
 
-To keep the scope concrete and measurable, this thesis addresses the following research questions (RQs):
+To keep the scope concrete and measurable, this thesis addresses the following research questions (RQs). These research questions are derived directly from the identified problems and are designed to verify whether the proposed objectives have been met or not.
 
 \begin{enumerate}
     \item \textbf{RQ1 (Proactive Safety):} Can the agentic framework reliably distinguish between crisis and non-crisis user states to trigger a timely and appropriate safety protocol?
@@ -107,9 +107,9 @@ To ensure the feasibility and focus of this bachelor's thesis, the following bou
 
     \item \textbf{Proof-of-Concept Evaluation Scope:} The evaluation adopts a \textbf{proof-of-concept validation approach} appropriate for bachelor's-level Design Science Research. The objective is to demonstrate \textbf{technical feasibility} that the Safety Agent Suite can execute core workflows correctly under controlled conditions. Evaluation uses modest sample sizes: 50 crisis scenarios for safety triage (RQ1), 10 conversation flows for orchestration (RQ2), 10 coaching scenarios for response quality (RQ3), and code review with unit tests for privacy validation (RQ4). This approach validates architectural correctness without requiring extensive data collection infrastructure, consistent with DSR artifact evaluation conventions where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
 
-    \item \textbf{Simulated Data for Privacy and Feasibility:} All testing utilizes \textbf{synthetically generated student mental health crisis scenarios and simulated conversation patterns} created using GPT-4 and Claude 3.5 Sonnet, not real user data. This approach is necessary to protect privacy during development and to enable controlled evaluation without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population. Ground truth labels for synthetic scenarios are provided by the primary researcher with peer validation, acknowledging that clinical expert validation remains future work.
+    \item \textbf{Simulated Data for Privacy and Feasibility:} All testing utilizes \textbf{synthetically generated student mental health crisis scenarios and simulated conversation patterns} created using GPT-4 and Claude 4.5 Sonnet, not real user data. This approach is necessary to protect privacy during development and to enable controlled evaluation without requiring human subjects approval. However, it means that agent performance has not been validated on the specific linguistic diversity, cultural contexts, and edge cases of a live Indonesian student population. Ground truth labels for synthetic scenarios are provided by the primary researcher with peer validation, acknowledging that clinical expert validation remains future work.
 
-    \item \textbf{Single-Rater Assessment with AI Validation:} Response quality evaluation (RQ3) is conducted by the primary researcher using a structured rubric, with GPT-4 performing independent validation on the same responses to provide a reference point for consistency. This pragmatic approach demonstrates the evaluation methodology while acknowledging that inter-rater reliability analysis with multiple clinical experts and formal therapeutic quality assessment using validated instruments (e.g., Cognitive Therapy Scale) remain future work appropriate for clinical validation studies.
+    \item \textbf{Single-Rater Assessment with AI Validation:} Response quality evaluation (RQ3) is conducted by the primary researcher using a structured rubric, with Gemini 2.5 Pro performing independent validation on the same responses to provide a reference point for consistency. This pragmatic approach demonstrates the evaluation methodology while acknowledging that inter-rater reliability analysis with multiple clinical experts and formal therapeutic quality assessment using validated instruments (e.g., Cognitive Therapy Scale) remain future work appropriate for clinical validation studies.
 
     \item \textbf{Privacy-Aware Design Without Formal Proofs:} This research implements k-anonymity enforcement ($k \geq 5$) with code-level verification and unit testing to validate privacy safeguards function as designed. This demonstrates \textbf{privacy-aware agent behavior} and implementation correctness within the prototype context. However, it does not pursue full differential privacy proofs, formal threat modeling using frameworks like LINDDUN, or cryptographic verification—activities appropriate for production security audits but beyond bachelor's thesis scope.
 

@@ -15,8 +15,10 @@ This evaluation adopts a \textbf{proof-of-concept validation approach} appropria
 
 \begin{itemize}
     \item \textbf{Sample Sizes:} Modest test set sizes (50 crisis prompts, 10 orchestration flows, 10 coaching scenarios, code review for privacy) enable focused validation of architectural correctness without requiring extensive data collection infrastructure. This is consistent with DSR artifact evaluation conventions \cite{hevner2004design}, where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
+    \item \textbf{Simulation-Based Evaluation (In-Silico):} Given the sensitive nature of mental health interventions, this study adopts a simulation-based evaluation strategy. Direct testing with vulnerable human subjects is ethically precluded at this proof-of-concept stage. Therefore, synthetic datasets were generated to rigorously stress-test the safety protocols without risking patient harm \cite{Kamarzarin2025Simulation}.
+    \item \textbf{Automated Quality Assessment (LLM-as-a-Judge):} To address the subjectivity of qualitative evaluation and the limitations of a single human rater, this study employs an LLM-assisted evaluation framework. A frontier language model serves as an objective judge to score agent responses against a standardized rubric, a methodology shown to correlate highly with human expert judgment \cite{Zheng2023LLMJudge}.
     \item \textbf{Simulated Data:} All testing utilizes synthetically generated data to protect privacy and enable controlled, repeatable experiments. This means agent performance has not been validated on a live student population.
-    \item \textbf{Single-Rater Assessment:} Response quality is assessed by the primary researcher using a structured rubric, with GPT-4 providing a validation score. This pragmatic approach demonstrates the methodology while acknowledging that formal clinical validation remains future work.
+    \item \textbf{Single-Rater Assessment:} Response quality is assessed by the primary researcher using a structured rubric, with Gemini 2.5 Pro providing a validation score. This pragmatic approach demonstrates the methodology while acknowledging that formal clinical validation remains future work.
     \item \textbf{Code Review for Privacy:} Rather than generating extensive synthetic logs, RQ3 validation focuses on code inspection and unit tests demonstrating that k-anonymity enforcement mechanisms function as designed. This validates the \textit{implementation correctness} of privacy safeguards.
 \end{itemize}
 
@@ -71,9 +73,9 @@ This section documents the evaluation protocol that links the Design Science sta
 \subsection*{Datasets and Scenario Assets}
 
 \begin{itemize}
-    \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy.
-    \item \textbf{Orchestration Test Suite (RQ2):} 10 structured conversation flows designed to test agent routing, tool use, and error handling.
-    \item \textbf{Coaching Prompts (RQ3):} 10 scenarios for evaluating the quality of the Therapeutic Coach Agent's responses.
+    \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy. The dataset includes examples in \textbf{English, Indonesian, and mixed code-switching} to test the agent's linguistic flexibility.
+    \item \textbf{Orchestration Test Suite (RQ2):} 10 structured conversation flows designed to test agent routing, tool use, and error handling. These scenarios also feature multilingual inputs.
+    \item \textbf{Coaching Prompts (RQ3):} 10 scenarios for evaluating the quality of the Therapeutic Coach Agent's responses, covering common student issues in both English and Indonesian.
     \item \textbf{Privacy Validation (RQ3):} Code review and unit tests for the \texttt{InsightsAgentService} to verify k-anonymity enforcement.
 \end{itemize}
 
@@ -81,7 +83,7 @@ This section documents the evaluation protocol that links the Design Science sta
 
 \begin{itemize}
     \item \textbf{Safety Reviews}: All crisis classifications are validated against ground truth labels.
-    \item \textbf{Quality Assessment}: Coaching responses are scored against a defined rubric by the primary researcher, with GPT-4 as a validation rater.
+    \item \textbf{Quality Assessment}: Coaching responses are scored against a defined rubric by the primary researcher, with Gemini 2.5 Pro as a validation rater.
     \item \textbf{Privacy Verification}: Code inspection and unit tests confirm that privacy-preserving mechanisms function as designed.
 \end{itemize}
 
@@ -217,7 +219,7 @@ This section will discuss any observed failures in orchestration, such as incorr
 \subsection{Evaluation Design}
 This evaluation had a dual objective: to assess the quality of the agent-generated therapeutic content and to verify the implementation of the system's privacy safeguards. 
 
-For response quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching prompts covering common student issues (e.g., academic stress, motivation). These responses were then scored by the primary researcher using a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. The success criterion was an average rubric score of 3.5 or higher.
+For response quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching prompts covering common student issues (e.g., academic stress, motivation). These responses were then evaluated using an \textbf{LLM-as-a-Judge} methodology \cite{Zheng2023LLMJudge}. A frontier Large Language Model was employed to score each response against a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. This automated evaluation approach ensures consistency and reduces the subjectivity inherent in single-rater human assessments. The success criterion was an average rubric score of 3.5 or higher.
 
 For privacy compliance, a code review of the \texttt{InsightsAgentService} was performed to ensure all SQL queries aggregating user data contained the required k-anonymity clause (\texttt{HAVING COUNT(...) >= 5}). Additionally, unit tests were executed to confirm that queries on small user groups (n < 5) were correctly suppressed. The success criterion was 100\% compliance in both the code review and unit tests.
 
