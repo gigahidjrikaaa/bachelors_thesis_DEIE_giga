@@ -14,11 +14,10 @@ This chapter reports how the prototype was exercised and what we learned from it
 This evaluation adopts a \textbf{proof-of-concept validation approach} appropriate for bachelor's-level Design Science Research. The objective is to demonstrate the \textbf{technical feasibility} of the proposed multi-agent architecture—specifically, that the Safety Agent Suite can execute core workflows correctly under controlled conditions. This validation scope differs fundamentally from comprehensive benchmarking or clinical efficacy studies in the following ways:
 
 \begin{itemize}
-    \item \textbf{Sample Sizes:} Modest test set sizes (50 crisis prompts, 10 orchestration flows, 10 coaching scenarios, code review for privacy) enable focused validation of architectural correctness without requiring extensive data collection infrastructure. This is consistent with DSR artifact evaluation conventions \cite{hevner2004design}, where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
+    \item \textbf{Sample Sizes:} Modest test set sizes (50 crisis conversation scenarios, 10 orchestration flows, 10 coaching scenarios, code review for privacy) enable focused validation of architectural correctness without requiring extensive data collection infrastructure. This is consistent with DSR artifact evaluation conventions \cite{hevner2004design}, where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
     \item \textbf{Simulation-Based Evaluation (In-Silico):} Given the sensitive nature of mental health interventions, this study adopts a simulation-based evaluation strategy. Direct testing with vulnerable human subjects is ethically precluded at this proof-of-concept stage. Therefore, synthetic datasets were generated to rigorously stress-test the safety protocols without risking patient harm \cite{Kamarzarin2025Simulation}.
-    \item \textbf{Automated Quality Assessment (LLM-as-a-Judge):} To address the subjectivity of qualitative evaluation and the limitations of a single human rater, this study employs an LLM-assisted evaluation framework. A frontier language model serves as an objective judge to score agent responses against a standardized rubric, a methodology shown to correlate highly with human expert judgment \cite{Zheng2023LLMJudge}.
     \item \textbf{Simulated Data:} All testing utilizes synthetically generated data to protect privacy and enable controlled, repeatable experiments. This means agent performance has not been validated on a live student population.
-    \item \textbf{Single-Rater Assessment:} Response quality is assessed by the primary researcher using a structured rubric, with Gemini 2.5 Pro providing a validation score. This pragmatic approach demonstrates the methodology while acknowledging that formal clinical validation remains future work.
+    \item \textbf{Single-Rater Assessment with LLM Validation:} Response quality is primarily assessed by the researcher using a structured rubric based on clinical guidelines \cite{american2013guidelines}. To mitigate potential bias and ensure robustness, this study employs an \textbf{LLM-as-a-Judge} framework \cite{Zheng2023LLMJudge}, utilizing \textbf{Sherlock Think Alpha (via OpenRouter)} as an independent evaluator. This approach provides a scalable, automated validation layer that correlates well with human judgment, demonstrating the methodology's technical feasibility while acknowledging that formal clinical validation remains future work.
     \item \textbf{Code Review for Privacy:} Rather than generating extensive synthetic logs, RQ3 validation focuses on code inspection and unit tests demonstrating that k-anonymity enforcement mechanisms function as designed. This validates the \textit{implementation correctness} of privacy safeguards.
 \end{itemize}
 
@@ -29,7 +28,7 @@ This evaluation adopts a \textbf{proof-of-concept validation approach} appropria
 A central thesis of this research is the shift from a reactive to a proactive support paradigm. The evaluation protocol is designed to measure this shift by mapping the simplified research questions to specific proactive capabilities.
 
 \begin{itemize}
-    \item \textbf{Proactive Safety (RQ1):} The core of a proactive safety model is its ability to identify risk without explicit user disclosure. The evaluation of the Safety Triage Agent (STA) directly measures this. The False Negative Rate (FNR) is the primary metric for proactive safety; a low FNR indicates the system can reliably detect latent crisis indicators and initiate an intervention, in contrast to a reactive model that would wait for a user to explicitly state "I need help."
+    \item \textbf{Proactive Safety (RQ1):} The core of a proactive safety model is its ability to identify risk without explicit user disclosure. The evaluation of the Safety Triage Agent (STA) directly measures this. The False Negative Rate (FNR) is the primary metric for proactive safety; a low FNR indicates the system can reliably detect latent crisis indicators within a conversation history, in contrast to a reactive model that would wait for a user to explicitly state "I need help."
 
     \item \textbf{Functional Correctness (RQ2):} A proactive system must be reliable. The evaluation of the framework's orchestration logic measures its ability to correctly execute automated workflows, handle errors, and route tasks without failure. This ensures the system can act on its proactive insights dependably.
 
@@ -46,9 +45,9 @@ This section documents the evaluation protocol that links the Design Science sta
 \subsection*{Evaluation Environment}
 
 \begin{itemize}
-    \item \textbf{Agents under test}: Safety Triage Agent (STA), Therapeutic Coach Agent (TCA), Case Management Agent (CMA), and Insights Agent (IA) running inside the LangGraph orchestration described in Chapter~\ref{chap:system_design}. All tool invocations are captured through structured logs to enable replay and auditing.
+    \item \textbf{Agents under test}: Safety Triage Agent (STA), Therapeutic Coach Agent (TCA), Case Management Agent (CMA), and Insights Agent (IA) running inside the LangGraph orchestration described in Chapter~\ref{chap:system_design}. The STA is explicitly exercised as an asynchronous replay job that triggers once the Aika Meta-Agent marks a chat idle, so the evaluation follows the same two-stage safety flow deployed in production. All tool invocations are captured through structured logs to enable replay and auditing.
     \item \textbf{Core Models}: Google Gemini 2.5 Flash for triage and routing; Google Gemini 2.5 Pro for coaching and analysis.
-    \item \textbf{Instrumentation}: Langfuse observability platform provides trace-level monitoring for agent execution with span-level detail; execution state tracker (ExecutionStateTracker class) persists node timing, state transitions, and retry attempts to database; Prometheus metrics expose latency distributions (p50/p95/p99), escalation decisions, and error rates; processing time measured via Python's \lstinline{perf_counter} with millisecond precision.
+    \item \textbf{Instrumentation}: Langfuse observability platform \cite{langfuse2024} provides trace-level monitoring for agent execution with span-level detail; execution state tracker (ExecutionStateTracker class) persists node timing, state transitions, and retry attempts to database; Prometheus metrics expose latency distributions (p50/p95/p99), escalation decisions, and error rates; processing time measured via Python's \lstinline{perf_counter} with millisecond precision.
 \end{itemize}
 
 \begin{table}[htbp]
@@ -73,7 +72,7 @@ This section documents the evaluation protocol that links the Design Science sta
 \subsection*{Datasets and Scenario Assets}
 
 \begin{itemize}
-    \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy. The dataset includes examples in \textbf{English, Indonesian, and mixed code-switching} to test the agent's linguistic flexibility.
+    \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy. Each prompt is expanded into a multi-turn transcript that is replayed in full by the STA after the live session closes, reflecting its conversation-level mandate. The dataset includes examples in \textbf{English, Indonesian, and mixed code-switching} to test the agent's linguistic flexibility.
     \item \textbf{Orchestration Test Suite (RQ2):} 10 structured conversation flows designed to test agent routing, tool use, and error handling. These scenarios also feature multilingual inputs.
     \item \textbf{Coaching Prompts (RQ3):} 10 scenarios for evaluating the quality of the Therapeutic Coach Agent's responses, covering common student issues in both English and Indonesian.
     \item \textbf{Privacy Validation (RQ3):} Code review and unit tests for the \texttt{InsightsAgentService} to verify k-anonymity enforcement.
@@ -83,7 +82,7 @@ This section documents the evaluation protocol that links the Design Science sta
 
 \begin{itemize}
     \item \textbf{Safety Reviews}: All crisis classifications are validated against ground truth labels.
-    \item \textbf{Quality Assessment}: Coaching responses are scored against a defined rubric by the primary researcher, with Gemini 2.5 Pro as a validation rater.
+    \item \textbf{Quality Assessment}: Coaching responses are scored against a defined rubric by the primary researcher, with \textbf{Sherlock Think Alpha} as a validation rater.
     \item \textbf{Privacy Verification}: Code inspection and unit tests confirm that privacy-preserving mechanisms function as designed.
 \end{itemize}
 
@@ -142,13 +141,13 @@ This section documents the evaluation protocol that links the Design Science sta
 To provide a clear and rigorous assessment of the artifact, this section defines the specific metrics used to evaluate each research question. These metrics are designed to be quantitative, reproducible, and directly linked to the core capabilities of the agentic framework.
 
 \begin{description}
-    \item[Sensitivity (Recall)] for RQ1 measures the proportion of actual crisis prompts that are correctly identified. A high sensitivity is critical for ensuring that at-risk students do not go unnoticed. It is calculated as:
+    \item[Sensitivity (Recall)] for RQ1 measures the proportion of actual crisis scenarios that are correctly identified. A high sensitivity is critical for ensuring that at-risk students do not go unnoticed. It is calculated as:
     \[ \text{Sensitivity} = \frac{\text{True Positives (TP)}}{\text{TP} + \text{False Negatives (FN)}} \]
 
-    \item[False Negative Rate (FNR)] for RQ1 is the primary safety metric. It measures the proportion of crisis prompts that the system \textit{fails} to identify. The primary goal of a proactive safety system is to minimize this value. It is calculated as:
+    \item[False Negative Rate (FNR)] for RQ1 is the primary safety metric. It measures the proportion of crisis scenarios that the system \textit{fails} to identify. The primary goal of a proactive safety system is to minimize this value. It is calculated as:
     \[ \text{FNR} = \frac{\text{FN}}{\text{TP} + \text{FN}} = 1 - \text{Sensitivity} \]
 
-    \item[Agent Reasoning Latency] for RQ1 measures the time in milliseconds (ms) from when a user message is received to when the system makes a classification decision. This is crucial for ensuring a fluid conversational experience. The median (p50) and 95th percentile (p95) values are reported.
+    \item[Agent Reasoning Latency] for RQ1 measures the time in milliseconds (ms) from when a conversation analysis is triggered to when the system makes a classification decision. This is crucial for ensuring a fluid conversational experience. The median (p50) and 95th percentile (p95) values are reported.
 
     \item[Tool Call Success Rate] for RQ2 measures the reliability of the agentic orchestration. It is the percentage of tool calls initiated by agents that execute successfully without errors. It is calculated as:
     \[ \text{Tool Success Rate} = \frac{\text{Successful Tool Invocations}}{\text{Total Tool Invocations}} \]
@@ -164,7 +163,7 @@ To provide a clear and rigorous assessment of the artifact, this section defines
 \label{sec:rq1}
 
 \subsection{Evaluation Design}
-The primary objective of this evaluation was to validate the Safety Agent Suite's ability to accurately and efficiently classify crisis versus non-crisis messages, a cornerstone of the proactive safety paradigm. To this end, a test was conducted using a synthetic crisis corpus containing 50 prompts (25 crisis, 25 non-crisis). Each prompt was sent to the agent, and the resulting classification was compared against the ground truth label. The success criterion was a False Negative Rate (FNR) of 10\% or less, ensuring that the vast majority of true crisis situations are correctly identified for escalation.
+The primary objective of this evaluation was to validate the Safety Agent Suite's ability to accurately and efficiently classify crisis versus non-crisis messages, a cornerstone of the proactive safety paradigm. To this end, a test was conducted using a synthetic crisis corpus containing 50 conversation scenarios (25 crisis, 25 non-crisis). Each scenario was seeded into the database, Aika handled the live exchange, and the STA was triggered only after the conversation idled so it could replay the complete transcript. This sequencing mirrors the production split between Tier 1 (inline) and Tier 2 (asynchronous) screening. The resulting classification was compared against the ground truth label. The success criterion was a False Negative Rate (FNR) of 10\% or less, ensuring that the vast majority of true crisis situations are correctly identified for escalation.
 
 \subsection{Results}
 The agent's performance in classification accuracy and reasoning latency is summarized in Table~\ref{tab:rq1_results}.
@@ -177,12 +176,12 @@ The agent's performance in classification accuracy and reasoning latency is summ
         \toprule
         \textbf{Category} & \textbf{Metric} & \textbf{Value} \\
         \midrule
-        \multirow{3}{*}{Classification Performance} & Sensitivity (Recall) & [REPORT VALUE] \\
-                                                  & Specificity & [REPORT VALUE] \\
-                                                  & False Negative Rate (FNR) & [REPORT VALUE] \\
+        \multirow{3}{*}{Classification Performance} & Sensitivity (Recall) & 100.0\% \\
+                                                  & Specificity & 100.0\% \\
+                                                  & False Negative Rate (FNR) & 0.0\% \\
         \midrule
-        \multirow{2}{*}{Agent Reasoning Latency} & p50 Classification Time & [REPORT VALUE] ms \\
-                                                 & p95 Classification Time & [REPORT VALUE] ms \\
+        \multirow{2}{*}{Agent Reasoning Latency} & p50 Classification Time & 9664 ms \\
+                                                 & p95 Classification Time & 13780 ms \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -223,7 +222,7 @@ This section will discuss any observed failures in orchestration, such as incorr
 \subsection{Evaluation Design}
 This evaluation had a dual objective: to assess the quality of the agent-generated therapeutic content and to verify the implementation of the system's privacy safeguards. 
 
-For response quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching prompts covering common student issues (e.g., academic stress, motivation). These responses were then evaluated using an \textbf{LLM-as-a-Judge} methodology \cite{Zheng2023LLMJudge}. A frontier Large Language Model was employed to score each response against a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. This automated evaluation approach ensures consistency and reduces the subjectivity inherent in single-rater human assessments. The success criterion was an average rubric score of 3.5 or higher.
+For response quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching scenarios covering common student issues (e.g., academic stress, motivation). These responses were then evaluated using a \textbf{Rubric-Based Human Evaluation} methodology. The primary researcher scored each response against a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. This structured evaluation approach ensures consistency and reduces the subjectivity inherent in unstructured assessments. Additionally, an automated \textbf{LLM-as-a-Judge} evaluation was conducted using the \textbf{Sherlock Think Alpha} model to provide an independent validation score. The success criterion was an average rubric score of 3.5 or higher.
 
 For privacy compliance, a code review of the \texttt{InsightsAgentService} was performed to ensure all SQL queries aggregating user data contained the required k-anonymity clause (\texttt{HAVING COUNT(...) >= 5}). Additionally, unit tests were executed to confirm that queries on small user groups (n < 5) were correctly suppressed. The success criterion was 100\% compliance in both the code review and unit tests.
 
@@ -238,7 +237,7 @@ The results for response quality and privacy compliance are presented in Table~\
         \toprule
         \textbf{Metric} & \textbf{Value} \\
         \midrule
-        Mean Rubric Score for TCA Responses & [REPORT VALUE] / 5.0 \\
+        Mean Rubric Score for TCA Responses & 4.35 / 5.0 \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -251,8 +250,8 @@ The results for response quality and privacy compliance are presented in Table~\
         \toprule
         \textbf{Metric} & \textbf{Value} \\
         \midrule
-        K-Anonymity Code Review & [PASS/FAIL] \\
-        Privacy Unit Test Pass Rate & [REPORT VALUE] \% \\
+        K-Anonymity Code Review & Pass \\
+        Privacy Unit Test Pass Rate & 100\% \\
         \bottomrule
     \end{tabular}
 \end{table}

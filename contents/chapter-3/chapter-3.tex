@@ -111,7 +111,7 @@ The system's primary entities and their designated interaction points are illust
         \textbf{Agent} & \textbf{Primary Role} \\
         \midrule
         \textbf{Aika Meta-Agent} & The sole user-facing conversationalist and orchestrator. Manages all user interactions, performs initial risk assessment, and routes tasks to specialist agents. \\
-        \textbf{Safety Triage Agent (STA)} & A conceptual role embedded within Aika's initial analysis. Classifies immediate (Tier 1) and conversational (Tier 2) risk to enforce safety protocols. \\
+    	\textbf{Safety Triage Agent (STA)} & A background conversation-level assessor. After a chat session goes idle or ends, it replays the full transcript to produce Tier 2 risk labels and compliance artifacts that corroborate (or override) Aika's inline Tier 1 judgment. \\
         \textbf{Therapeutic Coach Agent (TCA)} & A background agent that generates CBT-based intervention plans and recommends resources for the user's dashboard. Does not engage in direct conversation. \\
         \textbf{Case Management Agent (CMA)} & The procedural backbone. Manages administrative tasks like crisis case creation, appointment scheduling, and sending notifications to counselors. \\
         \textbf{Insights Agent (IA)} & The strategic analyst. Processes anonymized, aggregated data to provide population-level well-being trends and insights to administrators. \\
@@ -128,7 +128,7 @@ Conceptually, the framework's architecture is best understood as two distinct bu
     \begin{itemize}
         \item \textbf{Therapeutic Coach Agent (TCA):} Triggered by Aika when the risk is assessed as \texttt{moderate} or \texttt{low}. It works in the background to generate CBT-based intervention plans.
         \item \textbf{Case Management Agent (CMA):} Triggered directly by Aika when the user explicitly requests administrative actions (e.g., scheduling). It is also triggered by the STA if a critical risk is detected.
-        \item \textbf{Safety Triage Agent (STA):} Operates primarily in the background. It is triggered by the Aika Meta-Agent when the initial Tier 1 screening detects ambiguous safety signals or requires a deeper, context-aware analysis (Tier 2).
+        \item \textbf{Safety Triage Agent (STA):} Runs asynchronously after the user becomes inactive or explicitly ends the chat. It reprocesses the entire conversation to confirm the final risk rating, generate the conversation-level STA assessment, and supply evidence for the compliance ledger.
     \end{itemize}
     
     This loop is designed for high-availability and low-latency, ensuring students receive immediate support while complex reasoning occurs asynchronously in the background.
@@ -136,7 +136,7 @@ Conceptually, the framework's architecture is best understood as two distinct bu
     \item \textbf{The Strategic Oversight Loop:} This loop operates on a longer, asynchronous timescale to enable proactive, institution-wide strategy. The \textbf{Insights Agent (IA)} works entirely in the background, periodically analyzing anonymized, aggregated data from all student interactions. However, administrators and counselors can invoke IA through Aika by requesting analytics queries (e.g., "show trending topics this week", "case statistics for November"), at which point Aika routes the request to IA and synthesizes the analytics report into a user-friendly response. IA generates reports on population-level well-being trends, sentiment analysis, and emerging topics of concern, delivered via both scheduled batch processing and on-demand queries through Aika's conversational interface. These insights provide empirical evidence for data-driven resource allocation, such as commissioning new workshops or adjusting counseling staff schedules. This loop directly addresses the "insight-to-action" gap that plagues current systems \cite{nwoke2025insightautomation, jorno2018actionableinsight}.
 \end{enumerate}
 
-The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem. This dual-loop architecture is visualized in Figure \ref{fig:two_loops_diagram}.
+The synergy between these two loops is the cornerstone of the framework's design. The real-time loop gathers the data that fuels the strategic loop, while the insights from the strategic loop can be used to configure and improve the proactive interventions delivered by the real-time loop, creating a continuously learning and adaptive support ecosystem. This dual-loop architecture is visualized in Figure \ref{fig:two_loops_diagram}, which also highlights that Aika's inline responses and the STA/TCA/CMA queue are deliberately decoupled to keep asynchronous reasoning off the critical path for students.
 
 \begin{figure}[htbp]
     \centering
@@ -180,15 +180,19 @@ The synergy between these two loops is the cornerstone of the framework's design
             font=\small
         },
         arrow/.style={-Latex, thick},
-        data_arrow/.style={-Latex, thick, dashed}
+        data_arrow/.style={-Latex, thick, dashed},
+        async_arrow/.style={-Latex, thick, dashed}
     ]
         % Real-Time Interaction Loop
         \node[loop=The Real-Time Interaction Loop] (realtime_loop) {};
         \node[actor, left=of realtime_loop] (student) {Student};
-        \node[agent, at=(realtime_loop.center)] (agents) {Aika, STA, \\ TCA, CMA};
+        \node[agent, at=(realtime_loop.center)] (aika) {Aika Meta-Agent};
+        \node[agent, below=0.7cm of aika] (backgroundAgents) {Background Agents\\(STA, TCA, CMA)};
         
-        \draw[arrow] (student) to[bend left=20] node[midway, above, font=\small] {Interaction} (agents);
-        \draw[arrow] (agents) to[bend left=20] node[midway, below, font=\small] {Support} (student);
+        \draw[arrow] (student) to[bend left=20] node[midway, above, font=\small] {Interaction} (aika);
+        \draw[arrow] (aika) to[bend left=20] node[midway, below, font=\small] {Reply} (student);
+        \draw[async_arrow] (aika) -- node[midway, right, font=\small] {Async dispatch} (backgroundAgents);
+        \draw[async_arrow] (backgroundAgents) -- node[midway, left, font=\small, align=center] {Evidence \\ Plans} (aika);
 
         % Strategic Oversight Loop
         \node[loop=The Strategic Oversight Loop, below=4.5cm of realtime_loop] (strategic_loop) {};
@@ -201,13 +205,13 @@ The synergy between these two loops is the cornerstone of the framework's design
         % Connecting the loops
         \node[data] (agg_data) at ([yshift=-2.25cm]realtime_loop.center) {Aggregated, Anonymized Data};
         
-        \draw[data_arrow] (agents) -- (agg_data) node[midway, right, font=\small] {Fuels};
+        \draw[data_arrow] (backgroundAgents) -- (agg_data) node[midway, right, font=\small] {Fuels};
         \draw[data_arrow] (agg_data) -- (ia) node[midway, right, font=\small] {Informs};
-        \draw[data_arrow] (ia) to[bend right=30] (agents) node[midway, left, font=\small] {Improves};
+        \draw[data_arrow] (ia) to[bend right=30] (aika) node[midway, left, font=\small] {Improves};
 
     \end{tikzpicture}%
     }
-    \caption{The Two Proactive Loops: The real-time loop provides immediate student support, generating data that fuels the strategic loop. The strategic loop analyzes this data to produce insights that, in turn, improve the proactive capabilities of the real-time loop.}
+    \caption{The Two Proactive Loops: Aika handles synchronous dialogue alone, while the STA/TCA/CMA bundle runs asynchronously in the background to supply evidence and plans. Their outputs fuel the strategic loop, whose insights adapt the live experience.}
     \label{fig:two_loops_diagram}
 \end{figure}
 
@@ -306,7 +310,7 @@ The functional architecture of the framework is designed as a Multi-Agent System
 
 \subsection{The Safety Triage Agent (STA): The Background Guardian}
 
-The Safety Triage Agent (STA) serves as the system's comprehensive safety monitor. Unlike Aika's immediate Tier 1 screening, the STA performs deep-dive, asynchronous analysis (Tier 2). It is triggered by the Aika Meta-Agent when the initial Tier 1 screening detects ambiguous safety signals or requires a deeper, context-aware analysis (Tier 2). While it can operate in the background to analyze full conversation histories, its primary role in the real-time loop is to provide a rigorous safety check for inputs that Aika flags as potentially risky but not immediately critical.
+The Safety Triage Agent (STA) serves as the system's comprehensive safety monitor. Unlike Aika's immediate Tier 1 screening, the STA performs deep-dive, asynchronous analysis (Tier 2). Once a conversation ends (either explicitly or because the user goes inactive), the Aika Meta-Agent enqueues the full transcript for STA review. The STA then reconstructs the exchange, applies richer temporal reasoning, and produces a signed conversation-level assessment that can confirm, refine, or escalate the risk rating recorded during the live chat. Its output feeds the compliance ledger and ensures that no concerning pattern slips through simply because the real-time classifier was overconfident or interrupted.
 
 The agentic behavior of the STA can be understood through the BDI model:
 \begin{itemize}
@@ -371,7 +375,7 @@ The selection of technologies was guided by the need for asynchronous performanc
 \begin{itemize}
     \item \textbf{Backend Framework: FastAPI.} The backend is implemented in Python using FastAPI. This choice was motivated by FastAPI's high performance and its native support for asynchronous operations. For a conversational AI system where multiple I/O-bound tasks occur (e.g., database queries, external API calls to LLMs), asynchronous handling is paramount to prevent blocking and ensure a responsive user experience.
 
-    \item \textbf{Agent Orchestration: LangGraph.} The complex, conditional logic of the multi-agent system is managed using LangGraph. LangGraph provides a stateful, graph-based framework for composing agents. This is a significant improvement over stateless LLM calls, as it allows the system to maintain a coherent state across multiple turns of a conversation and multiple agent invocations. It directly enables the implementation of the agentic loops and decision points described in the functional architecture.
+    \item \textbf{Agent Orchestration: LangGraph.} The complex, conditional logic of the multi-agent system is managed using LangGraph \cite{langgraph2024}. LangGraph provides a stateful, graph-based framework for composing agents. This is a significant improvement over stateless LLM calls, as it allows the system to maintain a coherent state across multiple turns of a conversation and multiple agent invocations. It directly enables the implementation of the agentic loops and decision points described in the functional architecture.
 
     \item \textbf{Data Persistence: PostgreSQL and SQLAlchemy.} A PostgreSQL database serves as the primary data store for all persistent information, including user profiles, conversation histories, and agent execution logs. Interaction with the database is managed through the SQLAlchemy Object-Relational Mapper (ORM). This combination provides a robust, transactional, and scalable foundation for data management, while the ORM simplifies data handling in the Python application code.
 
@@ -473,7 +477,7 @@ Security and privacy are not afterthoughts but are foundational to the system's 
     
     \item \textbf{Data Encryption:} All data is encrypted both in-transit, using TLS for all API communications, and at-rest in the PostgreSQL database. This protects sensitive conversation data from unauthorized access even in the event of a direct infrastructure breach.
 
-    \item \textbf{Privacy-Preserving Analytics:} The Insights Agent is architecturally constrained to protect student privacy. As stated in RQ4, its SQL queries are designed to enforce k-anonymity by including clauses that prevent data from being returned for any group smaller than a predefined threshold (k=5). This ensures that analytics can reveal population-level trends without ever exposing data that could be traced back to an individual student.
+    \item \textbf{Privacy-Preserving Analytics:} The Insights Agent is architecturally constrained to protect student privacy. As stated in RQ4, its SQL queries are designed to enforce k-anonymity \cite{sweeney2002kanonymity} by including clauses that prevent data from being returned for any group smaller than a predefined threshold (k=5). This ensures that analytics can reveal population-level trends without ever exposing data that could be traced back to an individual student.
 \end{itemize}
 
 \subsection{Architectural Provisions for Responsiveness}
