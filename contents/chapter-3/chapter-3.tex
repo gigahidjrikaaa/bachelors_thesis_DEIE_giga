@@ -484,7 +484,7 @@ Security and privacy are not afterthoughts but are foundational to the system's 
     
     \item \textbf{Data Encryption:} All data is encrypted both in-transit, using TLS for all API communications, and at-rest in the PostgreSQL database. This protects sensitive conversation data from unauthorized access even in the event of a direct infrastructure breach.
 
-    \item \textbf{Privacy-Preserving Analytics:} The Insights Agent is architecturally constrained to protect student privacy. As stated in RQ4, its SQL queries are designed to enforce k-anonymity \cite{sweeney2002kanonymity} by including clauses that prevent data from being returned for any group smaller than a predefined threshold (k=5). This ensures that analytics can reveal population-level trends without ever exposing data that could be traced back to an individual student.
+    \item \textbf{Privacy-Preserving Analytics:} The Insights Agent is architecturally constrained to protect student privacy. As stated in RQ3, its SQL queries are designed to enforce k-anonymity \cite{sweeney2002kanonymity} by including clauses that prevent data from being returned for any group smaller than a predefined threshold (k=5). This ensures that analytics can reveal population-level trends without ever exposing data that could be traced back to an individual student.
 \end{itemize}
 
 \subsection{Architectural Provisions for Responsiveness}

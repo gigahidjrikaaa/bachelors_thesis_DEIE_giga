@@ -30,9 +30,9 @@ A central thesis of this research is the shift from a reactive to a proactive su
 \begin{itemize}
     \item \textbf{Proactive Safety (RQ1):} The core of a proactive safety model is its ability to identify risk without explicit user disclosure. The evaluation of the Safety Triage Agent (STA) directly measures this. The False Negative Rate (FNR) is the primary metric for proactive safety; a low FNR indicates the system can reliably detect latent crisis indicators within a conversation history, in contrast to a reactive model that would wait for a user to explicitly state "I need help."
 
-    \item \textbf{Functional Correctness (RQ2):} A proactive system must be reliable. The evaluation of the framework's orchestration logic measures its ability to correctly execute automated workflows, handle errors, and route tasks without failure. This ensures the system can act on its proactive insights dependably.
+    \item \textbf{Functional Correctness \& Quality (RQ2):} A proactive system must be both reliable and effective. The evaluation measures the framework's ability to correctly execute automated workflows (orchestration) and generate appropriate therapeutic responses (quality). This ensures the system can not only act on its proactive insights dependably but also deliver safe, helpful interventions.
 
-    \item \textbf{Output Quality \& Privacy (RQ3):} A proactive framework must produce outputs that are both useful and safe. This involves evaluating the quality of coaching advice to ensure it is appropriate and helpful, while simultaneously verifying that institutional insights are generated in a way that rigorously protects student privacy. This combined evaluation ensures the system's actions are both effective and responsible.
+    \item \textbf{Privacy-Preserving Insights (RQ3):} A proactive framework must be responsible. This involves verifying that institutional insights are generated in a way that rigorously protects student privacy. This evaluation ensures the system's strategic capabilities do not compromise individual trust.
 \end{itemize}
 
 By framing the evaluation in this manner, we are not merely testing technical functions but are assessing the artifact's success in operationalizing the core proactive principles outlined in Chapter 1. Specifically, we posit that \textbf{Proactivity = Detection + Initiation}. Therefore, by validating the system's ability to detect latent risk (RQ1) and autonomously execute the subsequent workflow (RQ2), we provide the necessary technical proof that the system is \textit{capable} of proactive intervention, even without a longitudinal clinical trial.
@@ -68,9 +68,9 @@ This section documents the evaluation protocol that links the Design Science sta
         \midrule
         \textbf{RQ1: Proactive Safety} & Scenario-based testing on crisis corpus (n=50) & Sensitivity, Specificity, False Negative Rate (FNR), p50/p95 Latency & FNR $\leq$ 10\% \\
         \midrule
-        \textbf{RQ2: Autonomous Orchestration} & Workflow execution testing on orchestration suite (n=10) & Tool Call Success Rate, Retry Recovery Rate, State Transition Accuracy & Success Rate $\geq$ 95\% \\
+        \textbf{RQ2: Autonomous Orchestration} & Workflow execution (n=10) \& Rubric scoring (n=10) & Tool Call Success Rate, State Transition Accuracy, Mean Rubric Score & Success $\geq$ 95\%, Score $\geq$ 3.5/5 \\
         \midrule
-        \textbf{RQ3: Strategic Proactivity} & Rubric scoring on coaching prompts (n=10) \& Code review/unit tests for privacy & Mean Rubric Score (1-5 scale), Boundary Behavior Accuracy, K-Anonymity Compliance & Score $\geq$ 3.5/5, 100\% Compliance \\
+        \textbf{RQ3: Strategic Proactivity} & Code review/unit tests for privacy & K-Anonymity Compliance & 100\% Compliance \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -113,15 +113,15 @@ This section documents the evaluation protocol that links the Design Science sta
 
     % Row 2: RQ2
     \node[rq_box, below=of rq1] (rq2) {RQ2:\\Autonomous Orchestration};
-    \node[method_box, right=of rq2] (method2) {Workflow execution\\(Orchestration Suite, n=10)};
-    \node[metric_box, right=of method2] (metric2) {Tool Call Success,\\Retry Recovery,\\State Accuracy};
-    \node[target_box, right=of metric2] (target2) {Success $\geq$ 95\%};
+    \node[method_box, right=of rq2] (method2) {Workflow execution (n=10)\\Rubric scoring (n=10)};
+    \node[metric_box, right=of method2] (metric2) {Tool Call Success,\\State Accuracy,\\Rubric Score};
+    \node[target_box, right=of metric2] (target2) {Success $\geq$ 95\%\\Score $\geq$ 3.5/5};
 
     % Row 3: RQ3
     \node[rq_box, below=of rq2] (rq3) {RQ3:\\Strategic Proactivity};
-    \node[method_box, right=of rq3] (method3) {Rubric scoring (n=10) \&\\Code review};
-    \node[metric_box, right=of method3] (metric3) {Rubric Score (1-5),\\K-Anonymity Compliance};
-    \node[target_box, right=of metric3] (target3) {Score $\geq$ 3.5/5\\100\% Compliance};
+    \node[method_box, right=of rq3] (method3) {Code review \&\\Unit tests};
+    \node[metric_box, right=of method3] (metric3) {K-Anonymity Compliance};
+    \node[target_box, right=of metric3] (target3) {100\% Compliance};
 
     % Headers
     \node[header, above=0.2cm of rq1] {Research Question};
@@ -160,7 +160,7 @@ To provide a clear and rigorous assessment of the artifact, this section defines
 
     \item[State Transition Accuracy] for RQ2 is a qualitative metric determined by manually inspecting the execution traces in Langfuse. It is the percentage of test scenarios where the agent system transitions between states exactly as defined in the LangGraph state machine.
 
-    \item[Mean Rubric Score] for RQ3 measures the quality of the Therapeutic Coach Agent's generated responses. Each response is scored on a 1-5 scale across multiple dimensions (e.g., empathy, relevance), and the mean score across all prompts and dimensions is reported.
+    \item[Mean Rubric Score] for RQ2 measures the quality of the Therapeutic Coach Agent's generated responses. Each response is scored on a 1-5 scale across multiple dimensions (e.g., empathy, relevance), and the mean score across all prompts and dimensions is reported.
 
     \item[K-Anonymity Compliance] for RQ3 is a binary (Pass/Fail) metric. It passes only if a code review confirms that all relevant SQL queries in the \texttt{InsightsAgentService} contain the required k-anonymity clause and all associated unit tests pass.
 \end{description}
@@ -195,18 +195,22 @@ The agent's performance in classification accuracy and reasoning latency is summ
 \subsection{Discussion}
 This section will analyze any misclassifications, especially false negatives, to understand their root causes (e.g., linguistic ambiguity, implicit distress signals). It will also discuss the trade-off between detection speed and accuracy.
 
-\section{RQ2: Autonomous Orchestration Evaluation}
+\section{RQ2: Autonomous Orchestration and Intervention Quality}
 \label{sec:rq2}
 
 \subsection{Evaluation Design}
-This evaluation aimed to assess the system's ability to \textbf{autonomously orchestrate} complex interventions without human oversight. A test suite of 10 structured conversation flows was designed to exercise various paths through the agent system, including successful triage-to-coaching handoffs, escalations to case management, and error handling. Each scenario was executed, and the system's behavior, including all tool calls and state transitions, was logged via Langfuse and compared against the expected workflow. The success criteria were a tool call success rate of 95\% or higher and 100\% state transition accuracy.
+This evaluation aimed to assess the system's ability to \textbf{autonomously orchestrate} complex interventions and deliver \textbf{high-quality therapeutic support}.
+
+For orchestration reliability, a test suite of 10 structured conversation flows was designed to exercise various paths through the agent system, including successful triage-to-coaching handoffs, escalations to case management, and error handling. Each scenario was executed, and the system's behavior was logged via Langfuse. The success criteria were a tool call success rate of 95\% or higher and 100\% state transition accuracy.
+
+For intervention quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching scenarios covering common student issues (e.g., academic stress, motivation). These responses were evaluated using a \textbf{Rubric-Based Human Evaluation} methodology. The primary researcher scored each response against a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. Additionally, an automated \textbf{LLM-as-a-Judge} evaluation was conducted using \textbf{Sherlock Think Alpha} as an independent validator. The success criterion was an average rubric score of 3.5 or higher.
 
 \subsection{Results}
-The reliability of the agentic workflow orchestration is summarized in Table~\ref{tab:rq2_results}.
+The reliability of the workflow orchestration and the quality of the generated interventions are summarized in Table~\ref{tab:rq2_results}.
 
 \begin{table}[htbp]
     \centering
-    \caption{RQ2: Autonomous Orchestration Evaluation Results.}
+    \caption{RQ2: Orchestration and Quality Evaluation Results.}
     \label{tab:rq2_results}
     \begin{tabular}{l c}
         \toprule
@@ -215,42 +219,28 @@ The reliability of the agentic workflow orchestration is summarized in Table~\re
         Overall Tool-Call Success Rate & 98.2\% \\
         State Transition Accuracy & 100.0\% \\
         Retry and Recovery Success Rate & 100.0\% \\
-        \bottomrule
-    \end{tabular}
-\end{table}
-
-\subsection{Discussion}
-This section will discuss any observed failures in orchestration, such as incorrect routing or failed tool calls. It will provide recommendations for improving the robustness of the state graph and error handling logic.
-
-\section{RQ3: Strategic Proactivity Evaluation}
-\label{sec:rq3}
-
-\subsection{Evaluation Design}
-This evaluation had a dual objective: to assess the quality of the agent-generated therapeutic content and to verify the system's capacity to generate \textbf{strategic institutional insights} safely.
-
-For response quality, the Therapeutic Coach Agent (TCA) was tasked with generating responses to 10 coaching scenarios covering common student issues (e.g., academic stress, motivation). These responses were then evaluated using a \textbf{Rubric-Based Human Evaluation} methodology. The primary researcher scored each response against a 5-point rubric (see Appendix~\ref{app:coaching_prompts}) that assessed empathy, appropriateness, and adherence to basic CBT principles. This structured evaluation approach ensures consistency and reduces the subjectivity inherent in unstructured assessments. Additionally, an automated \textbf{LLM-as-a-Judge} evaluation was conducted using the \textbf{Sherlock Think Alpha} model to provide an independent validation score. The success criterion was an average rubric score of 3.5 or higher.
-
-For privacy compliance, a code review of the \texttt{InsightsAgentService} was performed to ensure all SQL queries aggregating user data contained the required k-anonymity clause (\texttt{HAVING COUNT(...) >= 5}). Additionally, unit tests were executed to confirm that queries on small user groups (n < 5) were correctly suppressed. The success criterion was 100\% compliance in both the code review and unit tests.
-
-\subsection{Results}
-The results for response quality and privacy compliance are presented in Table~\ref{tab:rq3_quality_results} and Table~\ref{tab:rq3_privacy_results}, respectively.
-
-\begin{table}[htbp]
-    \centering
-    \caption{RQ3: Strategic Proactivity (Quality) Results.}
-    \label{tab:rq3_quality_results}
-    \begin{tabular}{l c}
-        \toprule
-        \textbf{Metric} & \textbf{Value} \\
-        \midrule
         Mean Rubric Score for TCA Responses & 4.35 / 5.0 \\
         \bottomrule
     \end{tabular}
 \end{table}
 
+\subsection{Discussion}
+This section will discuss the robustness of the state graph and the quality of the therapeutic content. It will analyze any orchestration failures and discuss the strengths of the TCA's empathetic responses, linking them to the prompt engineering strategies employed.
+
+\section{RQ3: Strategic Insights and Privacy Evaluation}
+\label{sec:rq3}
+
+\subsection{Evaluation Design}
+This evaluation focused on verifying the system's capacity to generate \textbf{strategic institutional insights} safely. The primary objective was to confirm that the Insights Agent (IA) could aggregate population-level data without compromising individual student privacy.
+
+For privacy compliance, a code review of the \texttt{InsightsAgentService} was performed to ensure all SQL queries aggregating user data contained the required k-anonymity clause (\texttt{HAVING COUNT(...) >= 5}). Additionally, unit tests were executed to confirm that queries on small user groups (n < 5) were correctly suppressed. The success criterion was 100\% compliance in both the code review and unit tests.
+
+\subsection{Results}
+The results for privacy compliance are presented in Table~\ref{tab:rq3_privacy_results}.
+
 \begin{table}[htbp]
     \centering
-    \caption{RQ3: Strategic Proactivity (Privacy) Results.}
+    \caption{RQ3: Strategic Insights (Privacy) Results.}
     \label{tab:rq3_privacy_results}
     \begin{tabular}{l c}
         \toprule
@@ -263,7 +253,7 @@ The results for response quality and privacy compliance are presented in Table~\
 \end{table}
 
 \subsection{Discussion}
-This section will discuss the strengths and weaknesses of the agent's coaching abilities, linking them to prompt engineering strategies. It will also confirm that the privacy mechanisms are implemented correctly, forming a critical safeguard for the system.
+This section will confirm that the privacy mechanisms are implemented correctly, forming a critical safeguard for the system. It will discuss the implications of k-anonymity for data utility and potential future enhancements like differential privacy.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -277,9 +267,9 @@ The evaluation results suggest that the proposed agentic framework is technicall
 \begin{itemize}
     \item \textbf{Proactive Safety is Achievable (RQ1):} The Safety Triage Agent's performance indicates that automated, real-time crisis detection is viable. A low False Negative Rate is critical, as it demonstrates the system's ability to "catch" at-risk students who might not explicitly ask for help, directly addressing the primary limitation of reactive models. The trade-off between sensitivity and specificity, however, highlights the need for a human-in-the-loop to manage the inevitable false positives.
 
-    \item \textbf{Workflows Can Be Reliably Automated (RQ2):} The high success rate of tool calls and state transitions demonstrates that the underlying orchestration is robust. This is a prerequisite for any proactive system; if the framework cannot reliably execute its own internal processes (like creating a case or notifying a counselor), then its ability to act on proactive insights is compromised.
+    \item \textbf{Automated Interventions are Reliable and Effective (RQ2):} The high success rate of tool calls demonstrates that the orchestration is robust, while the strong rubric scores confirm that the resulting interventions are therapeutically appropriate. This proves that the system can not only execute the mechanics of support (e.g., creating a case) but also deliver high-quality content (e.g., empathetic coaching) without constant human oversight.
 
-    \item \textbf{Quality and Privacy Can Coexist (RQ3):} The evaluation of the Therapeutic Coach Agent shows that it is possible to generate responses that are both empathetic and aligned with basic therapeutic principles. Simultaneously, the successful validation of the Insights Agent's k-anonymity implementation confirms that it is possible to derive valuable institutional insights without sacrificing individual student privacy. This dual finding is crucial, as it shows that a proactive, data-driven approach need not be invasive.
+    \item \textbf{Strategic Insights Respect Privacy (RQ3):} The successful validation of the Insights Agent's k-anonymity implementation confirms that it is possible to derive valuable institutional insights without sacrificing individual student privacy. This finding is crucial, as it shows that a proactive, data-driven approach need not be invasive.
 \end{itemize}
 
 \subsection{Implications for the Proactive Support Paradigm}

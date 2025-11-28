@@ -1,0 +1,333 @@
+\chapter*{APPENDIX}
+\label{app:implementation_details}
+
+This appendix provides the technical artifacts that underpin the Safety Agent Suite's implementation. It includes the repository information for reproducibility, the core system prompts that define the agents' behavior, and the key algorithms used for graph-based reasoning.
+
+\section{Repository Information}
+\label{sec:repo_info}
+
+The complete source code for the UGM-AICare project, including the agentic backend, frontend interface, and deployment configurations, is available in the following GitHub repository.
+
+\begin{itemize}
+    \item \textbf{Repository URL:} \url{https://github.com/gigahidjrikaaa/UGM-AICare.git}
+    \item \textbf{Version Referenced:} v1.0-release
+    \item \textbf{License:} MIT License
+\end{itemize}
+
+\subsection*{Project Structure}
+The project follows a microservices architecture. The key directories relevant to this thesis are:
+
+\begin{itemize}
+    \item \texttt{backend/app/agents/}: Contains the LangGraph state machine definitions and agent workflows.
+    \item \texttt{backend/app/agents/sta/}: Contains the Safety Triage Agent logic and Gemini classifiers.
+    \item \texttt{backend/app/agents/aika\_orchestrator\_graph.py}: The master orchestrator graph definition.
+    \item \texttt{backend/app/core/llm.py}: Contains the LLM interaction logic and system prompts.
+\end{itemize}
+
+\section{System Prompts}
+\label{sec:system_prompts}
+
+The following prompts define the core cognitive behavior of the agents. They are presented here to provide transparency into how the agents are instructed to handle safety-critical tasks.
+
+\subsection{Safety Triage Agent (STA) Classification Prompt}
+This prompt is used by the Safety Triage Agent to analyze user messages for risk levels using a Chain-of-Thought (CoT) reasoning process.
+
+\begin{lstlisting}[style=academicStyle, language=json, caption={System Prompt for Safety Triage Classification}]
+Kamu adalah spesialis triage krisis kesehatan mental untuk mahasiswa Indonesia.
+
+Analyze pesan ini untuk risiko kesehatan mental menggunakan EXPLICIT STEP-BY-STEP REASONING.
+
+**Pesan Saat Ini:**
+"{message}"
+
+**Konteks Percakapan Sebelumnya:**
+{history_str}
+
+**ANALISIS SISTEMATIS:**
+
+**STEP 1 - KATA KUNCI KRISIS:**
+List kata-kata eksplisit yang indicate krisis (bunuh diri, self-harm, death wishes, mention metode).
+Quote exact phrases dari pesan.
+
+**STEP 2 - POLA LINGUISTIK:**
+Check untuk: finality language, past-tense life review, goodbye statements, hopelessness.
+Explain apa yang kamu temukan.
+
+**STEP 3 - TONE EMOSIONAL:**
+Rate negative valence (0-10). Look for: despair, defeat, emptiness, isolation.
+Provide evidence dari pesan.
+
+**STEP 4 - SINYAL URGENSI:**
+Check untuk: immediacy ("hari ini", "sekarang", "malam ini"), rencana konkret, time constraints.
+List apa yang kamu temukan.
+
+**STEP 5 - FAKTOR PROTEKTIF:**
+Look for: rencana masa depan, mention support, help-seeking, ambivalence, humor.
+Note kalau ada.
+
+**STEP 6 - FAKTOR KONTEKSTUAL:**
+Consider: stigma kesehatan mental Indonesia, tekanan akademik (konteks UGM), norma budaya.
+Gimana budaya affect interpretasi?
+
+**STEP 7 - KEBUTUHAN DUKUNGAN:**
+Apakah user butuh:
+- calm_down: teknik manajemen anxiety/panic
+- break_down_problem: bantuan dengan complexity yang overwhelming
+- general_coping: strategi stress management
+- none: nggak perlu plan immediate
+
+**STEP 8 - KLASIFIKASI FINAL:**
+Berdasarkan steps 1-7, classify:
+- risk_level: 0 (low), 1 (moderate), 2 (high), 3 (critical)
+- intent: crisis_support | acute_distress | academic_stress | relationship_strain | general_support
+- next_step: human (escalate) | tca (coaching) | resource (self-help)
+- confidence: 0.0-1.0 (seberapa yakin kamu?)
+
+Weight factors:
+- Kata kunci/pola krisis: immediate level 3
+- Multiple distress signals: level 2
+- Single stressor + coping: level 1
+- Casual/safe: level 0
+
+Return as JSON:
+{
+  "step1_crisis_keywords": ["list", "of", "keywords"],
+  "step2_linguistic_patterns": "description",
+  "step3_emotional_tone": {"score": 7, "evidence": "quotes"},
+  "step4_urgency_signals": ["list"],
+  "step5_protective_factors": ["list"],
+  "step6_cultural_context": "notes",
+  "step7_support_needs": "calm_down | break_down_problem | general_coping | none",
+  "step8_classification": {
+    "risk_level": 2,
+    "intent": "acute_distress",
+    "next_step": "tca",
+    "confidence": 0.85,
+    "reasoning": "brief explanation of decision"
+  }
+}
+\end{lstlisting}
+
+\subsection{Aika Orchestrator Decision Prompt}
+This prompt is used by the Aika Meta-Agent to decide whether to handle a query directly or invoke specialized agents.
+
+\begin{lstlisting}[style=academicStyle, language=json, caption={System Prompt for Orchestrator Decision}]
+Analyze this message and determine if specialized safety agents are needed.
+
+User Role: {user_role}
+Message: {state["message"]}
+
+Decision Criteria:
+
+FOR STUDENTS (user):
+- ALWAYS HANDLE DIRECTLY (needs_agents=false):
+  * Aika is the primary responder for ALL student interactions.
+  * Aika handles emotional support, crisis de-escalation, and appointment booking directly using tools.
+  * DO NOT invoke specialized agents (STA/TCA/CMA) synchronously.
+  * Background processes will handle deep risk analysis later.
+
+FOR ADMINS:
+- NEEDS AGENTS (invoke IA for analytics):
+  * Requests complex data/analytics ("trending topics", "case statistics")
+  * Aggregated reports requiring specialized processing
+  
+- NO AGENTS NEEDED:
+  * Simple status checks ("is system healthy?")
+  * General platform questions
+  * Specific user lookups (Aika can use tools for this)
+
+FOR COUNSELORS:
+- NEEDS AGENTS (invoke CMA for case management):
+  * Requests to CREATE or MODIFY cases
+  * Clinical insights requiring deep analysis
+  
+- NO AGENTS NEEDED:
+  * General clinical questions
+  * Viewing patient data (Aika can use tools)
+
+Return JSON with:
+{
+  "intent": "string (e.g., 'emotional_support', 'crisis', 'casual_chat', 'information_seeking')",
+  "intent_confidence": float (0.0-1.0),
+  "needs_agents": boolean,
+  "reasoning": "string explaining decision",
+  "suggested_response": "string (only if needs_agents=false, provide direct response)",
+  
+  "immediate_risk": "none|low|moderate|high|critical",
+  "crisis_keywords": ["list of crisis keywords found, empty if none"],
+  "risk_reasoning": "Brief 1-sentence explanation of risk assessment"
+}
+\end{lstlisting}
+
+\subsection{Therapeutic Coach Agent (TCA) Prompt}
+This prompt demonstrates how the TCA generates personalized, actionable intervention plans (e.g., for "Calm Down" interventions).
+
+\begin{lstlisting}[style=academicStyle, language=json, caption={System Prompt for TCA Plan Generation (Calm Down)}]
+Kamu adalah coach kesehatan mental yang expert dalam manajemen anxiety dan panic. Peran kamu adalah bantuin user untuk calm down ketika mereka experiencing anxiety, panic, atau stress yang overwhelming.
+
+Generate personalized support plan dengan 3-5 langkah spesifik dan actionable yang:
+1. Bantu grounding user di present moment
+2. Kurangi gejala fisiologis (jantung berdebar, napas cepat, dll.)
+3. Kasih teknik coping yang immediate
+4. Culturally sensitive dengan konteks Indonesia/Asia
+5. Pakai bahasa yang clear, compassionate, non-clinical
+
+REQUIREMENTS PENTING:
+- Setiap step harus immediately actionable (nggak vague)
+- Include durasi waktu spesifik (misal "5 menit", "3 napas dalam")
+- Pakai tone yang warm dan encouraging
+- Hindari jargon medis
+- Consider situasi spesifik dan context user
+
+Output format (JSON):
+{
+  "plan_steps": [
+    {"id": "step1", "label": "Tarik napas dalam 5 kali - hirup 4 hitungan, tahan 4, hembuskan 6", "duration_min": 2},
+    {"id": "step2", "label": "Sebutin 5 hal yang kamu lihat sekarang untuk grounding diri", "duration_min": 3}
+  ],
+  "resource_cards": [
+    {"resource_id": "breathing", "title": "Latihan Napas Terpandu", "summary": "Follow pola napas yang calming", "url": "https://aicare.example/calm/breathing"}
+  ]
+}
+\end{lstlisting}
+
+\subsection{Case Management Agent (CMA) Prompt}
+This prompt illustrates how the CMA intelligently matches students with the most suitable counselor based on case severity and preferences.
+
+\begin{lstlisting}[style=academicStyle, language={}, caption={System Prompt for CMA Counselor Selection}]
+Kamu adalah koordinator appointment kesehatan mental. Pilih psikolog yang PALING COCOK untuk case ini.
+
+Konteks Case:
+- Severity: {severity}
+- Preferensi Mahasiswa: {json.dumps(preferences)}
+
+Psikolog yang Available:
+{json.dumps(psych_profiles, indent=2)}
+
+Kriteria Pemilihan:
+1. Untuk case CRITICAL: Prioritas experience dan high ratings
+2. Match specialization kalau student punya concern spesifik
+3. Consider preferensi bahasa
+4. Prefer psikolog dengan jadwal availability yang defined
+
+Return HANYA psychologist ID (integer) dari pilihan kamu.
+\end{lstlisting}
+
+\subsection{Insights Agent (IA) Prompt}
+This prompt guides the Insights Agent in interpreting anonymized analytics data to provide actionable recommendations for university administrators.
+
+\begin{lstlisting}[style=academicStyle, language={}, caption={System Prompt for IA Analytics Interpretation}]
+Anda adalah asisten analitik data untuk platform kesehatan mental mahasiswa UGM-AICare.
+
+Tugas Anda:
+1. Menganalisis data statistik yang telah dianonimkan
+2. Mengidentifikasi tren dan pola penting
+3. Memberikan insight yang actionable untuk administrator
+4. Merekomendasikan intervensi berdasarkan data
+
+Format Respons:
+- Gunakan bahasa Indonesia yang profesional
+- Fokus pada insight praktis
+- Sertakan angka spesifik dari data
+- Berikan rekomendasi yang dapat ditindaklanjuti
+
+Catatan Privasi:
+- Semua data sudah dianonimkan dan diagregasi
+- Tidak ada informasi individual mahasiswa
+- Mengikuti standar k-anonymity (k >= 5)
+\end{lstlisting}
+
+\section{Core Algorithms}
+\label{sec:core_algorithms}
+
+\subsection{LangGraph State Schema}
+The following Python TypedDict defines the shared state that flows through the agent graph, ensuring type safety and consistent data passing between the Orchestrator, STA, TCA, and CMA.
+
+\begin{lstlisting}[style=academicStyle, language=Python, caption={Aika Orchestrator State Definition}]
+class AikaOrchestratorState(TypedDict, total=False):
+    """State for the unified Aika orchestrator graph."""
+    
+    # INPUT CONTEXT
+    user_id: int
+    user_role: Literal["user", "counselor", "admin"]
+    session_id: str
+    message: str
+    conversation_history: List[Dict[str, str]]
+    
+    # AIKA DECISION NODE OUTPUTS
+    intent: Optional[str]
+    needs_agents: bool
+    aika_direct_response: Optional[str]
+    agent_reasoning: Optional[str]
+    
+    # STA OUTPUTS (Safety Triage)
+    risk_level: Optional[int]
+    severity: Optional[Literal["low", "moderate", "high", "critical"]]
+    next_step: Optional[str]
+    
+    # TCA OUTPUTS (Therapeutic Coach)
+    intervention_plan: Optional[Dict[str, Any]]
+    should_intervene: bool
+    
+    # CMA OUTPUTS (Case Management)
+    case_id: Optional[int]
+    case_created: bool
+    assigned_counsellor_id: Optional[int]
+    
+    # FINAL RESPONSE
+    final_response: Optional[str]
+    response_source: Optional[Literal["aika_direct", "agents"]]
+    
+    # EXECUTION TRACKING
+    execution_id: Optional[str]
+    execution_path: List[str]
+    agents_invoked: List[str]
+\end{lstlisting}
+
+\subsection{Orchestrator Graph Construction}
+This algorithm defines the conditional routing logic of the Aika Orchestrator, demonstrating how the system dynamically chooses between direct responses and agent invocations.
+
+\begin{lstlisting}[style=academicStyle, language=Python, caption={LangGraph Construction Logic}]
+def create_aika_unified_graph(db: AsyncSession) -> StateGraph:
+    """Create unified Aika orchestrator graph."""
+    
+    workflow = StateGraph(AikaOrchestratorState)
+    
+    # Add nodes
+    workflow.add_node("aika_decision", partial(aika_decision_node, db=db))
+    workflow.add_node("execute_sta", partial(execute_sta_subgraph, db=db))
+    workflow.add_node("execute_sca", partial(execute_sca_subgraph, db=db))
+    workflow.add_node("execute_sda", partial(execute_sda_subgraph, db=db))
+    workflow.add_node("synthesize", partial(synthesize_final_response, db=db))
+    
+    # Entry point
+    workflow.set_entry_point("aika_decision")
+    
+    # Conditional routing after Aika decision
+    workflow.add_conditional_edges(
+        "aika_decision",
+        should_invoke_agents,
+        {
+            "invoke_cma": "execute_sda",  # Immediate crisis escalation
+            "invoke_sta": "execute_sta",
+            "end": END
+        }
+    )
+    
+    # Conditional routing after STA
+    workflow.add_conditional_edges(
+        "execute_sta",
+        should_route_to_sca,
+        {
+            "invoke_sca": "execute_sca",
+            "route_sda": "execute_sda",
+            "synthesize": "synthesize"
+        }
+    )
+    
+    # Terminal nodes
+    workflow.add_edge("execute_sda", "synthesize")
+    workflow.add_edge("synthesize", END)
+    
+    return workflow
+\end{lstlisting}
