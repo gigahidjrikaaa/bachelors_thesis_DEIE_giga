@@ -14,7 +14,7 @@ For high-level, real-time performance monitoring, the backend exposes custom met
 These metrics are scraped at 15-second intervals, providing the statistical basis for the performance results reported in subsequent sections.
 
 \subsection{Langfuse for Qualitative Trace Analysis}
-While Prometheus provides the "what" of system performance, Langfuse provides the "why." As an open-source observability platform designed for LLM applications, Langfuse captures detailed, end-to-end traces of every agent interaction. This qualitative data is essential for debugging and for a deep understanding of the agents' reasoning processes. For each user request, Langfuse logs:
+While Prometheus captures quantitative performance metrics, Langfuse facilitates qualitative analysis of the reasoning process. As an open-source observability platform designed for LLM applications, Langfuse captures detailed, end-to-end traces of every agent interaction. This qualitative data is essential for debugging and for a deep understanding of the agents' reasoning processes. For each user request, Langfuse logs:
 \begin{itemize}
     \item \textbf{State Transitions:} The complete path of execution through the LangGraph state machine, which is used to manually verify state transition accuracy for RQ2.
     \item \textbf{LLM Invocations:} The exact prompts, model parameters, and generated outputs for every call to the Gemini models, enabling analysis of response quality for RQ3.

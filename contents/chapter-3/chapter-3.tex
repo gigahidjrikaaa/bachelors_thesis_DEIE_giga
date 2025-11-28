@@ -357,6 +357,13 @@ Its agentic model is focused on data analysis and synthesis:
 
 While the four specialized agents (STA, TCA, CMA, IA) provide the system's core intelligence, their coordination requires an orchestration layer. This layer must solve a fundamental challenge in multi-agent systems: how to present a unified, coherent interface to different user roles while dynamically routing requests based on intent, access rights, and context \cite{wooldridge2009introductionmas}. The Aika Meta-Agent is designed as this unified orchestration layer, acting as the single point of contact for all users and the master controller for the specialist agents operating in the background. Its primary responsibilities are to interpret user intent, manage conversational state, enforce role-based access control, and synthesize the outputs of the specialist agents into a coherent response.
 
+The agentic behavior of the Aika Meta-Agent is defined as:
+\begin{itemize}
+    \item \textbf{Beliefs:} Aika believes the current state of the conversation, the user's authenticated role (Student/Admin), and the capabilities of the available specialist agents.
+    \item \textbf{Desires:} Its primary desire is to maintain a seamless, empathetic user experience while strictly enforcing safety protocols and routing rules.
+    \item \textbf{Intentions:} Upon receiving a message, Aika forms the intention to classify the user's intent (e.g., "greeting" vs. "crisis"), select the appropriate downstream agent (or handle it locally), and synthesize the final response.
+\end{itemize}
+
 Collectively, these specialized agents operationalize the two proactive loops described in Section 3.2. The STA and TCA are the primary actors in the \textbf{Real-Time Interaction Loop}, enabling proactive individual support through immediate risk detection and the asynchronous delivery of therapeutic content. The IA is the engine of the \textbf{Strategic Oversight Loop}, providing the institution with proactive, population-level insights. The CMA acts as a crucial bridge between these loops, translating automated insights (from STA or IA) into concrete administrative actions, such as case creation or counselor notification. This functional separation ensures that each component is optimized for its specific role within the broader proactive ecosystem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

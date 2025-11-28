@@ -59,11 +59,11 @@ The critical insight from this comparison is that technological advancement alon
 The inefficiency and reactive nature of current university mental health support systems present a complex problem. To move towards a proactive and scalable model, this research addresses the following core challenges:
 
 \begin{enumerate}
-    \item \textbf{Architectural Design for Proactivity:} How can an agentic AI framework be designed to shift mental health support from a reactive to a proactive model while ensuring strict safety protocols? This involves investigating the necessary components for a system that can autonomously detect risk and initiate intervention, rather than waiting for user requests.
+    \item \textbf{The Passive Nature of Current Systems:} Traditional support models and standard chatbots are fundamentally passive, waiting for students to explicitly request help. How can an agentic AI framework be designed to autonomously detect latent risk signals and initiate intervention, thereby shifting the paradigm from reactive to proactive?
 
-    \item \textbf{Reliable Multi-Agent Orchestration:} How can a heterogeneous system of specialized agents be orchestrated to execute complex, stateful mental health workflows reliably? This addresses the research problem of coordinating non-deterministic LLM-based agents to perform deterministic, safety-critical administrative and clinical tasks.
+    \item \textbf{Orchestrating Autonomous Intervention:} Proactive support requires the system to take independent action (e.g., scheduling appointments, escalating crises) rather than just providing information. How can a heterogeneous system of specialized agents be orchestrated to execute these complex, stateful workflows reliably and autonomously?
 
-    \item \textbf{Pre-Clinical Validation Methodology:} How can the efficacy and safety of such an autonomous system be rigorously validated in a pre-clinical context? This addresses the need for a robust evaluation framework that can demonstrate technical feasibility and safety compliance without putting real human subjects at risk in early development stages.
+    \item \textbf{Validating Proactive Safety:} Validating a system that acts autonomously carries higher risk than validating a passive tool. How can the safety and efficacy of such an autonomous, proactive system be rigorously validated in a pre-clinical context to ensure it intervenes appropriately without overstepping?
 \end{enumerate}
 
 To address these challenges, this thesis proposes and details the \textbf{Safety Agent Suite}, a framework comprised of four specialized, collaborative intelligent agents: a \textbf{Safety Triage Agent (STA)}, a \textbf{Therapeutic Coach Agent (TCA)}, a \textbf{Case Management Agent (CMA)}, and an \textbf{Insights Agent (IA)}, coordinated through an \textbf{Aika Meta-Agent} (orchestrator) that provides unified, role-based orchestration and ensures coherent, safety-first interactions across all user roles.
@@ -75,9 +75,9 @@ To address these challenges, this thesis proposes and details the \textbf{Safety
 
 The primary objectives of this thesis are:
 \begin{enumerate}
-    \item To design an agentic AI framework, grounded in the BDI model of rational agency, that systematically bridges the 'insight-to-action' gap in institutional mental health support.
-    \item To implement a functional proof-of-concept prototype, the 'Safety Agent Suite,' demonstrating the orchestration of specialized agents (triage, coaching, service desk, insights) and a meta-agent coordinator using LangGraph.
-    \item To evaluate the prototype's core agentic workflows through scenario-based testing, validating its capacity for proactive intervention and automated administrative action.
+    \item To design an agentic AI framework, grounded in the BDI model of rational agency, that enables a paradigm shift from reactive to proactive mental health support in higher education.
+    \item To implement a functional proof-of-concept prototype, the 'Safety Agent Suite,' demonstrating the autonomous orchestration of specialized agents to perform system-initiated interventions (triage, coaching, service desk, insights).
+    \item To evaluate the prototype's core agentic workflows through scenario-based testing, specifically validating its capacity to detect latent risks and execute automated administrative actions.
 \end{enumerate}
 
 %-------------------------------------------------
@@ -88,9 +88,9 @@ The primary objectives of this thesis are:
 To keep the scope concrete and measurable, this thesis addresses the following research questions (RQs). These research questions are derived directly from the identified problems and are designed to verify whether the proposed objectives have been met or not.
 
 \begin{enumerate}
-    \item \textbf{RQ1 (Proactive Safety):} Can the agentic framework reliably distinguish between crisis and non-crisis user states to trigger a timely and appropriate safety protocol?
-    \item \textbf{RQ2 (Functional Correctness):} Does the multi-agent framework correctly execute its core automated workflows, such as routing users to the appropriate specialized agent and invoking necessary tools?
-    \item \textbf{RQ3 (Output Quality \& Privacy):} Can the framework generate outputs (coaching advice, institutional insights) that are both appropriate for their purpose and compliant with privacy-preserving principles?
+    \item \textbf{RQ1 (Proactive Safety):} Can the agentic framework autonomously detect latent crisis indicators and initiate appropriate safety protocols without explicit user escalation?
+    \item \textbf{RQ2 (Autonomous Orchestration):} Can the multi-agent architecture reliably orchestrate complex support workflows to enable system-initiated interventions (e.g., coaching, case creation) without manual user navigation?
+    \item \textbf{RQ3 (Strategic Proactivity):} Can the framework generate privacy-preserving, population-level insights that enable institutional leaders to engage in proactive resource allocation?
 \end{enumerate}
 
 These questions directly inform the evaluation in Chapter IV through scenario-based tests and transparent metrics (e.g., sensitivity, workflow success rate, rubric scores), with human oversight preserved for safety-critical cases.
