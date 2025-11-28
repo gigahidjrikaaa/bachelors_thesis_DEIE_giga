@@ -37,7 +37,7 @@ Despite their technological sophistication and therapeutic potential, the fundam
 
 Critically, this limitation is not unique to technology; \textbf{the traditional, in-person counseling model is equally reactive}. The standard university mental health service operates on an appointment-based system where students must: (1) recognize their own distress, (2) navigate the institutional referral process, (3) schedule an appointment (often facing multi-week waitlists), and (4) attend the session during limited office hours \cite{baik2019universities, gallagher2023counselor}. 
 
-This places the entire burden of initiation on the student, creating the same fundamental barrier across both technological and traditional systems: \textbf{it assumes students will self-identify their distress and actively seek help}. Research demonstrates that this assumption is systematically violated. Stigma, lack of mental health literacy, and a desire for self-reliance all contribute to low help-seeking rates \cite{corrigan2009stigmahelpseeking, patel2022helpseekingcollege}. More critically, the very symptoms of conditions like depression—including anhedonia, executive dysfunction, and social withdrawal—actively impair the cognitive and motivational capacities required to initiate help-seeking behavior \cite{liu2023distresshelpseeking, PLACEHOLDER_CITE_depression_helpseeking}.
+This places the entire burden of initiation on the student, creating the same fundamental barrier across both technological and traditional systems: \textbf{it assumes students will self-identify their distress and actively seek help}. Research demonstrates that this assumption is systematically violated. Stigma, lack of mental health literacy, and a desire for self-reliance all contribute to low help-seeking rates \cite{corrigan2009stigmahelpseeking, patel2022helpseekingcollege}. More critically, the very symptoms of conditions like depression—including anhedonia, executive dysfunction, and social withdrawal—actively impair the cognitive and motivational capacities required to initiate help-seeking behavior \cite{liu2023distresshelpseeking,Alesi2024_execdysfunction}.
 
 Therefore, both traditional and chatbot-based reactive models fail to serve the most vulnerable population: those who are in distress but do not initiate contact. A student experiencing suicidal ideation may lack the energy to schedule an appointment; a student with severe social anxiety may find the act of reaching out to be itself insurmountably distressing. This thesis proposes that a solution requires a \textbf{paradigm shift to a proactive support model} that aims to anticipate needs and intervene before a problem escalates. Drawing from principles in preventative healthcare and proactive customer relationship management, this model uses data to identify patterns and risk factors, enabling the institution to offer timely, relevant support to at-risk cohorts \cite{williams2022datadrivenhe, lyon2020datadrivenuniversity}. By continuously analyzing interaction patterns and employing automated risk detection, the proposed multi-agent framework can identify students in distress and initiate supportive contact \textit{before} they reach a crisis threshold, thereby addressing the systemic failure of all reactive support models.
 
@@ -93,7 +93,7 @@ The concept of \textbf{Data-Driven Decision-Making (DDDM)} posits that strategic
 The paradigm of Artificial Intelligence (AI) has evolved significantly from systems that perform singular, reactive tasks to those that exhibit autonomous, proactive, and social behaviors. A cornerstone of this evolution is the concept of an \textbf{intelligent agent}. An agent is not merely a program; it is a persistent computational entity with
 a degree of autonomy, situated within an environment, which it can both perceive and upon which it can act to achieve a set of goals or design objectives \cite{wooldridge1995intelligentagents}. The defining characteristic of an agent is its \textbf{autonomy}, its capacity to operate independently, making decisions and initiating actions without direct, constant human intervention. This is distinct from traditional objects, which are defined by their methods and attributes but do not exhibit control over their own behavior \cite{wooldridge2009introductionmas}.
 
-To operationalize this concept, this thesis formally introduces a framework built upon four distinct, specialized intelligent agents that form the \textbf{Safety Agent Suite}, coordinated by a unified orchestration layer. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---all user interactions occur exclusively through Aika's conversational interface, which internally orchestrates specialist agent invocations as needed. This design ensures a consistent user experience while enabling modular, specialized intelligence. Each specialist agent operates transparently in the background, invoked conditionally based on user role and intent. Together they form the core of the proposed proactive support system. The framework components are:
+To operationalize this concept, this thesis formally introduces a framework built upon \textbf{four specialized intelligent agents} (STA, TCA, CMA, IA) that form the \textbf{Safety Agent Suite}, orchestrated by a central \textbf{Meta-Agent (Aika)}. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---all user interactions occur exclusively through Aika's conversational interface, which internally orchestrates specialist agent invocations as needed. This design ensures a consistent user experience while enabling modular, specialized intelligence. Each specialist agent operates transparently in the background, invoked conditionally based on user role and intent. Together they form the core of the proposed proactive support system. The framework components are:
 \begin{itemize}
     \item The \textbf{Aika Meta-Agent}, responsible for: (1) serving as the sole user-facing conversational interface for all stakeholders, (2) performing immediate Tier 1 risk screening via structured JSON responses from Gemini API, (3) context-aware routing to specialist agents based on user role and intent classification, (4) synthesizing specialist outputs into coherent, role-appropriate conversational responses, and (5) role-based access control enforcement.
     \item The \textbf{Safety Triage Agent (STA)}, operating in the background to perform comprehensive conversation-level risk analysis (Tier 2) at conversation end, identifying cumulative risk patterns and recommending proactive follow-up interventions.
@@ -216,29 +216,6 @@ To formally ground the proposed framework in this established model, the roles a
     \end{tabular}
 \end{table}
 
-\paragraph{Formalization of the BDI Cycle}
-The BDI model operates through continuous state updates that govern how agents perceive, deliberate, and act. The cycle can be formalized as:
-
-\textbf{Belief Update:} An agent's beliefs are updated as new information is perceived:
-\begin{equation}
-Bel_{t+1} = Bel_t \cup \{\text{percept}_t\} \setminus \{\text{expired beliefs}\}
-\end{equation}
-where $\text{percept}_t$ represents new observations from the environment, and expired beliefs are those that are no longer valid or relevant.
-
-\textbf{Desire Selection:} The agent filters potential goals based on its current beliefs:
-\begin{equation}
-Des_t = \text{filter}(\text{Options}_t, Bel_t)
-\end{equation}
-where $\text{Options}_t$ represents all possible goals the agent could pursue, and the filter function selects those that are feasible given current beliefs.
-
-\textbf{Intention Formation:} The agent commits to a specific plan of action through deliberation:
-\begin{equation}
-Int_t = \text{deliberate}(Des_t, Bel_t, Int_{t-1})
-\end{equation}
-where the deliberation process considers current desires, beliefs, and previous intentions to form a committed plan.
-
-For example, in the \textbf{Safety Triage Agent (STA)}, $\text{percept}_t$ is the incoming student message $M_t$, beliefs include prior conversation context and crisis patterns, desires map to intervention goals (de-escalation, resource connection), and intentions become the selected action (escalate to CMA, provide coping strategy, or direct to emergency resources).
-
 When multiple agents, each with its own goals and capabilities, co-exist and interact within a shared environment, they form a \textbf{Multi-Agent System (MAS)}. An MAS is a system in which the overall intelligent behavior and functionality are a product of the collective, emergent dynamics of its constituent agents \cite{burguillo2017multiagentsystems, petrova2025agenticweb}. The power of an MAS lies in its ability to solve problems that would be difficult or impossible for a monolithic system or a single agent to handle. This is achieved through social interaction, primarily:
 
 \begin{itemize}
@@ -291,6 +268,20 @@ where $C_t$ represents the current case state (severity, student information, ap
 These formalizations establish the mathematical foundation for the multi-agent coordination described in subsequent sections and implemented in Chapter 3.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% SubSection: Explainable AI (XAI) and Trust in Automation
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Explainable AI (XAI) and Trust in Automation}
+\label{subsec:xai_trust}
+
+In safety-critical domains such as mental health support, the "black box" nature of deep learning models poses a significant challenge to adoption and safety. \textbf{Explainable AI (XAI)} refers to methods and techniques in the application of artificial intelligence technology (AI) such that the results of the solution can be understood by human experts \cite{arrieta2020explainable}. 
+
+\subsubsection{Trust in Automation}
+Trust is a foundational element in the relationship between humans and automated systems. Lee and See define trust in automation as "the attitude that an agent will help achieve an individual's goals in a situation characterized by uncertainty and vulnerability" \cite{lee2004trust}. In the context of the Safety Agent Suite, trust must be established not only with the student users but also with the clinical administrators who oversee the system. Over-trust can lead to complacency (missing critical failures), while under-trust can lead to disuse (ignoring valid alerts).
+
+\subsubsection{Algorithmic Transparency and Risk Reasoning}
+To mitigate these risks and foster appropriate trust, the system incorporates mechanisms for \textbf{algorithmic transparency}. Specifically, the Safety Triage Agent (STA) is designed to provide not just a risk classification, but also a structured \textbf{risk reasoning} output. This aligns with the principles of "post-hoc explainability," where the model articulates the specific linguistic cues or patterns that led to a high-risk assessment (e.g., "User expressed direct intent of self-harm in previous turn"). This transparency allows human supervisors to validate the agent's decisions, ensuring that the "human-in-the-loop" can effectively audit the system's performance and intervene when necessary \cite{holzinger2019causability}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Large Language Models (LLMs)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Large Language Models (LLMs)}
@@ -299,19 +290,7 @@ These formalizations establish the mathematical foundation for the multi-agent c
 Large Language Models (LLMs) are a class of deep learning models that have demonstrated remarkable capabilities in understanding and generating human-like text. The architectural foundation for virtually all modern LLMs, including the Gemini models used in this research, is the \textbf{Transformer architecture}, first introduced by Vaswani et al. \cite{vaswani2017attention}. The Transformer's key innovation is the \textbf{self-attention mechanism}, which allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors, such as Recurrent Neural Networks (RNNs) \cite{liu2023transformersurvey, vaswani2017comparisonrnn}.
 
 \paragraph{The Self-Attention Mechanism}
-The self-attention mechanism computes contextual representations by relating different positions in a sequence to each other. Given an input sequence, the mechanism computes three matrices: Query ($Q$), Key ($K$), and Value ($V$), each derived through learned linear projections of the input embeddings. The attention operation is then defined as:
-\begin{equation}
-\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
-\end{equation}
-where $d_k$ is the dimension of the key vectors. The scaling factor $\sqrt{d_k}$ prevents the dot products from growing too large, which would push the softmax function into regions with extremely small gradients.
-
-The attention weights, computed by the softmax of the scaled dot products between queries and keys, determine how much each position in the sequence should attend to every other position. These weights are then used to compute a weighted sum of the value vectors, producing contextually-aware representations.
-
-Modern Transformers employ \textbf{multi-head attention}, which applies multiple attention operations in parallel, each with different learned projections:
-\begin{equation}
-\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, \ldots, \text{head}_h)W^O
-\end{equation}
-where $\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$ and $W^O$ is an output projection matrix. This allows the model to attend to information from different representation subspaces simultaneously. For instance, Gemini 2.5 employs 32 attention heads per layer, enabling it to capture diverse linguistic patterns and semantic relationships concurrently.
+The self-attention mechanism allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors. Modern Transformers employ \textbf{multi-head attention}, which applies multiple attention operations in parallel, enabling the model to capture diverse linguistic patterns and semantic relationships concurrently.
 
 The core operation of a Transformer-based model involves processing input text through a series of encoding and/or decoding layers. The process can be conceptualized as follows:
 \begin{enumerate}
@@ -416,7 +395,6 @@ Gemini 2.5 builds upon the efficient \textbf{Mixture-of-Experts (MoE) Transforme
 The strategic role of Gemini 2.5 in this framework is defined by its next-generation capabilities:
 \begin{itemize}
     \item \textbf{Native Multimodality with Expressive Audio:} A significant architectural leap in Gemini 2.5 is its native handling of audio \cite{googleblogaudio2025}. Unlike models that first transcribe audio to text, Gemini 2.5 processes audio streams directly. This allows it to understand not just the words, but also the nuances of human speech such as tone, pitch, and prosody, which is invaluable for a mental health application where user sentiment is key.
-    \item \textbf{Controllable Reasoning and "Thinking Time":} Gemini 2.5 introduces a "thinking budget," a mechanism that allows developers to control the trade-off between response latency and reasoning depth \cite{google2025gemini2_5}. For high-frequency tasks performed by the Safety Triage Agent, a lower budget can ensure speed. For complex analytical tasks required by the Insights Agent, a higher budget can be allocated to allow for more thorough reasoning, providing granular control over both cost and quality.
     \item \textbf{Advanced Agentic Capabilities and Tool Use:} The model is explicitly designed to power advanced agents. It features more reliable and sophisticated function calling, enabling seamless integration with external tools and APIs \cite{google2025gemini2_5}. This is essential for the Service Desk Agent to execute multi-step plans, such as scheduling an appointment based on a user's request.
     \item \textbf{High-Fidelity Reasoning:} As a frontier model, Gemini 2.5 serves as the high-capability engine for all requests, ensuring service continuity and the highest quality output.
 \end{itemize}
@@ -485,24 +463,18 @@ The stateful execution of a LangGraph workflow is governed by formal state updat
 \begin{equation}
 S_{t+1} = \text{node}_i(S_t) = S_t \oplus \Delta S_i
 \end{equation}
-where $S_t$ represents the current state at time step $t$, $\Delta S_i$ is the update produced by node $i$, and $\oplus$ denotes the state merging operation (where new fields override existing values while preserving unmodified fields).
+Here, $S_t$ represents the \textbf{Global State Object} at time step $t$, which contains the complete conversation history and metadata. $\Delta S_i$ is the \textbf{State Update} produced by node $i$ (e.g., a new message or a risk classification). The operator $\oplus$ denotes the \textbf{State Merging Operation}, where new fields in $\Delta S_i$ overwrite or append to existing values in $S_t$ while preserving all other unmodified fields. This ensures that context is never lost as the workflow progresses.
 
-Conditional edges implement routing logic via predicate functions that inspect the current state. For the Safety Agent Suite, the routing after risk assessment can be formalized as:
+Conditional edges implement routing logic via predicate functions that inspect this shared state. For the Safety Agent Suite, the routing after risk assessment is formalized to include a \textbf{confidence threshold} ($\tau$), ensuring that uncertain predictions are automatically escalated for human review. The routing function is defined as:
 \begin{equation}
 \text{next}(S_t) = \begin{cases}
-\text{escalate\_to\_sda} & \text{if } S_t.\text{risk\_level} \geq 2 \\
-\text{provide\_coaching} & \text{if } S_t.\text{risk\_level} = 1 \\
-\text{END} & \text{if } S_t.\text{risk\_level} = 0
+\text{escalate\_to\_cma} & \text{if } S_t.\text{risk\_level} \geq 2 \lor \text{conf}(S_t.\text{risk\_level}) < \tau \\
+\text{provide\_coaching} & \text{if } S_t.\text{risk\_level} = 1 \land \text{conf}(S_t.\text{risk\_level}) \geq \tau \\
+\text{END} & \text{if } S_t.\text{risk\_level} = 0 \land \text{conf}(S_t.\text{risk\_level}) \geq \tau
 \end{cases}
 \end{equation}
 
-This formalization enables dynamic multi-agent orchestration where the STA's risk assessment ($R_t$) determines subsequent workflow paths: moderate risk routes to the TCA for therapeutic intervention, high or critical risk escalates to the CMA for clinical case creation, and low risk concludes the interaction. The explicit state management ensures that all downstream agents have access to the complete conversation context, enabling informed decision-making throughout the workflow.
-
-More generally, for any conditional routing decision, the next node is determined by a routing function $\rho$:
-\begin{equation}
-\text{next\_node} = \rho(S_t) \in N \cup \{\text{END}\}
-\end{equation}
-where $\rho$ maps the current state to either another node in the graph or a terminal state, enabling arbitrary workflow complexity including loops, parallel execution, and human-in-the-loop interventions.
+This formalization enables dynamic multi-agent orchestration where the STA's risk assessment determines subsequent workflow paths: moderate risk routes to the TCA for therapeutic intervention, high or critical risk escalates to the CMA for clinical case creation, and low risk concludes the interaction. The explicit state management ensures that all downstream agents have access to the complete conversation context, enabling informed decision-making throughout the workflow.
 
 This cyclical, stateful approach provides several key advantages for this framework:
 \begin{enumerate}
