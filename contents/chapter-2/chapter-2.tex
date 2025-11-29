@@ -226,46 +226,52 @@ When multiple agents, each with its own goals and capabilities, co-exist and int
 
 Therefore, this thesis leverages the MAS paradigm by designing a framework composed of four specialized, collaborative agents coordinated by a meta-agent orchestrator. Their individual, goal-directed behaviors, orchestrated within a hierarchical architecture, work in concert to achieve the overarching systemic objective: transforming institutional mental health support from a reactive model to a proactive, data-driven ecosystem.
 
-\subsubsection{Mathematical Formalization of Agent Decision Functions}
+\subsubsection{Formal Logic of Agent Orchestration}
 \label{subsubsec:agent_decision_functions}
 
-To operationalize the BDI model for the Safety Agent Suite, each agent's core decision-making process is formalized as a mathematical function mapping inputs to outputs. This formalization bridges the theoretical BDI framework to the practical implementation described in Chapter 3.
+To operationalize the BDI model, the decision-making logic of the Safety Agent Suite is formalized as a set of mapping functions. This formalization clarifies how the Aika Meta-Agent orchestrates the specialized agents based on user inputs and context, bridging the theoretical framework to the practical implementation in Chapter 3.
 
-\paragraph{Safety Triage Agent (STA)} The STA assesses risk level $R_t \in \{0, 1, 2, 3\}$ from student message $M_t$:
+\paragraph{Aika Meta-Agent (Orchestrator)}
+As the primary interface, Aika performs the initial intent classification ($I$) and Tier 1 risk assessment ($R_{immediate}$) on the current user message ($m_t$):
 \begin{equation}
-R_t = f_{STA}(M_t; \theta_{LLM}, \mathcal{C})
+(I, R_{immediate}) = f_{Aika}(m_t, \text{UserRole})
 \end{equation}
-where $\theta_{LLM}$ represents the LLM parameters (Gemini 2.5 Flash) and $\mathcal{C}$ is the crisis pattern corpus used for contextual understanding. The discrete risk level maps to severity categories:
+This output determines the immediate routing logic:
 \begin{equation}
-\text{severity}(R_t) = \begin{cases}
-\text{low} & R_t = 0 \\
-\text{moderate} & R_t = 1 \\
-\text{high} & R_t = 2 \\
-\text{critical} & R_t = 3
+\text{Action} = \begin{cases}
+\text{Escalate to CMA} & \text{if } R_{immediate} \in \{\text{High}, \text{Critical}\} \\
+\text{Invoke Tools} & \text{if } I \in \{\text{Scheduling}, \text{Info}\} \\
+\text{Direct Response} & \text{otherwise}
 \end{cases}
 \end{equation}
 
-This classification determines subsequent routing: moderate risk ($R_t = 1$) triggers supportive coaching via TCA, while high or critical risk ($R_t \geq 2$) initiates immediate escalation to the Case Management Agent for clinical case management.
-
-\paragraph{Therapeutic Coach Agent (TCA)} The TCA generates therapeutic response $A_t$ given the current message and conversation history:
+\paragraph{Safety Triage Agent (STA)}
+Operating in the background, the STA performs a deep, Tier 2 analysis on the full conversation history ($H_t$) to assess the cumulative risk level ($R_{cumulative}$):
 \begin{equation}
-A_t = f_{TCA}(M_t, H_{t-1}; \theta_{LLM}, \mathcal{I})
+R_{cumulative} = f_{STA}(H_t)
 \end{equation}
-where $H_{t-1} = \{(M_0, A_0), \ldots, (M_{t-1}, A_{t-1})\}$ is the conversation history capturing previous exchanges, and $\mathcal{I}$ represents the intervention library containing evidence-based therapeutic frameworks (CBT, Motivational Interviewing). The history dependency enables the agent to maintain therapeutic continuity and adapt interventions based on student progress.
+Unlike Aika's immediate check, this function analyzes patterns across multiple turns to identify latent distress that may not be apparent in a single message.
 
-\paragraph{Insights Agent (IA)} The IA computes aggregate metric $\mu$ from anonymized message set $\mathcal{M}$:
+\paragraph{Therapeutic Coach Agent (TCA)}
+If the STA identifies moderate distress, the TCA is invoked to generate a personalized intervention plan ($P_{intervention}$), rather than a direct chat response:
 \begin{equation}
-\mu = f_{IA}(\mathcal{M}, q; \mathcal{K})
+P_{intervention} = f_{TCA}(H_t, \text{UserProfile})
 \end{equation}
-where $q$ represents the analytical query (e.g., crisis trend analysis, topic modeling, sentiment aggregation) and $\mathcal{K}$ enforces privacy constraints such as k-anonymity and query result suppression. The IA's output informs institutional decision-making by quantifying population-level trends while preserving individual privacy.
+This plan is stored asynchronously for the student to access, ensuring that therapeutic content is delivered without disrupting the conversational flow.
 
-\paragraph{Case Management Agent (CMA)} The CMA determines administrative action $\alpha_t$ based on case state and available resources:
+\paragraph{Case Management Agent (CMA)}
+The CMA is triggered for administrative or crisis actions ($\alpha$), such as scheduling appointments or creating crisis tickets, based on the current case state ($C_t$) and resource availability ($Res$):
 \begin{equation}
-\alpha_t = f_{CMA}(C_t, R_{avail}; \theta_{LLM})
+\alpha = f_{CMA}(C_t, Res)
 \end{equation}
-where $C_t$ represents the current case state (severity, student information, appointment history) and $R_{avail}$ denotes available resources (counselor schedules, emergency contact protocols). Actions include appointment scheduling, case note creation, and resource allocation.
 
-These formalizations establish the mathematical foundation for the multi-agent coordination described in subsequent sections and implemented in Chapter 3.
+\paragraph{Insights Agent (IA)}
+The IA aggregates anonymized data ($\mathcal{D}$) to compute population-level metrics ($\mu$) while enforcing privacy constraints ($k$-anonymity):
+\begin{equation}
+\mu = f_{IA}(\mathcal{D}, \text{Query}) \quad \text{s.t. } \text{Privacy}(\mu) \ge k
+\end{equation}
+
+These formalizations establish the logical foundation for the multi-agent coordination, ensuring that each agent operates within a clearly defined scope while contributing to the cohesive system behavior.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Explainable AI (XAI) and Trust in Automation
@@ -287,7 +293,7 @@ To mitigate these risks and foster appropriate trust, the system incorporates me
 \subsection{Large Language Models (LLMs)}
 \label{subsec:llms}
 
-Large Language Models (LLMs) are a class of deep learning models that have demonstrated remarkable capabilities in understanding and generating human-like text. The architectural foundation for virtually all modern LLMs, including the Gemini models used in this research, is the \textbf{Transformer architecture}, first introduced by Vaswani et al. \cite{vaswani2017attention}. The Transformer's key innovation is the \textbf{self-attention mechanism}, which allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors, such as Recurrent Neural Networks (RNNs) \cite{liu2023transformersurvey, vaswani2017comparisonrnn}.
+Large Language Models (LLMs) are a class of deep learning models that have demonstrated remarkable capabilities in understanding and generating human-like text. The architectural foundation for virtually all modern LLMs, including the Gemini models used in this research, is the \textbf{Transformer architecture} (see Figure \ref{fig:transformer_architecture}), first introduced by Vaswani et al. \cite{vaswani2017attention}. The Transformer's key innovation is the \textbf{self-attention mechanism}, which allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors, such as Recurrent Neural Networks (RNNs) \cite{liu2023transformersurvey, vaswani2017comparisonrnn}.
 
 \paragraph{The Self-Attention Mechanism}
 The self-attention mechanism allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors. Modern Transformers employ \textbf{multi-head attention}, which applies multiple attention operations in parallel, enabling the model to capture diverse linguistic patterns and semantic relationships concurrently.
