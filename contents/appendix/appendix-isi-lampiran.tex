@@ -108,16 +108,16 @@ from datetime import datetime
 from langgraph.graph import StateGraph, END
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.graph_state import SCAState
+from app.agents.graph_state import TCAState
 from app.agents.tca.service import TherapeuticCoachService
-from app.agents.tca.schemas import SCAInterveneRequest
+from app.agents.tca.schemas import TCAInterveneRequest
 from app.agents.execution_tracker import execution_tracker
 from app.domains.mental_health.models import InterventionPlanRecord
 
 logger = logging.getLogger(__name__)
 
 
-async def ingest_triage_signal_node(state: SCAState) -> SCAState:
+async def ingest_triage_signal_node(state: TCAState) -> TCAState:
     """Node: Ingest triage signal from STA."""
     execution_id = state.get("execution_id")
     if execution_id:
@@ -146,7 +146,7 @@ async def ingest_triage_signal_node(state: SCAState) -> SCAState:
     return state
 
 
-async def determine_intervention_type_node(state: SCAState) -> SCAState:
+async def determine_intervention_type_node(state: TCAState) -> TCAState:
     """Node: Determine appropriate intervention type."""
     execution_id = state.get("execution_id")
     if execution_id:
@@ -182,7 +182,7 @@ async def determine_intervention_type_node(state: SCAState) -> SCAState:
 The Case Management Agent (CMA) handles high-severity cases that require human escalation.
 
 \begin{lstlisting}[language=Python, caption={CMA LangGraph Definition (cma\_graph.py)}]
-async def ingest_escalation_node(state: SDAState) -> SDAState:
+async def ingest_escalation_node(state: CMAState) -> CMAState:
     """Node: Ingest escalation signal from STA."""
     execution_id = state.get("execution_id")
     if execution_id:

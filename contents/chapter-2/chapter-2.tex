@@ -108,7 +108,7 @@ Fundamentally, an agent's operation is defined by a continuous cycle of percepti
 
 \begin{itemize}
     \item \textbf{Beliefs:} This represents the informational state of the agent, its knowledge about the environment, which may be incomplete or incorrect. For the \textbf{Insights Agent}, beliefs correspond to the current understanding of student well-being trends derived from anonymized data.
-    \item \textbf{Desires:} These are the motivational states of the agent, representing the objectives or goals it is designed to achieve. Desires can be seen as the potential tasks the agent could undertake, such as the \textbf{Support Coach Agent's} overarching goal to "deliver personalized coaching."
+    \item \textbf{Desires:} These are the motivational states of the agent, representing the objectives or goals it is designed to achieve. Desires can be seen as the potential tasks the agent could undertake, such as the \textbf{Therapeutic Coach Agent's} overarching goal to "deliver personalized coaching."
     \item \textbf{Intentions:} This represents the agent's commitment to a specific plan or course of action. An intention is a desire that the agent has chosen to actively pursue. For instance, the \textbf{Safety Triage Agent}, upon identifying a high-severity conversation, forms an intention to immediately route the user to emergency resources.
 \end{itemize}
 
@@ -229,15 +229,22 @@ Therefore, this thesis leverages the MAS paradigm by designing a framework compo
 \subsubsection{Formal Logic of Agent Orchestration}
 \label{subsubsec:agent_decision_functions}
 
-To operationalize the BDI model, the decision-making logic of the Safety Agent Suite is formalized as a set of mapping functions. This formalization clarifies how the Aika Meta-Agent orchestrates the specialized agents based on user inputs and context, bridging the theoretical framework to the practical implementation in Chapter 3.
+To operationalize the BDI model, the decision-making logic of the Safety Agent Suite is formalized as a set of mapping functions. This formalization clarifies how the Aika Meta-Agent orchestrates the specialized agents based on user inputs and context.
 
 \paragraph{Aika Meta-Agent (Orchestrator)}
-As the primary interface, Aika performs the initial intent classification ($I$) and Tier 1 risk assessment ($R_{immediate}$) on the current user message ($m_t$):
+Think of the Aika Meta-Agent as the "front desk receptionist" of the system. Its job is to handle the immediate interaction. When a user sends a message ($m_t$), Aika considers who the user is ($\text{UserRole}$) and performs two simultaneous tasks: it classifies what the user wants ($I$) and checks for any immediate danger ($R_{immediate}$). This initial triage is defined in Equation \ref{eq:aika_func}:
+
 \begin{equation}
+\label{eq:aika_func}
 (I, R_{immediate}) = f_{Aika}(m_t, \text{UserRole})
 \end{equation}
-This output determines the immediate routing logic:
+
+In Equation \ref{eq:aika_func}, $f_{Aika}$ represents the meta-agent's cognitive processing (powered by the LLM). It takes the raw input message and the user's role as variables and outputs a tuple containing the Intent ($I$) and the Immediate Risk Level ($R_{immediate}$).
+
+Based on this initial assessment, Aika must decide where to route the conversation. This is analogous to the receptionist deciding whether to call security, schedule an appointment, or just answer a simple question. This routing logic is formalized in Equation \ref{eq:aika_action}:
+
 \begin{equation}
+\label{eq:aika_action}
 \text{Action} = \begin{cases}
 \text{Escalate to CMA} & \text{if } R_{immediate} \in \{\text{High}, \text{Critical}\} \\
 \text{Invoke Tools} & \text{if } I \in \{\text{Scheduling}, \text{Info}\} \\
@@ -245,33 +252,47 @@ This output determines the immediate routing logic:
 \end{cases}
 \end{equation}
 
+Equation \ref{eq:aika_action} describes a piecewise function where the output $\text{Action}$ depends on the values of $R_{immediate}$ and $I$. If the risk is high, the system escalates; if the intent requires a specific tool, it invokes it; otherwise, it handles the query directly.
+
 \paragraph{Safety Triage Agent (STA)}
-Operating in the background, the STA performs a deep, Tier 2 analysis on the full conversation history ($H_t$) to assess the cumulative risk level ($R_{cumulative}$):
+While Aika handles the "now," the Safety Triage Agent acts as a background investigator. It doesn't just look at the last message; it reviews the entire conversation history ($H_t$) to find patterns that might indicate a deeper problem, such as slowly increasing anxiety. This deep-dive analysis produces a cumulative risk score ($R_{cumulative}$), as defined in Equation \ref{eq:sta_func}:
+
 \begin{equation}
+\label{eq:sta_func}
 R_{cumulative} = f_{STA}(H_t)
 \end{equation}
-Unlike Aika's immediate check, this function analyzes patterns across multiple turns to identify latent distress that may not be apparent in a single message.
+
+In Equation \ref{eq:sta_func}, the variable $H_t$ represents the full transcript of the session up to time $t$. The function $f_{STA}$ processes this large context window to output the comprehensive risk assessment.
 
 \paragraph{Therapeutic Coach Agent (TCA)}
-If the STA identifies moderate distress, the TCA is invoked to generate a personalized intervention plan ($P_{intervention}$), rather than a direct chat response:
+If the system identifies a need for support that isn't an emergency (e.g., moderate stress), the Therapeutic Coach Agent steps in. Think of the TCA as a counselor who prepares a "take-home" care plan. It uses the conversation history ($H_t$) and the student's profile ($\text{UserProfile}$) to generate a personalized intervention plan ($P_{intervention}$), such as a set of CBT exercises. This is modeled in Equation \ref{eq:tca_func}:
+
 \begin{equation}
+\label{eq:tca_func}
 P_{intervention} = f_{TCA}(H_t, \text{UserProfile})
 \end{equation}
-This plan is stored asynchronously for the student to access, ensuring that therapeutic content is delivered without disrupting the conversational flow.
+
+Equation \ref{eq:tca_func} shows that the intervention plan $P_{intervention}$ is a function of both what happened in the chat ($H_t$) and who the student is ($\text{UserProfile}$), ensuring the advice is tailored to the individual.
 
 \paragraph{Case Management Agent (CMA)}
-The CMA is triggered for administrative or crisis actions ($\alpha$), such as scheduling appointments or creating crisis tickets, based on the current case state ($C_t$) and resource availability ($Res$):
+The Case Management Agent is the system's administrator. Its role is to execute concrete logistical actions ($\alpha$), such as creating a ticket in the database or booking a slot. To do this, it needs to know the current state of the case ($C_t$) and what resources are available ($Res$), like open calendar slots. This is defined in Equation \ref{eq:cma_func}:
+
 \begin{equation}
+\label{eq:cma_func}
 \alpha = f_{CMA}(C_t, Res)
 \end{equation}
 
+In Equation \ref{eq:cma_func}, the output $\alpha$ represents the administrative action taken. The function $f_{CMA}$ ensures that this action is valid given the current constraints ($Res$) and case status ($C_t$).
+
 \paragraph{Insights Agent (IA)}
-The IA aggregates anonymized data ($\mathcal{D}$) to compute population-level metrics ($\mu$) while enforcing privacy constraints ($k$-anonymity):
+Finally, the Insights Agent acts as a privacy-conscious data analyst. It looks at the data from the entire student population ($\mathcal{D}$) to answer specific questions ($\text{Query}$), producing population-level metrics ($\mu$). However, it operates under a strict constraint: it must not reveal any individual's identity. This is mathematically represented by the condition $\text{Privacy}(\mu) \ge k$, which refers to k-anonymity. This is formalized in Equation \ref{eq:ia_func}:
+
 \begin{equation}
+\label{eq:ia_func}
 \mu = f_{IA}(\mathcal{D}, \text{Query}) \quad \text{s.t. } \text{Privacy}(\mu) \ge k
 \end{equation}
 
-These formalizations establish the logical foundation for the multi-agent coordination, ensuring that each agent operates within a clearly defined scope while contributing to the cohesive system behavior.
+Equation \ref{eq:ia_func} states that the metrics $\mu$ are derived from the dataset $\mathcal{D}$ and the $\text{Query}$, subject to the constraint that the privacy score of the result must meet or exceed the threshold $k$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SubSection: Explainable AI (XAI) and Trust in Automation
@@ -297,6 +318,15 @@ Large Language Models (LLMs) are a class of deep learning models that have demon
 
 \paragraph{The Self-Attention Mechanism}
 The self-attention mechanism allows the model to dynamically weigh the importance of different words in an input sequence when processing and generating language. This enables the model to capture complex, long-range dependencies and contextual relationships far more effectively than its predecessors. Modern Transformers employ \textbf{multi-head attention}, which applies multiple attention operations in parallel, enabling the model to capture diverse linguistic patterns and semantic relationships concurrently.
+
+Mathematically, the scaled dot-product attention is defined in Equation \ref{eq:attention}:
+
+\begin{equation}
+\label{eq:attention}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+
+To understand Equation \ref{eq:attention}, imagine you are trying to understand the meaning of a specific word in a sentence (the Query, $Q$). To do this, you look at all the other words in the sentence (the Keys, $K$) to see which ones are relevant. The dot product $QK^T$ calculates a "relevance score" between your word and every other word. We divide by $\sqrt{d_k}$ to keep the numbers stable. The $\text{softmax}$ function then converts these scores into probabilities (weights) that sum to 1. Finally, we multiply these weights by the actual content of the words (the Values, $V$). The result is a new representation of your word that is a weighted mixture of all the relevant context around it.
 
 The core operation of a Transformer-based model involves processing input text through a series of encoding and/or decoding layers. The process can be conceptualized as follows:
 \begin{enumerate}
@@ -401,7 +431,7 @@ Gemini 2.5 builds upon the efficient \textbf{Mixture-of-Experts (MoE) Transforme
 The strategic role of Gemini 2.5 in this framework is defined by its next-generation capabilities:
 \begin{itemize}
     \item \textbf{Native Multimodality with Expressive Audio:} A significant architectural leap in Gemini 2.5 is its native handling of audio \cite{googleblogaudio2025}. Unlike models that first transcribe audio to text, Gemini 2.5 processes audio streams directly. This allows it to understand not just the words, but also the nuances of human speech such as tone, pitch, and prosody, which is invaluable for a mental health application where user sentiment is key.
-    \item \textbf{Advanced Agentic Capabilities and Tool Use:} The model is explicitly designed to power advanced agents. It features more reliable and sophisticated function calling, enabling seamless integration with external tools and APIs \cite{google2025gemini2_5}. This is essential for the Service Desk Agent to execute multi-step plans, such as scheduling an appointment based on a user's request.
+    \item \textbf{Advanced Agentic Capabilities and Tool Use:} The model is explicitly designed to power advanced agents. It features more reliable and sophisticated function calling, enabling seamless integration with external tools and APIs \cite{google2025gemini2_5}. This is essential for the Case Management Agent to execute multi-step plans, such as scheduling an appointment based on a user's request.
     \item \textbf{High-Fidelity Reasoning:} As a frontier model, Gemini 2.5 serves as the high-capability engine for all requests, ensuring service continuity and the highest quality output.
 \end{itemize}
 
@@ -421,23 +451,35 @@ While LLMs provide powerful reasoning capabilities, they are inherently stateles
 
 \textbf{LangChain} is an open-source framework designed specifically for this purpose, providing the essential "glue" to connect LLMs with external resources and compose them into complex applications \cite{barua2024llmagentsreview,yu2025agentworkflow}. The core philosophy of LangChain is to provide modular components that can be "chained" together to create complex workflows. The most recent and fundamental abstraction in LangChain is the \textbf{LangChain Expression Language (LCEL)}. LCEL provides a declarative, composable syntax for building chains, where the pipe (`|`) operator streams the output of one component into the input of the next. Every component in an LCEL chain is a "Runnable," a standardized interface that supports synchronous, asynchronous, batch, and streaming invocations, making it highly versatile for production environments \cite{yu2025agentworkflow, pospech2025metagraph}.
 
-A simple LCEL chain can be represented as:
-$$ \text{Chain} = \text{PromptTemplate} \ | \ \text{LLM} \ | \ \text{OutputParser} $$
+A simple LCEL chain can be represented as shown in Equation \ref{eq:lcel_chain}:
+\begin{equation}
+\label{eq:lcel_chain}
+\text{Chain} = \text{PromptTemplate} \ | \ \text{LLM} \ | \ \text{OutputParser}
+\end{equation}
 In this sequence, user input is first formatted by a `PromptTemplate`, the result is passed to the `LLM` for processing, and the LLM's raw output is then transformed into a structured format (e.g., JSON) by an `OutputParser`.
 
 For this thesis, the most critical application of LangChain is its ability to create \textbf{agents}. A LangChain agent uses an LLM not just for text processing, but as a reasoning engine to make decisions. This is often based on a framework known as \textbf{ReAct (Reasoning and Acting)}, which enables the LLM to synergize reasoning and action \cite{yao2022react, barua2024llmagentsreview}. The agent is given access to a set of \textbf{Tools}, which are simply functions that can interact with the outside world (e.g., a database query function, a file reader, a web search API). The agent's operational loop, managed by an \textbf{Agent Executor}, can be formalized as an iterative process.
 
 Let $G$ be the initial goal and $H_t$ be the history of actions and observations up to step $t$. The process at each step $t$ is:
 \begin{enumerate}
-    \item \textbf{Reasoning (Thought Generation):} The agent generates a thought $th_t$ and a subsequent action $a_t$ by sampling from the LLM's conditional probability distribution, given the goal and the history so far.
-    $$ (th_t, a_t) \sim p(th, a | G, H_{t-1}; \theta_{LLM}) $$
+    \item \textbf{Reasoning (Thought Generation):} The agent generates a thought $th_t$ and a subsequent action $a_t$ by sampling from the LLM's conditional probability distribution, given the goal and the history so far, as formalized in Equation \ref{eq:react_thought}:
+    \begin{equation}
+    \label{eq:react_thought}
+    (th_t, a_t) \sim p(th, a | G, H_{t-1}; \theta_{LLM})
+    \end{equation}
     The prompt to the LLM contains the goal and the trajectory of previous thoughts, actions, and observations, guiding its next decision.
 
-    \item \textbf{Action Execution:} The Agent Executor parses $a_t$ to identify the chosen tool and its input, then executes it to produce an observation, $o_t$.
-    $$ o_t = \text{ExecuteTool}(a_t) $$
+    \item \textbf{Action Execution:} The Agent Executor parses $a_t$ to identify the chosen tool and its input, then executes it to produce an observation, $o_t$ (Equation \ref{eq:react_action}).
+    \begin{equation}
+    \label{eq:react_action}
+    o_t = \text{ExecuteTool}(a_t)
+    \end{equation}
 
-    \item \textbf{History Augmentation:} The new observation is appended to the history, forming the context for the next iteration.
-    $$ H_t = H_{t-1} \oplus (a_t, o_t) $$
+    \item \textbf{History Augmentation:} The new observation is appended to the history, forming the context for the next iteration, as shown in Equation \ref{eq:react_history}.
+    \begin{equation}
+    \label{eq:react_history}
+    H_t = H_{t-1} \oplus (a_t, o_t)
+    \end{equation}
     This loop continues until the LLM determines the goal $G$ is met and generates a final answer.
 \end{enumerate}
 This iterative loop is what transforms a passive LLM into a proactive, problem-solving agent. For example, the \textbf{Insights Agent} in this framework, when tasked with "summarizing student stress trends," would use this loop to formulate a SQL query (Thought and Action), execute it (Observation), and then use the results to generate a final summary. This orchestration is fundamental to enabling the autonomous capabilities central to this thesis.
@@ -461,18 +503,23 @@ A LangGraph workflow can be defined by the following components:
 \begin{itemize}
     \item \textbf{State Graph:} The overall structure, $G = (N, E)$, where $N$ is a set of nodes and $E$ is a set of directed edges. The graph's state is explicitly defined by a state object that is passed and updated throughout the execution.
     \item \textbf{Nodes:} Each node represents an agent or a tool. When called, a node receives the current state object as input and returns a dictionary of updates to be applied to the state. For example, the `Safety Triage Agent` node would take the user's message from the state, process it, and return an update specifying the assessed risk level.
-    \item \textbf{Edges:} Edges connect the nodes and control the flow of the application. LangGraph supports \textbf{conditional edges}, which are crucial for agentic behavior. After a node executes, a routing function is called to inspect the current state and decide which node to move to next \cite{yu2025agentworkflow,pospech2025metagraph}. For example, after the `Safety Triage Agent` runs, a conditional edge might route the workflow to the `Service Desk Agent` if the risk is moderate, or directly to an "escalate" tool if the risk is critical.
+    \item \textbf{Edges:} Edges connect the nodes and control the flow of the application. LangGraph supports \textbf{conditional edges}, which are crucial for agentic behavior. After a node executes, a routing function is called to inspect the current state and decide which node to move to next \cite{yu2025agentworkflow,pospech2025metagraph}. For example, after the `Safety Triage Agent` runs, a conditional edge might route the workflow to the `Therapeutic Coach Agent` if the risk is moderate, or to the `Case Management Agent` if the risk is critical.
 \end{itemize}
 
 \paragraph{State Transition Semantics}
-The stateful execution of a LangGraph workflow is governed by formal state update rules. Each node in the graph transforms the shared state through a state update function:
+The stateful execution of a LangGraph workflow is governed by formal state update rules. Each node in the graph transforms the shared state through a state update function, defined in Equation \ref{eq:state_update}:
+
 \begin{equation}
+\label{eq:state_update}
 S_{t+1} = \text{node}_i(S_t) = S_t \oplus \Delta S_i
 \end{equation}
-Here, $S_t$ represents the \textbf{Global State Object} at time step $t$, which contains the complete conversation history and metadata. $\Delta S_i$ is the \textbf{State Update} produced by node $i$ (e.g., a new message or a risk classification). The operator $\oplus$ denotes the \textbf{State Merging Operation}, where new fields in $\Delta S_i$ overwrite or append to existing values in $S_t$ while preserving all other unmodified fields. This ensures that context is never lost as the workflow progresses.
 
-Conditional edges implement routing logic via predicate functions that inspect this shared state. For the Safety Agent Suite, the routing after risk assessment is formalized to include a \textbf{confidence threshold} ($\tau$), ensuring that uncertain predictions are automatically escalated for human review. The routing function is defined as:
+Equation \ref{eq:state_update} describes how the conversation's context evolves. Think of $S_t$ as a shared project notebook at time $t$. When an agent (node $i$) does some work, it produces a result, $\Delta S_i$ (e.g., a new risk score). It doesn't throw away the notebook; instead, it uses the merging operator $\oplus$ to add its new note to the existing pages. The result, $S_{t+1}$, is the updated notebook containing everything from before plus the new information, ready for the next agent.
+
+Conditional edges implement routing logic via predicate functions that inspect this shared state. For the Safety Agent Suite, the routing after risk assessment is formalized to include a \textbf{confidence threshold} ($\tau$), ensuring that uncertain predictions are automatically escalated for human review. The routing function is defined in Equation \ref{eq:routing_logic}:
+
 \begin{equation}
+\label{eq:routing_logic}
 \text{next}(S_t) = \begin{cases}
 \text{escalate\_to\_cma} & \text{if } S_t.\text{risk\_level} \geq 2 \lor \text{conf}(S_t.\text{risk\_level}) < \tau \\
 \text{provide\_coaching} & \text{if } S_t.\text{risk\_level} = 1 \land \text{conf}(S_t.\text{risk\_level}) \geq \tau \\
@@ -480,11 +527,17 @@ Conditional edges implement routing logic via predicate functions that inspect t
 \end{cases}
 \end{equation}
 
-This formalization enables dynamic multi-agent orchestration where the STA's risk assessment determines subsequent workflow paths: moderate risk routes to the TCA for therapeutic intervention, high or critical risk escalates to the CMA for clinical case creation, and low risk concludes the interaction. The explicit state management ensures that all downstream agents have access to the complete conversation context, enabling informed decision-making throughout the workflow.
+Equation \ref{eq:routing_logic} acts like a traffic controller at a junction. It looks at the current state of the notebook ($S_t$). Specifically, it checks the risk level and how confident the agent is in that assessment ($\text{conf}$).
+\begin{itemize}
+    \item If the risk is high ($\ge 2$) OR the agent is unsure (confidence $< \tau$), the traffic is directed to the Case Manager for human review.
+    \item If the risk is moderate ($= 1$) AND the agent is sure, it goes to the Coach.
+    \item If the risk is low ($= 0$) AND the agent is sure, the interaction ends.
+\end{itemize}
+This logic ensures that high-stakes or uncertain situations are always escalated, while routine cases are handled automatically.
 
 This cyclical, stateful approach provides several key advantages for this framework:
 \begin{enumerate}
-    \item \textbf{Explicit Multi-Agent Collaboration:} LangGraph allows for the explicit definition of workflows where different agents are called in sequence or in parallel, and their outputs are used to inform the next step \cite{tran2025multiagentcollaboration, mathew2025largelanguagemodelagents}. This is essential for the \textbf{Safety Agent Suite}, where the `Insights Agent`'s output must trigger the `Support Coach Agent`.
+    \item \textbf{Explicit Multi-Agent Collaboration:} LangGraph allows for the explicit definition of workflows where different agents are called in sequence or in parallel, and their outputs are used to inform the next step \cite{tran2025multiagentcollaboration, mathew2025largelanguagemodelagents}. This is essential for the \textbf{Safety Agent Suite}, where the `Insights Agent`'s output must trigger the `Therapeutic Coach Agent`.
     \item \textbf{State Management and Durability:} Because the state is explicitly managed, the agent's "memory" of the conversation and its previous actions is robust. The graph's execution can be paused, resumed, and inspected, which is vital for long-running, interactive coaching sessions.
     \item \textbf{Flexibility and Control:} Unlike the more constrained loops of standard agent executors, LangGraph allows for the creation of arbitrary cycles. An agent can loop, retry a tool call if it fails, or route to a human-in-the-loop for verification, providing a much higher degree of control and reliability for a safety-critical application \cite{tang2025autoagent, aquinodeazevedo2025ragtomultiagent}.
 \end{enumerate}

@@ -147,15 +147,22 @@ FOR COUNSELORS:
 
 Return JSON with:
 {
-  "intent": "string (e.g., 'emotional_support', 'crisis', 'casual_chat', 'information_seeking')",
+  "intent": "string (MUST be one of: 'casual_chat', 'emotional_support', 'crisis_intervention', 'information_inquiry', 'appointment_scheduling', 'emergency_escalation', 'analytics_query')",
   "intent_confidence": float (0.0-1.0),
   "needs_agents": boolean,
+  "next_step": "string (MUST be one of: 'tca', 'cma', 'ia', 'sta', 'none')",
   "reasoning": "string explaining decision",
   "suggested_response": "string (only if needs_agents=false, provide direct response)",
   
   "immediate_risk": "none|low|moderate|high|critical",
   "crisis_keywords": ["list of crisis keywords found, empty if none"],
-  "risk_reasoning": "Brief 1-sentence explanation of risk assessment"
+  "risk_reasoning": "Brief 1-sentence explanation of risk assessment",
+
+  "analytics_params": {
+      "question_id": "string (MUST be one of: 'crisis_trend', 'dropoffs', 'resource_reuse', 'fallback_reduction', 'cost_per_helpful', 'coverage_windows')",
+      "start_date": "YYYY-MM-DD (default to 30 days ago if not specified)",
+      "end_date": "YYYY-MM-DD (default to today if not specified)"
+  }
 }
 \end{lstlisting}
 

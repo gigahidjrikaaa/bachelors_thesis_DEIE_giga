@@ -124,11 +124,11 @@ Conceptually, the framework's architecture is best understood as two distinct bu
 \begin{enumerate}
     \item \textbf{The Real-Time Interaction Loop:} This loop handles immediate, synchronous interactions with individual students through a unified conversational interface. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---students interact exclusively with Aika, never directly accessing the specialist agents. When a student sends a message, Aika processes it via a single Gemini API call that returns a structured JSON response containing immediate risk assessment (Tier 1) and intent classification.
     
-    Based on this initial assessment, Aika acts as a dispatcher to the background specialist agents:
+    Based on this initial assessment, Aika acts as a supervisor to the background specialist agents:
     \begin{itemize}
-        \item \textbf{Therapeutic Coach Agent (TCA):} Triggered by Aika when the risk is assessed as \texttt{moderate} or \texttt{low}. It works in the background to generate CBT-based intervention plans.
-        \item \textbf{Case Management Agent (CMA):} Triggered directly by Aika when the user explicitly requests administrative actions (e.g., scheduling). It is also triggered by the STA if a critical risk is detected.
-        \item \textbf{Safety Triage Agent (STA):} Runs asynchronously after the user becomes inactive or explicitly ends the chat. It reprocesses the entire conversation to confirm the final risk rating, generate the conversation-level STA assessment, and supply evidence for the compliance ledger.
+        \item \textbf{Therapeutic Coach Agent (TCA):} Triggered directly by Aika when the risk is assessed as \texttt{moderate} or \texttt{low}. It works in the background to generate CBT-based intervention plans.
+        \item \textbf{Case Management Agent (CMA):} Triggered directly by Aika when the user explicitly requests administrative actions (e.g., scheduling) or when a critical risk is detected.
+        \item \textbf{Safety Triage Agent (STA):} Runs asynchronously in the background after the user becomes inactive or explicitly ends the chat. It reprocesses the entire conversation to confirm the final risk rating, generate the conversation-level STA assessment, and supply evidence for the compliance ledger. It can also be manually invoked by administrators for specific risk checks.
     \end{itemize}
     
     This loop is designed for high-availability and low-latency, ensuring students receive immediate support while complex reasoning occurs asynchronously in the background.
@@ -142,72 +142,75 @@ The synergy between these two loops is the cornerstone of the framework's design
     \centering
     \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
-        node distance=1.5cm and 1cm,
-        loop/.style={
-            rectangle, 
-            draw=black, 
-            very thick, 
-            rounded corners=3pt, 
-            minimum width=8cm, 
-            minimum height=3.5cm, 
-            label={[font=\bfseries]above:#1}
+        node distance=1.5cm and 2cm,
+        font=\small,
+        % Styles
+        loop_box/.style={
+            rectangle, draw=black!60, very thick, rounded corners=5pt,
+            fill=gray!5, inner sep=15pt,
+            label={[font=\bfseries\large, anchor=north west, text=ugmBlue]north west:#1}
         },
         actor/.style={
-            circle, 
-            draw=black, 
-            thick, 
-            fill=gray!10, 
-            minimum size=1.2cm, 
-            align=center
+            circle, draw=black, thick, fill=white,
+            minimum size=1.2cm, align=center, drop shadow
         },
         agent/.style={
-            rectangle, 
-            draw=black, 
-            thick, 
-            rounded corners=2pt, 
-            fill=gray!5, 
-            minimum width=2.5cm, 
-            align=center,
-            font=\small
+            rectangle, draw=ugmBlue, thick, fill=ugmBlue!10,
+            rounded corners=3pt, minimum width=3cm, minimum height=1.2cm,
+            align=center, drop shadow
         },
-        data/.style={
-            rectangle, 
-            draw=black, 
-            dashed, 
-            thick, 
-            fill=gray!5, 
-            align=center, 
-            font=\small
+        data_store/.style={
+            cylinder, shape border rotate=90, draw=black, thick,
+            aspect=0.25, fill=white, minimum width=2.5cm, minimum height=1.5cm,
+            align=center
         },
-        arrow/.style={-Latex, thick},
-        data_arrow/.style={-Latex, thick, dashed},
-        async_arrow/.style={-Latex, thick, dashed}
+        arrow/.style={-Latex, thick, draw=black!80},
+        async_arrow/.style={-Latex, thick, dashed, draw=black!80},
+        feedback_arrow/.style={-Latex, very thick, draw=ugmGold, dashed}
     ]
-        % Real-Time Interaction Loop
-        \node[loop=The Real-Time Interaction Loop] (realtime_loop) {};
-        \node[actor, left=of realtime_loop] (student) {Student};
-        \node[agent, at=(realtime_loop.center)] (aika) {Aika Meta-Agent};
-        \node[agent, below=0.7cm of aika] (backgroundAgents) {Background Agents\\(STA, TCA, CMA)};
-        
-        \draw[arrow] (student) to[bend left=20] node[midway, above, font=\small] {Interaction} (aika);
-        \draw[arrow] (aika) to[bend left=20] node[midway, below, font=\small] {Reply} (student);
-        \draw[async_arrow] (aika) -- node[midway, right, font=\small] {Async dispatch} (backgroundAgents);
-        \draw[async_arrow] (backgroundAgents) -- node[midway, left, font=\small, align=center] {Evidence \\ Plans} (aika);
 
-        % Strategic Oversight Loop
-        \node[loop=The Strategic Oversight Loop, below=4.5cm of realtime_loop] (strategic_loop) {};
-        \node[actor, right=of strategic_loop] (admin) {Admin / \\ Counselor};
-        \node[agent, at=(strategic_loop.center)] (ia) {Insights Agent \\ (IA)};
-        
-        \draw[arrow] (ia) to[bend left=20] node[midway, above, font=\small] {Reports} (admin);
-        \draw[arrow] (admin) to[bend left=20] node[midway, below, font=\small] {Queries} (ia);
+        % --- Nodes ---
+        % Real-Time Loop
+        \node[agent] (aika) {Aika Meta-Agent};
+        \node[actor, left=3.5cm of aika] (student) {Student};
+        \node[agent, below=2.5cm of aika] (bg_agents) {Background Agents\\(STA, TCA, CMA)};
 
-        % Connecting the loops
-        \node[data] (agg_data) at ([yshift=-2.25cm]realtime_loop.center) {Aggregated, Anonymized Data};
-        
-        \draw[data_arrow] (backgroundAgents) -- (agg_data) node[midway, right, font=\small] {Fuels};
-        \draw[data_arrow] (agg_data) -- (ia) node[midway, right, font=\small] {Informs};
-        \draw[data_arrow] (ia) to[bend right=30] (aika) node[midway, left, font=\small] {Improves};
+        % Data Store (Bridge)
+        \node[data_store, below=2cm of bg_agents] (data) {Aggregated\\Data};
+
+        % Strategic Loop
+        \node[agent, below=2cm of data] (ia) {Insights Agent\\(IA)};
+        \node[actor, right=3.5cm of ia] (admin) {Admin /\\Counselor};
+
+        % --- Background Layers for Fit Boxes ---
+        \begin{scope}[on background layer]
+            \node[fit=(student) (aika) (bg_agents), loop_box={The Real-Time Interaction Loop}] (rt_loop) {};
+            \node[fit=(ia) (admin), loop_box={The Strategic Oversight Loop}] (strat_loop) {};
+        \end{scope}
+
+        % --- Connections: Real-Time Loop ---
+        % Student <-> Aika
+        \draw[arrow] (student) to[bend left=15] node[midway, above] {Interaction} (aika);
+        \draw[arrow] (aika) to[bend left=15] node[midway, below] {Reply} (student);
+
+        % Aika <-> Background Agents
+        \draw[async_arrow] (aika.250) -- node[midway, left, align=right, font=\footnotesize] {Async\\Dispatch} (bg_agents.110);
+        \draw[async_arrow] (bg_agents.70) -- node[midway, right, align=left, font=\footnotesize] {Evidence\\\& Plans} (aika.290);
+
+        % --- Connections: Strategic Loop ---
+        % Admin <-> IA
+        \draw[arrow] (admin) to[bend left=15] node[midway, below] {Queries} (ia);
+        \draw[arrow] (ia) to[bend left=15] node[midway, above] {Reports} (admin);
+
+        % --- Cross-Loop Connections ---
+        % Background -> Data -> IA
+        \draw[arrow] (bg_agents) -- node[midway, right] {Fuels} (data);
+        \draw[arrow] (data) -- node[midway, right] {Informs} (ia);
+
+        % Feedback: IA -> Aika (The "Improves" loop)
+        % Route this carefully to avoid crossing the data store or looking messy
+        % Go around the left side
+        \draw[feedback_arrow] (ia.west) -- ++(-2,0) |- (aika.west) node[pos=0.25, left, align=right, text=ugmGold] {Strategic\\Insights\\(Improves)};
 
     \end{tikzpicture}%
     }
@@ -231,14 +234,16 @@ The returned JSON object's schema is detailed in Table~\ref{tab:aika_json_schema
         \toprule
         \textbf{Field} & \textbf{Type} & \textbf{Description} \\
         \midrule
-        \code{reply} & string & The empathetic, context-aware conversational response to be displayed to the user. \\
+        \code{suggested\_response} & string & The conversational response when no specialist agents are needed. If agents are invoked, this field is typically omitted or null. \\
         \code{immediate\_risk} & string & A five-level risk classification (\code{none}, \code{low}, \code{moderate}, \code{high}, \code{critical}) for the single message, enabling instantaneous safety screening. \\
         \code{crisis\_keywords} & array & A list of detected keywords from a predefined crisis lexicon (e.g., "bunuh diri," "menyakiti diri sendiri"). \\
         \code{risk\_reasoning} & string & A model-generated explanation for the assigned risk level, providing transparency for human oversight. \\
-        \code{intent} & string & The classified user intent (e.g., \code{request\_support}, \code{schedule\_appointment}), which dictates subsequent routing logic. \\
+        \code{intent} & string & The classified user intent (e.g., \code{emotional\_support}, \code{crisis\_intervention}, \code{analytics\_query}), which dictates subsequent routing logic. \\
+        \code{intent\_confidence} & float & A confidence score (0.0-1.0) indicating the model's certainty in the intent classification. \\
         \code{needs\_agents} & boolean & A flag indicating whether the query requires routing to a background specialist agent. \\
+        \code{next\_step} & string & The specific downstream agent to route to (\code{tca}, \code{cma}, \code{ia}, \code{sta}, or \code{none}). \\
         \code{reasoning} & string & A brief explanation of why specialist agents are or are not needed, justifying the routing decision. \\
-        \code{suggested\_response} & string & An optional, complete response for simple interactions, allowing the system to bypass agent orchestration and reduce latency. \\
+        \code{analytics\_params} & object & Optional parameters (e.g., \code{question\_id}, date range) captured when the intent is \code{analytics\_query}, enabling the Insights Agent to execute specific reports. \\
         \bottomrule
     \end{tabular}
 \end{table}
@@ -251,13 +256,14 @@ An example of this schema in practice is shown in Figure~\ref{fig:json_moderate_
     \centering
 \begin{lstlisting}[style=academicStyle, language=json]
 {
-  "reply": "Saya mengerti kamu merasa tertekan dengan ujian yang akan datang. Wajar banget kok merasa cemas. Yuk, kita coba teknik grounding bersama untuk menenangkan pikiran.",
+  "suggested_response": null,
   "immediate_risk": "low",
   "crisis_keywords": [],
   "risk_reasoning": "User expresses anxiety about exams but no self-harm or severe distress indicators.",
-  "intent": "express_distress",
+  "intent": "emotional_support",
+  "intent_confidence": 0.95,
   "needs_agents": true,
-  "suggested_agent": "TCA",
+  "next_step": "tca",
   "reasoning": "Requires TCA for CBT coping strategies and intervention plan"
 }
 \end{lstlisting}
@@ -271,13 +277,14 @@ In contrast, a simple greeting would return:
     \centering
 \begin{lstlisting}[style=academicStyle, language=json]
 {
-  "reply": "Halo! Saya Aika, asisten kesehatan mentalmu. Ada yang bisa saya bantu hari ini?",
+  "suggested_response": "Halo! Saya Aika, asisten kesehatan mentalmu. Ada yang bisa saya bantu hari ini?",
   "immediate_risk": "none",
   "crisis_keywords": [],
   "risk_reasoning": "Standard greeting, no risk detected.",
-  "intent": "greeting",
+  "intent": "casual_chat",
+  "intent_confidence": 0.99,
   "needs_agents": false,
-  "suggested_agent": null,
+  "next_step": "none",
   "reasoning": "Simple greeting handled by meta-agent directly."
 }
 \end{lstlisting}
@@ -364,6 +371,72 @@ The agentic behavior of the Aika Meta-Agent is defined as:
     \item \textbf{Intentions:} Upon receiving a message, Aika forms the intention to classify the user's intent (e.g., "greeting" vs. "crisis"), select the appropriate downstream agent (or handle it locally), and synthesize the final response.
 \end{itemize}
 
+\subsubsection{Dual-Mode Operation: Router vs. ReAct Agent}
+Aika operates in two distinct cognitive modes to balance latency with capability:
+
+\begin{enumerate}
+    \item \textbf{Fast-Path Routing (Router Mode):} Upon receiving a message, Aika first acts as a semantic router (functioning as the architectural \textit{Supervisor}, see Section \ref{sec:supervisor_arch}). It utilizes a single-shot inference step to classify the user's intent into a structured JSON schema. This avoids the latency of a full reasoning loop for simple routing decisions.
+    
+    \item \textbf{Iterative Execution (ReAct Mode):} If the routing decision determines that Aika should handle the request directly (e.g., for appointment scheduling or general inquiries), the system transitions to a Reasoning and Acting (ReAct) loop. Defined formally as a trajectory $\tau = (o_1, a_1, o_2, a_2, \dots)$, Aika iteratively:
+    \begin{itemize}
+        \item \textbf{Reasons} about the current state and missing information.
+        \item \textbf{Acts} by invoking specific tools (e.g., \texttt{check\_schedule}, \texttt{book\_slot}).
+        \item \textbf{Observes} the tool output and refines its next action.
+    \end{itemize}
+\end{enumerate}
+
+This hybrid approach ensures that the system remains responsive for high-level orchestration while retaining the depth required for complex task execution. This dual-mode logic is visualized in Figure \ref{fig:dual_mode_logic}.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.95\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=1.8cm and 2.5cm,
+        auto,
+        startstop/.style={circle, draw=black, thick, fill=black!5, minimum size=0.8cm, font=\footnotesize},
+        process/.style={rectangle, draw=black, thick, fill=white, text width=2.5cm, align=center, rounded corners=2pt, minimum height=1cm, font=\small},
+        decision/.style={diamond, draw=black, thick, fill=gray!10, aspect=2, text width=1.8cm, align=center, inner sep=0pt, font=\footnotesize},
+        line/.style={draw, -latex, thick},
+        label_node/.style={font=\scriptsize, fill=white, inner sep=1pt, align=center}
+    ]
+        % Nodes
+        \node [startstop] (start) {Start};
+        \node [process, below=of start] (router) {Aika Router\\(Single-Shot)};
+        \node [decision, below=of router] (decide) {Needs\\Tools?};
+        
+        % Fast Path
+        \node [process, right=of decide, xshift=1cm] (direct) {Direct\\Response};
+        
+        % ReAct Path
+        \node [process, below=of decide, yshift=-0.5cm] (thought) {Thought};
+        \node [process, below=of thought] (action) {Action\\(Tool Call)};
+        \node [process, left=of action, xshift=-1cm] (observe) {Observation};
+        
+        \node [startstop, right=of direct] (end) {End};
+
+        % Edges
+        \path [line] (start) -- (router);
+        \path [line] (router) -- (decide);
+        
+        % No Tools -> Direct
+        \path [line] (decide) -- node [label_node] {No} (direct);
+        \path [line] (direct) -- (end);
+        
+        % Yes Tools -> ReAct
+        \path [line] (decide) -- node [label_node] {Yes} (thought);
+        \path [line] (thought) -- (action);
+        \path [line] (action) -- (observe);
+        \path [line] (observe) |- (thought);
+        
+        % Exit ReAct
+        \path [line] (thought.east) -| node [label_node, near start] {Done} (direct.south);
+
+    \end{tikzpicture}%
+    }
+    \caption{Dual-Mode Operation Logic. The system first attempts a fast-path routing decision. Only if complex tool use is required does it enter the iterative ReAct loop.}
+    \label{fig:dual_mode_logic}
+\end{figure}
+
 Collectively, these specialized agents operationalize the two proactive loops described in Section 3.2. The STA and TCA are the primary actors in the \textbf{Real-Time Interaction Loop}, enabling proactive individual support through immediate risk detection and the asynchronous delivery of therapeutic content. The IA is the engine of the \textbf{Strategic Oversight Loop}, providing the institution with proactive, population-level insights. The CMA acts as a crucial bridge between these loops, translating automated insights (from STA or IA) into concrete administrative actions, such as case creation or counselor notification. This functional separation ensures that each component is optimized for its specific role within the broader proactive ecosystem.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -402,18 +475,19 @@ The system's data model is designed to support its core functions: tracking conv
 
 \subsection{Stateful Orchestration with LangGraph}
 
-The heart of the technical architecture is the LangGraph state machine, which operationalizes the agentic behavior. The orchestration follows a "dispatcher" pattern where the Aika Meta-Agent serves as the central decision node, routing control to specialist agents only when specific conditions are met.
+The heart of the technical architecture is the LangGraph state machine, which operationalizes the agentic behavior. The orchestration follows a "supervisor" pattern where the Aika Meta-Agent serves as the central decision node, routing control to specialist agents only when specific conditions are met.
 
 The process is as follows:
 \begin{enumerate}
     \item A user message initializes the \texttt{AgentState}.
     \item The graph routes the state to the first node, the \textbf{Aika Meta-Agent}.
-    \item Aika analyzes the input using its system prompt and updates the \texttt{AgentState} with a Tier 1 risk assessment and a routing decision (e.g., \texttt{needs\_agents: true}, \texttt{next\_step: "sta"}).
+    \item Aika analyzes the input using its system prompt and updates the \texttt{AgentState} with a Tier 1 risk assessment and a routing decision (e.g., \texttt{needs\_agents: true}, \texttt{next\_step: "tca"}).
     \item A conditional edge reads the \texttt{next\_step} from the state and routes it to the appropriate next node:
     \begin{itemize}
-        \item \textbf{Safety Triage Agent (STA):} For background risk analysis (Tier 2).
         \item \textbf{Therapeutic Coach Agent (TCA):} For generating coping strategies (Moderate/Low risk).
         \item \textbf{Case Management Agent (CMA):} For immediate crisis escalation or administrative requests.
+        \item \textbf{Safety Triage Agent (STA):} For manual risk analysis invoked by administrators (Tier 2 analysis for students runs as a background task).
+        \item \textbf{Insights Agent (IA):} For population-level analytics and reporting (Admin only).
         \item \textbf{End:} For direct replies where no specialist agent is required.
     \end{itemize}
     \item Specialist agents, if invoked, execute their logic, update the shared state, and the flow converges to the end of the graph.
@@ -423,12 +497,13 @@ This stateful, graph-based approach provides a robust and explicit way to manage
 
 \begin{figure}[htbp]
     \centering
+    \resizebox{0.95\textwidth}{!}{%
     \begin{tikzpicture}[
-        node distance=1.5cm and 2.5cm,
+        node distance=1.8cm and 2.0cm,
         auto,
         % Styles
         startstop/.style={circle, draw=black, thick, fill=black!5, minimum size=0.8cm, font=\footnotesize},
-        agent/.style={rectangle, draw=black, thick, fill=white, text width=2.8cm, align=center, rounded corners=2pt, minimum height=1.2cm, font=\small\bfseries},
+        agent/.style={rectangle, draw=black, thick, fill=white, text width=2.2cm, align=center, rounded corners=2pt, minimum height=1.2cm, font=\small\bfseries},
         decision/.style={diamond, draw=black, thick, fill=gray!10, aspect=2, text width=1.8cm, align=center, inner sep=0pt, font=\footnotesize},
         line/.style={draw, -latex, thick},
         label_node/.style={font=\scriptsize, fill=white, inner sep=1pt, align=center}
@@ -436,34 +511,95 @@ This stateful, graph-based approach provides a robust and explicit way to manage
 
         % Nodes
         \node [startstop] (start) {Start};
-        \node [agent, below=of start] (aika) {Aika Meta-Agent\\(Dispatcher)};
+        \node [agent, below=of start, text width=3cm] (aika) {Aika Meta-Agent\\(Supervisor)};
         
         % Specialist Agents arranged below Aika
-        \node [agent, below left=of aika, xshift=-0.5cm, yshift=-1cm] (sta) {Safety Triage\\(STA)};
-        \node [agent, below=of aika, yshift=-1cm] (tca) {Therapeutic Coach\\(TCA)};
-        \node [agent, below right=of aika, xshift=0.5cm, yshift=-1cm] (cma) {Case Mgmt\\(CMA)};
+        % Spreading 4 agents horizontally
+        \node [agent, below=of aika, xshift=-4.5cm, yshift=-1cm] (sta) {Safety Triage\\(STA)};
+        \node [agent, below=of aika, xshift=-1.5cm, yshift=-1cm] (tca) {Therapeutic Coach\\(TCA)};
+        \node [agent, below=of aika, xshift=1.5cm, yshift=-1cm] (cma) {Case Mgmt\\(CMA)};
+        \node [agent, below=of aika, xshift=4.5cm, yshift=-1cm] (ia) {Insights Agent\\(IA)};
         
-        \node [startstop, below=of tca, yshift=-1cm] (end) {End};
+        \node [startstop, below=of aika, yshift=-4cm] (end) {End};
 
         % Edges from Start
         \path [line] (start) -- (aika);
 
         % Routing from Aika
         \path [line] (aika) -| node [label_node, near start] {Safety Check} (sta);
-        \path [line] (aika) -- node [label_node] {Coaching} (tca);
-        \path [line] (aika) -| node [label_node, near start] {Admin/Crisis} (cma);
+        \path [line] (aika) -| node [label_node, near start, pos=0.3] {Coaching} (tca);
+        \path [line] (aika) -| node [label_node, near start, pos=0.3] {Crisis/Admin} (cma);
+        \path [line] (aika) -| node [label_node, near start] {Analytics} (ia);
         
         % Direct Reply path (curved to avoid crossing)
-        \path [line] (aika.east) -- ++(1.5,0) |- node [label_node, near start] {Direct Reply} (end);
+        % Drawing a path that goes around the agents
+        \draw [line] (aika.east) -- ++(5.5,0) |- node [label_node, near start] {Direct / ReAct} (end);
 
         % Convergence to End
         \path [line] (sta) |- (end);
-        \path [line] (tca) -- (end);
+        \path [line] (tca) |- (end);
         \path [line] (cma) |- (end);
+        \path [line] (ia) |- (end);
 
-    \end{tikzpicture}
-    \caption{LangGraph State Machine Visualization. Aika acts as the central dispatcher, routing the conversation to specialist agents (STA, TCA, CMA) or responding directly based on the context.}
+    \end{tikzpicture}%
+    }
+    \caption{LangGraph State Machine Visualization. Aika acts as the central supervisor, routing the conversation to specialist agents (STA, TCA, CMA, IA) or responding directly based on the context.}
     \label{fig:langgraph_state_machine}
+\end{figure}
+
+\subsubsection{Hierarchical Supervisor Architecture}
+\label{sec:supervisor_arch}
+The system implements a \textit{Supervisor} architectural pattern, modeled as a Hierarchical State Machine (HSM). In this topology, the Aika Meta-Agent functions as the root supervisor node, maintaining the global state of the conversation.
+
+Unlike a flat multi-agent system where agents communicate directly with one another (mesh topology), the Supervisor architecture enforces a star topology:
+\begin{itemize}
+    \item \textbf{Centralized Control:} All state transitions must pass through the Aika node, ensuring a single source of truth for the conversation context.
+    \item \textbf{Isolated Subgraphs:} Specialized agents (STA, TCA, CMA) are implemented as independent subgraphs. They process their specific tasks and return the updated state to the supervisor, rather than handing off control to other agents directly.
+    \item \textbf{Conditional Routing:} The edges between the supervisor and the subgraphs are conditional, determined by the \texttt{needs\_agents} and \texttt{risk\_level} variables derived during the routing phase.
+\end{itemize}
+
+This structure minimizes the "infinite loop" hallucinations common in cyclic multi-agent graphs and provides a deterministic execution path for safety-critical mental health interventions. The hierarchical relationship is illustrated in Figure \ref{fig:supervisor_hierarchy}.
+
+\begin{figure}[htbp]
+    \centering
+    \resizebox{0.8\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=3cm,
+        supervisor/.style={circle, draw=black, very thick, fill=white, minimum size=2.5cm, align=center, font=\bfseries},
+        worker/.style={rectangle, draw=black, thick, fill=gray!10, minimum width=2.5cm, minimum height=1.2cm, align=center, font=\small},
+        arrow/.style={-latex, thick},
+        label_text/.style={font=\scriptsize, align=center, midway, fill=white}
+    ]
+        % Nodes
+        \node [supervisor] (aika) {Aika\\(Supervisor)};
+        
+        % Workers arranged in a row below
+        \node [worker, below=of aika, xshift=-5cm] (sta) {STA\\(Worker)};
+        \node [worker, below=of aika, xshift=-1.7cm] (tca) {TCA\\(Worker)};
+        \node [worker, below=of aika, xshift=1.7cm] (cma) {CMA\\(Worker)};
+        \node [worker, below=of aika, xshift=5cm] (ia) {IA\\(Worker)};
+        
+        % Edges
+        % Aika -> STA
+        \draw [arrow] (aika) -- node [label_text, sloped, above] {Delegate} (sta);
+        \draw [arrow, dashed] (sta) to[bend left=15] node [label_text, sloped, below] {Return} (aika);
+        
+        % Aika -> TCA
+        \draw [arrow] (aika) -- node [label_text, sloped, above] {Delegate} (tca);
+        \draw [arrow, dashed] (tca) to[bend left=15] node [label_text, sloped, below] {Return} (aika);
+        
+        % Aika -> CMA
+        \draw [arrow] (aika) -- node [label_text, sloped, above] {Delegate} (cma);
+        \draw [arrow, dashed] (cma) to[bend right=15] node [label_text, sloped, below] {Return} (aika);
+
+        % Aika -> IA
+        \draw [arrow] (aika) -- node [label_text, sloped, above] {Delegate} (ia);
+        \draw [arrow, dashed] (ia) to[bend right=15] node [label_text, sloped, below] {Return} (aika);
+
+    \end{tikzpicture}%
+    }
+    \caption{Hierarchical Supervisor Architecture. Aika acts as the central supervisor, delegating tasks to worker agents (subgraphs) and receiving their state updates. Workers do not communicate directly with each other.}
+    \label{fig:supervisor_hierarchy}
 \end{figure}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -494,7 +630,7 @@ While formal performance benchmarking is outside the scope of this thesis, the a
 \begin{itemize}
     \item \textbf{Asynchronous Processing:} The choice of FastAPI was deliberate for its native \texttt{async/await} support. This allows the application to handle long-running I/O operations, such as calling the Gemini API or querying the database, without blocking the main execution thread. This ensures the system can manage multiple concurrent conversations smoothly.
 
-    \item \textbf{Optimized Language Models:} The system employs a two-tier model strategy to balance capability with latency. For the initial, real-time safety screening performed by the \textbf{Aika Meta-Agent}, a low-latency model (Gemini 2.5 Flash) is used to ensure sub-second response times. For more complex, asynchronous tasks like generating detailed narrative summaries in the Insights Agent, a more powerful model (Gemini 2.5 Pro) is used, as latency is less critical for these background tasks.
+    \item \textbf{Optimized Language Models:} The system employs a two-tier model strategy to balance capability with latency. For the initial, real-time safety screening performed by the \textbf{Aika Meta-Agent}, a low-latency model (Gemini 2.5 Flash) is used to ensure rapid response times. For more complex, asynchronous tasks like generating detailed narrative summaries in the Insights Agent, a more powerful model (Gemini 2.5 Pro) is used, as latency is less critical for these background tasks.
 \end{itemize}
 
 \subsection{Human-in-the-Loop (HITL) Workflow for Safety}
@@ -523,7 +659,7 @@ The development of an AI-driven framework for mental health support necessitates
 
 \subsection{Informed Consent and Transparency}
 
-The UGM-AICare framework is designed with the principle that users must have clear understanding of the system's capabilities and limitations. The Support Coach Agent explicitly discloses its non-human nature in initial interactions, ensuring users engage with informed consent about the conversational context. This transparency is critical in healthcare applications where users may form therapeutic relationships with AI systems.
+The UGM-AICare framework is designed with the principle that users must have clear understanding of the system's capabilities and limitations. The Aika Meta-Agent explicitly discloses its non-human nature in initial interactions, ensuring users engage with informed consent about the conversational context. This transparency is critical in healthcare applications where users may form therapeutic relationships with AI systems.
 
 \subsection{Human-in-the-Loop for Safety and Ethical Safeguards}
 
