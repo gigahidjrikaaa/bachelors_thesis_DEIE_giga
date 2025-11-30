@@ -533,7 +533,7 @@ Equation \ref{eq:routing_logic} acts like a traffic controller at a junction. It
     \item If the risk is moderate ($= 1$) AND the agent is sure, it goes to the Coach.
     \item If the risk is low ($= 0$) AND the agent is sure, the interaction ends.
 \end{itemize}
-This logic ensures that high-stakes or uncertain situations are always escalated, while routine cases are handled automatically.
+This logic is designed to ensure that high-stakes or uncertain situations are escalated appropriately, while routine cases are handled automatically. However, since the routing decision is ultimately made by an LLM-based supervisor, empirical validation of routing accuracy is necessary (see Chapter~\ref{chap:evaluation}).
 
 This cyclical, stateful approach provides several key advantages for this framework:
 \begin{enumerate}

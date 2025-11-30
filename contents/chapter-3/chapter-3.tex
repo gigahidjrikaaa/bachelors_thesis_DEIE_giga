@@ -558,7 +558,7 @@ Unlike a flat multi-agent system where agents communicate directly with one anot
     \item \textbf{Conditional Routing:} The edges between the supervisor and the subgraphs are conditional, determined by the \texttt{needs\_agents} and \texttt{risk\_level} variables derived during the routing phase.
 \end{itemize}
 
-This structure minimizes the "infinite loop" hallucinations common in cyclic multi-agent graphs and provides a deterministic execution path for safety-critical mental health interventions. The hierarchical relationship is illustrated in Figure \ref{fig:supervisor_hierarchy}.
+This structure minimizes the "infinite loop" hallucinations common in cyclic multi-agent graphs and provides a structured execution path for safety-critical mental health interventions. Note that while the graph topology is deterministic, the routing decisions themselves are made by the LLM-based supervisor, introducing inherent variability characteristic of language model inference. The hierarchical relationship is illustrated in Figure \ref{fig:supervisor_hierarchy}.
 
 \begin{figure}[htbp]
     \centering
@@ -637,7 +637,7 @@ While formal performance benchmarking is outside the scope of this thesis, the a
 
 No fully automated system can or should replace human clinical judgment in crisis situations. The framework is designed with a robust Human-in-the-Loop (HITL) workflow as its ultimate safety net.
 
-The escalation path is deterministic and auditable:
+Once a crisis is detected, the subsequent escalation path is deterministic and auditable:
 \begin{enumerate}
     \item The \textbf{Aika Meta-Agent} (immediate) or \textbf{STA} (background) detects a message with "Critical" risk.
     \item This immediately triggers the \textbf{Case Management Agent (CMA)}.
