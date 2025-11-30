@@ -11,17 +11,17 @@ This chapter reports how the prototype was exercised and what we learned from it
 
 \subsection{Scope Boundaries and Rationale}
 
-This evaluation adopts a \textbf{proof-of-concept validation approach} appropriate for bachelor's-level Design Science Research. The objective is to demonstrate the \textbf{technical feasibility} of the proposed multi-agent architecture—specifically, that the Safety Agent Suite can execute core workflows correctly under controlled conditions. This validation scope differs fundamentally from comprehensive benchmarking or clinical efficacy studies in the following ways:
+This evaluation adopts a \textbf{proof-of-concept validation approach} appropriate for bachelor's-level Design Science Research. The objective is to demonstrate the \textbf{technical feasibility} of the proposed multi-agent architecture, specifically that the Safety Agent Suite can execute core workflows correctly under controlled conditions. This validation scope differs fundamentally from comprehensive benchmarking or clinical efficacy studies in the following ways:
 
 \begin{itemize}
-    \item \textbf{Sample Sizes:} Modest test set sizes (50 crisis conversation scenarios, 10 orchestration flows, 10 coaching scenarios, code review for privacy) enable focused validation of architectural correctness without requiring extensive data collection infrastructure. This is consistent with DSR artifact evaluation conventions \cite{dsr_methodology_hevner_2004}, where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
+    \item \textbf{Sample Sizes:} Modest test set sizes (50 crisis conversation scenarios, 15 orchestration flows, 10 coaching scenarios, code review for privacy) enable focused validation of architectural correctness without requiring extensive data collection infrastructure. This is consistent with DSR artifact evaluation conventions \cite{dsr_methodology_hevner_2004}, where initial validation focuses on demonstrating capability rather than exhaustive performance characterization.
     \item \textbf{Simulation-Based Evaluation (In-Silico):} Given the sensitive nature of mental health interventions, this study adopts a simulation-based evaluation strategy. Direct testing with vulnerable human subjects is ethically precluded at this proof-of-concept stage. Therefore, synthetic datasets were generated to rigorously stress-test the safety protocols without risking patient harm \cite{Kamarzarin2025Simulation}.
     \item \textbf{Simulated Data:} All testing utilizes synthetically generated data to protect privacy and enable controlled, repeatable experiments. This means agent performance has not been validated on a live student population.
     \item \textbf{Automated Assessment with LLM Validation:} Response quality is assessed using a structured rubric based on clinical guidelines \cite{american2013guidelines}. To ensure robustness and scalability, this study employs an \textbf{LLM-as-a-Judge} framework \cite{Zheng2023LLMJudge}, utilizing \textbf{GLM-4.5-Air (by Z.AI)} as the primary evaluator. This model was selected for three key reasons: (1) its \textbf{Mixture-of-Experts (MoE) architecture}, which delivers high-level reasoning capabilities comparable to larger proprietary models, ensuring accurate application of complex clinical rubrics; (2) its \textbf{optimization for agentic tasks}, which results in superior structured output generation and instruction following; and (3) its \textbf{cost-effective scalability}, which supports the thesis's goal of creating a sustainable, automated validation layer. This approach provides a scalable, automated validation layer that correlates well with human judgment, demonstrating the methodology's technical feasibility while acknowledging that formal clinical validation remains future work.
     \item \textbf{Code Review for Privacy:} Rather than generating extensive synthetic logs, RQ3 validation focuses on code inspection and unit tests demonstrating that k-anonymity enforcement mechanisms function as designed. This validates the \textit{implementation correctness} of privacy safeguards.
 \end{itemize}
 
-\textbf{Positioning Statement:} This evaluation demonstrates that the proposed multi-agent architecture is \textit{technically feasible}—the agents can classify crises, orchestrate workflows, generate appropriate responses, and enforce privacy thresholds under controlled conditions. It does \textbf{not} claim to have validated clinical efficacy, cultural appropriateness for Indonesian students, or production-readiness for deployment without further testing. Such claims would require ethics approval, multi-rater expert evaluation, field pilots with real users, and longitudinal outcome measurement—activities beyond bachelor's thesis scope but identified as critical future work in Section~\ref{sec:discussion}.
+\textbf{Positioning Statement:} This evaluation demonstrates that the proposed multi-agent architecture is \textit{technically feasible}. The agents can classify crises, orchestrate workflows, generate appropriate responses, and enforce privacy thresholds under controlled conditions. It does \textbf{not} claim to have validated clinical efficacy, cultural appropriateness for Indonesian students, or production-readiness for deployment without further testing. Such claims would require ethics approval, multi-rater expert evaluation, field pilots with real users, and longitudinal outcome measurement. These activities extend beyond bachelor's thesis scope but are identified as critical future work in Section~\ref{sec:discussion}.
 
 \subsection{Measuring Proactive Capabilities}
 
@@ -68,7 +68,7 @@ This section documents the evaluation protocol that links the Design Science sta
         \midrule
         \textbf{RQ1: Proactive Safety} & Scenario-based testing on crisis corpus (n=50) & Sensitivity, Specificity, False Negative Rate (FNR), p50/p95 Latency & FNR $\leq$ 10\% \\
         \midrule
-        \textbf{RQ2: Autonomous Orchestration} & Workflow execution (n=10) \& Rubric scoring (n=10) & State Transition Accuracy, Mean Rubric Score & Success $\geq$ 95\%, Score $\geq$ 3.5/5 \\
+        \textbf{RQ2: Autonomous Orchestration} & Workflow execution (n=15) \& Rubric scoring (n=10) & State Transition Accuracy, Mean Rubric Score & Success $\geq$ 95\%, Score $\geq$ 3.5/5 \\
         \midrule
         \textbf{RQ3: Strategic Proactivity} & Code review/unit tests for privacy & K-Anonymity Compliance & 100\% Compliance \\
         \bottomrule
@@ -79,7 +79,7 @@ This section documents the evaluation protocol that links the Design Science sta
 
 \begin{itemize}
     \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy. Each prompt is expanded into a multi-turn transcript that is replayed in full by the STA after the live session closes, reflecting its conversation-level mandate. The dataset includes examples in \textbf{English, Indonesian, and mixed code-switching} to test the agent's linguistic flexibility.
-    \item \textbf{Orchestration Test Suite (RQ2):} 10 structured conversation flows designed to test agent routing and error handling. These scenarios also feature multilingual inputs.
+    \item \textbf{Orchestration Test Suite (RQ2):} 15 structured conversation flows designed to test agent routing and error handling. These scenarios also feature multilingual inputs.
     \item \textbf{Coaching Prompts (RQ2):} 10 scenarios for evaluating the quality of the Therapeutic Coach Agent's responses, covering common student issues in both English and Indonesian.
     \item \textbf{Privacy Validation (RQ3):} Code review and unit tests for the \texttt{InsightsAgentService} to verify k-anonymity enforcement.
 \end{itemize}
@@ -113,7 +113,7 @@ This section documents the evaluation protocol that links the Design Science sta
 
     % Row 2: RQ2
     \node[rq_box, below=of rq1] (rq2) {RQ2:\\Autonomous Orchestration};
-    \node[method_box, right=of rq2] (method2) {Workflow execution (n=10)\\Rubric scoring (n=10)};
+    \node[method_box, right=of rq2] (method2) {Workflow execution (n=15)\\Rubric scoring (n=10)};
     \node[metric_box, right=of method2] (metric2) {State Accuracy,\\Rubric Score};
     \node[target_box, right=of metric2] (target2) {Score $\geq$ 3.5/5};
 
@@ -363,7 +363,7 @@ This result is significant because it resolves the tension between the need for 
 \section{Discussion}
 \label{sec:discussion}
 
-This section synthesizes the findings from the evaluation of the three research questions to provide a holistic assessment of the agentic framework's capabilities and limitations. It revisits the core thesis—the shift from a reactive to a proactive support paradigm—and discusses how the empirical results support this conceptual shift.
+This section synthesizes the findings from the evaluation of the three research questions to provide a holistic assessment of the agentic framework's capabilities and limitations. It revisits the core thesis, namely the shift from a reactive to a proactive support paradigm, and discusses how the empirical results support this conceptual shift.
 
 \subsection{Synthesis of Findings}
 

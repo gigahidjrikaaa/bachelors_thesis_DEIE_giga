@@ -14,40 +14,138 @@ The DSR process model, as outlined by Peffers et al., provides an iterative fram
 
 \definecolor{ugmBlue}{RGB}{0,73,144}
 \definecolor{ugmGold}{RGB}{217,160,33}
+\definecolor{ugmLightBlue}{RGB}{230,240,250}
 
 \begin{figure}[htbp]
     \centering
-    \resizebox{0.95\textwidth}{!}{%
-    \begin{tikzpicture} [
-        node distance=2.5cm and 1.5cm,
-        activity/.style={rectangle, draw=ugmBlue, very thick, rounded corners=3pt, fill=ugmBlue!5, minimum width=3.5cm, minimum height=1cm, align=center, font=\small},
-        arrow/.style={-Latex, thick, ugmBlue},
-        feedback/.style={-Latex, thick, ugmGold, dashed}
+    \resizebox{\textwidth}{!}{%
+    \begin{tikzpicture}[
+        node distance=0.8cm,
+        % Stage box style
+        stagebox/.style={
+            rectangle, 
+            draw=ugmBlue, 
+            line width=1pt, 
+            rounded corners=4pt, 
+            fill=ugmLightBlue, 
+            minimum width=2.4cm, 
+            minimum height=2.8cm, 
+            align=center,
+            font=\footnotesize\bfseries
+        },
+        % Stage number circle
+        stagenum/.style={
+            circle, 
+            draw=ugmBlue, 
+            line width=1pt, 
+            fill=ugmBlue, 
+            text=white, 
+            font=\footnotesize\bfseries,
+            minimum size=0.6cm,
+            inner sep=0pt
+        },
+        % Chapter mapping label
+        chapterlabel/.style={
+            font=\scriptsize\itshape,
+            text=ugmBlue!70
+        },
+        % Main flow arrow
+        mainarrow/.style={-{Stealth[length=3mm]}, line width=1.2pt, ugmBlue},
+        % Iteration arrow
+        iterarrow/.style={-{Stealth[length=2.5mm]}, line width=1pt, ugmGold, dashed},
+        % Entry point styles
+        entrybox/.style={
+            rectangle,
+            draw=ugmBlue!60,
+            line width=0.8pt,
+            rounded corners=2pt,
+            fill=white,
+            minimum width=1.8cm,
+            minimum height=0.5cm,
+            align=center,
+            font=\tiny
+        }
     ]
-        % Nodes for each stage
-        \node[activity] (problem) {1. Problem Identification \& Motivation};
-        \node[activity, right=of problem] (objectives) {2. Define Objectives};
-        \node[activity, right=of objectives] (design) {3. Design \& Development};
-        \node[activity, below=of design] (evaluation) {5. Evaluation};
-        \node[activity, left=of evaluation] (demonstration) {4. Demonstration};
-        \node[activity, left=of demonstration] (communication) {6. Communication};
-
-        % Arrows for the main flow
-        \draw[arrow] (problem) -- (objectives);
-        \draw[arrow] (objectives) -- (design);
-        \draw[arrow] (design) -- (evaluation);
-        \draw[arrow] (evaluation) -- (demonstration);
-        \draw[arrow] (demonstration) -- (communication);
+        % ===== STAGE BOXES =====
+        % Stage 1: Problem Identification
+        \node[stagebox] (s1) {Problem\\Identification\\[2pt]\&\\Motivation};
+        \node[stagenum, above=0.15cm of s1] (n1) {1};
+        \node[chapterlabel, below=0.1cm of s1] {Chapter 1};
         
-        % Feedback loops
-        \draw[feedback] (design.south) to[out=-45, in=45] (objectives.south);
-        \draw[feedback] (evaluation.east) to[out=0, in=0, looseness=1.5] (design.east);
-        \draw[feedback] (demonstration.west) to[out=180, in=180, looseness=1.5] (design.west);
-        \draw[feedback] (communication.north) to[out=135, in=225, looseness=1.5] (problem.west);
-
+        % Stage 2: Objectives
+        \node[stagebox, right=1.2cm of s1] (s2) {
+            Define\\Objectives\\[2pt]of a\\Solution
+        };
+        \node[stagenum, above=0.15cm of s2] (n2) {2};
+        \node[chapterlabel, below=0.1cm of s2] {Chapter 1};
+        
+        % Stage 3: Design & Development
+        \node[stagebox, right=1.2cm of s2] (s3) {
+            Design\\[2pt]\&\\[2pt]Development
+        };
+        \node[stagenum, above=0.15cm of s3] (n3) {3};
+        \node[chapterlabel, below=0.1cm of s3] {Chapter 3};
+        
+        % Stage 4: Demonstration
+        \node[stagebox, right=1.2cm of s3] (s4) {
+            Demonstration
+        };
+        \node[stagenum, above=0.15cm of s4] (n4) {4};
+        \node[chapterlabel, below=0.1cm of s4] {Chapter 4};
+        
+        % Stage 5: Evaluation
+        \node[stagebox, right=1.2cm of s4] (s5) {
+            Evaluation
+        };
+        \node[stagenum, above=0.15cm of s5] (n5) {5};
+        \node[chapterlabel, below=0.1cm of s5] {Chapter 4};
+        
+        % Stage 6: Communication
+        \node[stagebox, right=1.2cm of s5] (s6) {
+            Communication
+        };
+        \node[stagenum, above=0.15cm of s6] (n6) {6};
+        \node[chapterlabel, below=0.1cm of s6] {Chapter 5};
+        
+        % ===== MAIN PROCESS FLOW =====
+        \draw[mainarrow] (s1) -- (s2);
+        \draw[mainarrow] (s2) -- (s3);
+        \draw[mainarrow] (s3) -- (s4);
+        \draw[mainarrow] (s4) -- (s5);
+        \draw[mainarrow] (s5) -- (s6);
+        
+        % ===== ITERATION ARROWS =====
+        % Design iteration back to objectives
+        \draw[iterarrow] (s3.south) -- ++(0,-0.6) -| node[pos=0.25, below, font=\tiny, text=ugmGold] {Iterate} (s2.south);
+        
+        % Evaluation feedback to design
+        \draw[iterarrow] (s5.north) -- ++(0,0.8) -| (s3.north);
+        
+        % ===== ENTRY POINTS (below stages) =====
+        \node[entrybox, below=1.0cm of s1] (e1) {Problem-\\Centered};
+        \node[entrybox, below=1.0cm of s2] (e2) {Objective-\\Centered};
+        \node[entrybox, below=1.0cm of s3] (e3) {Design \&\\Development};
+        \node[entrybox, below=1.0cm of s4] (e4) {Client/\\Context};
+        
+        % Entry point arrows
+        \draw[-{Stealth[length=2mm]}, ugmBlue!50, line width=0.6pt] (e1) -- (s1);
+        \draw[-{Stealth[length=2mm]}, ugmBlue!50, line width=0.6pt] (e2) -- (s2);
+        \draw[-{Stealth[length=2mm]}, ugmBlue!50, line width=0.6pt] (e3) -- (s3);
+        \draw[-{Stealth[length=2mm]}, ugmBlue!50, line width=0.6pt] (e4) -- (s4);
+        
+        % Entry points label
+        \node[font=\scriptsize, text=ugmBlue!70, left=0.3cm of e1] {Possible Entry Points:};
+        
+        % ===== DISCIPLINE KNOWLEDGE ANNOTATIONS =====
+        % Top annotation bar
+        \draw[ugmBlue!40, line width=0.5pt] ([yshift=1.5cm]s1.north west) -- ([yshift=1.5cm]s6.north east);
+        \node[font=\tiny, text=ugmBlue!60, anchor=south] at ([yshift=1.6cm]s1.north) {Literature Review};
+        \node[font=\tiny, text=ugmBlue!60, anchor=south] at ([yshift=1.6cm]s3.north) {Artifact Construction};
+        \node[font=\tiny, text=ugmBlue!60, anchor=south] at ([yshift=1.6cm]s5.north) {Validation};
+        
     \end{tikzpicture}%
     }% End resizebox
-    \caption{The Design Science Research (DSR) process model as applied in this thesis, adapted from Peffers et al. \cite{dsr_methodology_peers_2006}. The diagram shows the sequential stages and the iterative feedback loops that inform the research process.}
+    \caption{The Design Science Research (DSR) process model as applied in this thesis, adapted from Peffers et al. \cite{dsr_methodology_peers_2006}. The six stages are shown in sequence with chapter mappings below each stage. Dashed arrows indicate iterative feedback loops between evaluation and design phases. Entry points indicate where different research motivations may initiate the DSR cycle.}
     \label{fig:dsr_flowchart}
 \end{figure}
 
@@ -122,7 +220,7 @@ The system's primary entities and their designated interaction points are illust
 Conceptually, the framework's architecture is best understood as two distinct but integrated operational loops:
 
 \begin{enumerate}
-    \item \textbf{The Real-Time Interaction Loop:} This loop handles immediate, synchronous interactions with individual students through a unified conversational interface. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}---students interact exclusively with Aika, never directly accessing the specialist agents. When a student sends a message, Aika processes it via a single Gemini API call that returns a structured JSON response containing immediate risk assessment (Tier 1) and intent classification.
+    \item \textbf{The Real-Time Interaction Loop:} This loop handles immediate, synchronous interactions with individual students through a unified conversational interface. \textbf{Critically, the Aika Meta-Agent is the sole user-facing component}: students interact exclusively with Aika, never directly accessing the specialist agents. When a student sends a message, Aika processes it via a single Gemini API call that returns a structured JSON response containing immediate risk assessment (Tier 1) and intent classification.
     
     Based on this initial assessment, Aika acts as a supervisor to the background specialist agents:
     \begin{itemize}
@@ -665,7 +763,7 @@ The UGM-AICare framework is designed with the principle that users must have cle
 
 The framework is explicitly designed as a tool that assists, but does not replace, human counselors. Every critical risk escalation from the \textbf{Aika Meta-Agent} or \textbf{Safety Triage Agent (STA)} creates a case that requires mandatory review and action by a qualified human professional. The system automates the detection and reporting, but the final clinical judgment and intervention remain firmly in human hands.
 
-This human oversight is not merely procedural—it addresses the fundamental ethical limitation of LLMs in safety-critical contexts. While models like Gemini 2.5 Flash demonstrate strong performance in text understanding, they can still misinterpret nuanced emotional states or linguistic cues. The human-in-the-loop design ensures that no automated risk classification leads directly to intervention without expert clinical validation.
+This human oversight is not merely procedural; it addresses the fundamental ethical limitation of LLMs in safety-critical contexts. While models like Gemini 2.5 Flash demonstrate strong performance in text understanding, they can still misinterpret nuanced emotional states or linguistic cues. The human-in-the-loop design ensures that no automated risk classification leads directly to intervention without expert clinical validation.
 
 Given the high-stakes nature of mental health triage, the system is designed with explicit ethical safeguards:
 
