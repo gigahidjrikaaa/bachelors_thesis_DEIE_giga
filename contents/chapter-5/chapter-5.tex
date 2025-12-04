@@ -21,10 +21,25 @@ In summary, this thesis successfully designed, built, and validated a proof-of-c
 
 \section{Suggestions for Future Work}
 
-While this research successfully demonstrated technical feasibility, the evaluation results reveal specific areas requiring further development. The following suggestions are prioritized based on the empirical findings:
+While this research successfully demonstrated technical feasibility, the evaluation results reveal specific areas requiring further development. The following suggestions are prioritized based on the empirical findings and methodological limitations identified during the thesis defense.
 
 \begin{enumerate}
-    \item \textbf{Orchestration Accuracy Improvement (High Priority):} The 64.71\% state transition accuracy is the most pressing limitation. Future work should focus on:
+    \item \textbf{Domain Expert Integration (Critical Priority):} The most significant limitation of this research is the absence of clinical mental health professionals during the development process. Future iterations must involve:
+    \begin{itemize}
+        \item \textbf{Clinical Consultation:} Engaging licensed psychologists and counselors to review and refine the safety classification criteria, therapeutic intervention strategies, and response templates.
+        \item \textbf{Expert-Curated Datasets:} Collaborating with domain experts to create or validate evaluation datasets, ensuring that scenarios accurately represent real student mental health presentations rather than researcher assumptions.
+        \item \textbf{Iterative Feedback Loops:} Establishing regular review cycles where clinical experts evaluate system outputs and provide feedback for prompt refinement.
+    \end{itemize}
+    This integration addresses the fundamental gap between technical capability and clinical appropriateness.
+
+    \item \textbf{Utilization of Authentic UGM Data (High Priority):} UGM's counseling services have accumulated real student conversation data that represents the most ecologically valid resource for system evaluation. Future work should:
+    \begin{itemize}
+        \item Obtain IRB approval and informed consent protocols for using anonymized counseling data.
+        \item Collaborate with UGM's counseling center to access historical chat logs in appropriate formats.
+        \item Validate system performance against authentic Indonesian student mental health presentations.
+    \end{itemize}
+    
+    \item \textbf{Orchestration Accuracy Improvement (High Priority):} The 64.71\% state transition accuracy is the most pressing technical limitation. Future work should focus on:
     \begin{itemize}
         \item \textbf{Enhanced Context Management:} Implementing explicit conversation state persistence to prevent context degradation in multi-turn crisis scenarios.
         \item \textbf{Third-Party Danger Handling:} Extending the intent classification system to explicitly recognize scenarios involving danger to others, not just the user.
@@ -40,4 +55,4 @@ While this research successfully demonstrated technical feasibility, the evaluat
     \item \textbf{Exploration of Advanced Privacy Models:} While k-anonymity proved functional, future iterations could explore Differential Privacy for stronger mathematical guarantees, particularly as the system scales to larger populations with more granular analytics needs.
 \end{enumerate}
 
-These directions for future work are directly informed by the evaluation results, ensuring that subsequent research addresses the demonstrated limitations while building upon the validated capabilities.
+These directions for future work are directly informed by the evaluation results and examiner feedback, ensuring that subsequent research addresses the demonstrated limitations while building upon the validated capabilities.

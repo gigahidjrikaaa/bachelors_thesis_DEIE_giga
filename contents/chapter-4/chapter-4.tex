@@ -77,10 +77,12 @@ This section documents the evaluation protocol that links the Design Science sta
 
 \subsection*{Datasets and Scenario Assets}
 
+The evaluation utilizes three synthetic datasets, each designed to stress-test specific agentic capabilities. A detailed documentation of the dataset taxonomy, example scenarios, and expert validation protocol is provided in Appendix~\ref{appendix:datasets}.
+
 \begin{itemize}
-    \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy. Each prompt is expanded into a multi-turn transcript that is replayed in full by the STA after the live session closes, reflecting its conversation-level mandate. The dataset includes examples in \textbf{English, Indonesian, and mixed code-switching} to test the agent's linguistic flexibility.
-    \item \textbf{Orchestration Test Suite (RQ2):} 15 structured conversation flows designed to test agent routing and error handling. These scenarios also feature multilingual inputs.
-    \item \textbf{Coaching Prompts (RQ2):} 10 scenarios for evaluating the quality of the Therapeutic Coach Agent's responses, covering common student issues in both English and Indonesian.
+    \item \textbf{Crisis Corpus (RQ1):} 50 synthetic prompts (25 crisis, 25 non-crisis) to measure classification accuracy. Each prompt is expanded into a multi-turn transcript that is replayed in full by the STA after the live session closes, reflecting its conversation-level mandate. The dataset includes examples in \textbf{English, Indonesian, and mixed code-switching} to test the agent's linguistic flexibility. The scenario taxonomy includes active suicidal ideation, passive suicidal ideation, self-harm disclosure, acute panic, and third-party danger scenarios (see Table~\ref{tab:crisis_taxonomy} in Appendix~\ref{appendix:datasets}).
+    \item \textbf{Orchestration Test Suite (RQ2a):} 15 structured conversation flows designed to test agent routing and error handling across standard coaching paths, crisis escalation paths, multi-turn context retention, and error recovery scenarios. These scenarios also feature multilingual inputs.
+    \item \textbf{Coaching Prompts (RQ2b):} 10 scenarios for evaluating the quality of the Therapeutic Coach Agent's responses, covering common student issues including academic overwhelm, motivation concerns, and social anxiety in both English and Indonesian.
     \item \textbf{Privacy Validation (RQ3):} Code review and unit tests for the \texttt{InsightsAgentService} to verify k-anonymity enforcement.
 \end{itemize}
 
@@ -91,6 +93,24 @@ This section documents the evaluation protocol that links the Design Science sta
     \item \textbf{Quality Assessment}: Coaching responses are scored against a defined rubric using \textbf{GLM-4.5-Air} as the automated evaluator.
     \item \textbf{Privacy Verification}: Code inspection and unit tests confirm that privacy-preserving mechanisms function as designed.
 \end{itemize}
+
+\subsection*{Expert Validation of Synthetic Datasets}
+
+To mitigate subjectivity in the synthetic dataset generation process and establish ground truth validity, an expert validation protocol was conducted. The validation addressed a core methodological concern: ensuring that synthetically generated crisis scenarios accurately represent realistic student mental health presentations.
+
+\textbf{Expert Validator Qualification.} The validation was performed by the thesis supervisor, who possesses direct domain expertise relevant to this study. The supervisor has prior experience developing mental health chatbot systems and has access to anonymized real conversation data from UGM's counseling services. This combination of technical expertise in conversational AI systems and exposure to authentic student mental health discourse provides appropriate qualification for validating the ecological validity of the synthetic scenarios.
+
+\textbf{Validation Methodology.} The expert reviewer independently assessed the 50-scenario crisis corpus along two dimensions:
+\begin{enumerate}
+    \item \textbf{Ground Truth Label Accuracy:} Verification that each scenario's assigned label (crisis vs. non-crisis) correctly reflects the clinical severity presented in the conversation.
+    \item \textbf{Ecological Validity:} Assessment of whether the linguistic patterns, emotional expressions, and problem presentations in synthetic scenarios plausibly reflect real student mental health conversations.
+\end{enumerate}
+
+The validation employed a structured review protocol where the expert examined each scenario without access to the assigned ground truth label, then provided an independent classification. Agreement between the researcher's original labels and the expert's independent classifications was computed to establish inter-rater reliability.
+
+\textbf{Validation Outcomes.} The expert validation confirmed high agreement on ground truth labels, with disagreements primarily occurring on boundary cases involving ambiguous severity indicators (e.g., passive suicidal ideation expressed through cultural idioms). These boundary cases were resolved through discussion, and the final ground truth labels reflect the consensus classification. The detailed scenario taxonomy, example scenarios from each category, and the complete validation protocol are documented in Appendix~\ref{appendix:datasets}.
+
+This expert validation step addresses a common limitation in simulation-based AI evaluation: the risk that synthetic data reflects researcher assumptions rather than authentic domain phenomena. While not equivalent to multi-rater clinical validation with licensed mental health professionals, the supervisor's domain expertise and access to real conversation data provides meaningful quality assurance appropriate for proof-of-concept validation.
 
 \begin{figure}[htbp]
     \centering
@@ -394,6 +414,22 @@ The findings have several implications for the design of next-generation univers
 \subsection{Limitations and Future Work}
 
 The proof-of-concept evaluation, while successful in demonstrating technical feasibility, has several limitations that point toward future research directions.
+
+\subsubsection{Methodological Limitations}
+
+This research acknowledges the following methodological limitations that affect the generalizability and validity of the findings:
+
+\begin{itemize}
+    \item \textbf{Machine-Generated Synthetic Data:} All evaluation datasets were generated by an LLM (Claude 4.5 Sonnet) under researcher supervision, without real-time involvement from clinical mental health professionals. While post-hoc expert validation was conducted by the thesis supervisor, this does not substitute for datasets created or curated by domain experts. Synthetic scenarios may not capture the full complexity, cultural nuance, and unpredictable nature of real student mental health presentations.
+    
+    \item \textbf{Unutilized Authentic Data Sources:} UGM's counseling services and existing chatbot deployments have accumulated authentic student conversation data that could have provided a more ecologically valid evaluation dataset. This data was not utilized due to: (1) timeline constraints that precluded the extended process of obtaining data access agreements, (2) consent requirements including IRB approval and compliance with Indonesian data protection regulations, and (3) data format incompatibility with the structured conversation transcripts required for this evaluation. Future work should prioritize obtaining ethical approval to leverage these authentic data sources.
+    
+    \item \textbf{Absence of Domain Expert Involvement During Development:} Clinical psychologists, licensed counselors, and mental health professionals were not consulted during the system design and development phases. This represents a significant gap: domain expert feedback could have informed prompt design, severity classification thresholds, therapeutic intervention strategies, and cultural appropriateness of responses. The development was purely technical, missing the clinical perspective that would be essential for production deployment.
+    
+    \item \textbf{Post-Hoc Validation Only:} The expert validation conducted by the thesis supervisor occurred after dataset generation and system development, not during these processes. This limits the validation's ability to shape the dataset quality and system behavior proactively.
+\end{itemize}
+
+\subsubsection{Technical Limitations}
 
 \begin{itemize}
     \item \textbf{Orchestration Refinement:} The 64.71\% state transition accuracy indicates that the routing logic requires significant improvement before production deployment. Future work should focus on enhanced context management, particularly for multi-turn crisis conversations, and explicit handling of third-party danger scenarios.
